@@ -1,0 +1,32 @@
+| Назначение                        | Команда                                      |
+| --------------------------------- | -------------------------------------------- |
+| Полная сборка и запуск проекта    | `docker-compose up --build`                  |
+| Обычный запуск (если уже собрано) | `docker-compose up`                          |
+| Остановка всех контейнеров        | `docker-compose down`                        |
+| Перезапуск backend отдельно       | `docker-compose restart backend`             |
+| Перезапуск только после кода      | `docker-compose up backend --build`          |
+| Войти внутрь backend-контейнера   | `docker exec -it donate-raid-backend-1 bash` |
+| Логи backend                      | `docker logs -f donate-raid-backend-1`       |
+| Логи postgres                     | `docker logs -f donate-raid-postgres-1`      |
+
+docker compose exec backend tail -f logs/api.log
+docker compose up backend
+
+
+
+| Назначение               | Команда                                         |
+| ------------------------ | ----------------------------------------------- |
+| Инициализация (один раз) | `alembic init alembic`                          |
+| Создание миграции        | `alembic revision --autogenerate -m "описание"` |
+| Применить миграции       | `alembic upgrade head`                          |
+| Откат назад              | `alembic downgrade -1`                          |
+
+
+
+
+| Что делать                        | Команда                                                    |
+| --------------------------------- | ---------------------------------------------------------- |
+| Сгенерировать JWT секрет          | `python -c "import secrets; print(secrets.token_hex(32))"` |
+| Проверить токен или линк из логов | В логах ищи `Magic link: http://...`                       |
+| Проверить Swagger-доки            | [http://localhost:8000/docs](http://localhost:8000/docs)   |
+| Проверить бот в Telegram          | Перейди к своему @BotName                                  |

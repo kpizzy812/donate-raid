@@ -1,0 +1,169 @@
+.
+├── .env
+├── .env.example
+├── .gitignore
+├── backend
+│   ├── Dockerfile
+│   ├── __init__.py
+│   ├── alembic
+│   │   ├── README
+│   │   ├── env.py
+│   │   ├── script.py.mako
+│   │   └── versions
+│   │       ├── 1c1a2c749a29_add_guest_id_to_support_messages.py
+│   │       ├── 34854269d66a_add_user_model.py
+│   │       ├── 511a17723415_add_auth_tokens_table.py
+│   │       ├── 53e210c3db1d_add_sort_order_to_game_and_product.py
+│   │       ├── 602a81688e37_make_user_id_nullable_and_add_guest_id_.py
+│   │       ├── 68eef95045e2_init_all_tables.py
+│   │       ├── 89223fff209d_make_user_id_nullable_in_support_.py
+│   │       ├── 8be03eafc378_init_all_models.py
+│   │       ├── a0da8c644d27_add_support_messages.py
+│   │       ├── d5c180899ee3_add_input_fields_to_product.py
+│   │       └── db7eda77b35a_support_bigint_for_user_id_admin_id.py
+│   ├── alembic.ini
+│   ├── app
+│   │   ├── __init__.py
+│   │   ├── core
+│   │   │   ├── __init__.py
+│   │   │   ├── config.py
+│   │   │   ├── database.py
+│   │   │   └── logger.py
+│   │   ├── main.py
+│   │   ├── models
+│   │   │   ├── __init__.py
+│   │   │   ├── auth_token.py
+│   │   │   ├── blog
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── article.py
+│   │   │   ├── game.py
+│   │   │   ├── order.py
+│   │   │   ├── product.py
+│   │   │   ├── support.py
+│   │   │   └── user.py
+│   │   ├── routers
+│   │   │   ├── __init__.py
+│   │   │   ├── admin
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── articles.py
+│   │   │   │   ├── games.py
+│   │   │   │   ├── orders.py
+│   │   │   │   └── products.py
+│   │   │   ├── auth.py
+│   │   │   ├── blog
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── article.py
+│   │   │   ├── games.py
+│   │   │   ├── orders.py
+│   │   │   ├── products.py
+│   │   │   ├── support.py
+│   │   │   └── users.py
+│   │   ├── schemas
+│   │   │   ├── __init__.py
+│   │   │   ├── admin
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── articles.py
+│   │   │   │   ├── games.py
+│   │   │   │   ├── orders.py
+│   │   │   │   └── products.py
+│   │   │   ├── blog
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── article.py
+│   │   │   ├── game.py
+│   │   │   ├── order.py
+│   │   │   ├── product.py
+│   │   │   ├── support.py
+│   │   │   └── users.py
+│   │   ├── scripts
+│   │   │   ├── __init__.py
+│   │   │   └── debug_get_token.py
+│   │   ├── services
+│   │   │   ├── __init__.py
+│   │   │   ├── auth.py
+│   │   │   ├── games.py
+│   │   │   ├── mailer.py
+│   │   │   └── users.py
+│   │   └── templates
+│   │       ├── __init__.py
+│   │       └── emails
+│   │           ├── __init__.py
+│   │           ├── login_link.html
+│   │           ├── order_cancelled.html
+│   │           ├── order_created.html
+│   │           ├── order_refund.html
+│   │           └── order_success.html
+│   ├── bot
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   ├── handlers
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   ├── manual_orders.py
+│   │   │   └── support.py
+│   │   ├── instance.py
+│   │   ├── main.py
+│   │   ├── notify.py
+│   │   └── states
+│   │       ├── __init__.py
+│   │       ├── manual_orders.py
+│   │       └── support.py
+│   ├── logs
+│   ├── requirements.txt
+│   └── start.sh
+├── docker-compose.yml
+├── frontend
+│   ├── .env.local
+│   ├── Dockerfile
+│   ├── next-env.d.ts
+│   ├── next.config.js
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── public
+│   ├── src
+│   │   ├── app
+│   │   │   ├── auth
+│   │   │   │   └── verify
+│   │   │   │       └── page.tsx
+│   │   │   ├── game
+│   │   │   │   └── [id]
+│   │   │   │       └── page.tsx
+│   │   │   ├── layout.tsx
+│   │   │   ├── login
+│   │   │   │   └── page.tsx
+│   │   │   ├── manual-request
+│   │   │   │   └── page.tsx
+│   │   │   ├── me
+│   │   │   │   └── page.tsx
+│   │   │   ├── order
+│   │   │   │   ├── [id]
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── checkout
+│   │   │   │       └── page.tsx
+│   │   │   ├── page.tsx
+│   │   │   └── support
+│   │   │       └── page.tsx
+│   │   ├── components
+│   │   │   ├── GameCard.tsx
+│   │   │   ├── Header.tsx
+│   │   │   ├── LiveDropdown.tsx
+│   │   │   ├── SupportChat.tsx
+│   │   │   ├── ThemeProvider.tsx
+│   │   │   └── ThemeToggle.tsx
+│   │   ├── context
+│   │   │   └── CartContext.tsx
+│   │   ├── hooks
+│   │   │   └── useUser.ts
+│   │   ├── lib
+│   │   │   ├── adminApi.ts
+│   │   │   └── api.ts
+│   │   ├── locales
+│   │   ├── styles
+│   │   │   └── globals.css
+│   │   └── types
+│   ├── tailwind.config.js
+│   └── tsconfig.json
+├── info.txt
+└── tree.txt
+
+44 directories, 123 files

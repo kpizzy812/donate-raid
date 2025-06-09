@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+alembic
+psycopg2-binary
+pydantic
+pydantic[email]
+redis
+python-dotenv
+sqlalchemy
+pydantic-settings
+loguru
+python-jose
+aiogram==3.*
+Jinja2>=3.1.6
+jwt
