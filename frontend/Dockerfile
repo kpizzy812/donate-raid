@@ -1,15 +1,15 @@
-# frontend/Dockerfile
-FROM node:20
+# Используем Node.js 18 Alpine
+FROM node:18-alpine
 
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm install
 
-# Все остальные файлы будут подгружаться через volume (см. docker-compose)
+# Копируем остальные файлы
 COPY . .
 
 EXPOSE 3000
 
-# Используем dev-режим (с hot reload)
+# Используем dev-режим
 CMD ["npm", "run", "dev"]

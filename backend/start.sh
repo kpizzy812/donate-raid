@@ -1,7 +1,13 @@
 #!/bin/bash
 
+# Автозагрузка переменных из корневого .env (если есть)
+if [ -f "$(dirname "$0")/../.env" ]; then
+  export $(grep -v '^\s*#' "$(dirname "$0")/../.env" | xargs)
+fi
+
 echo "🔄 Starting backend and/or bot..."
 
+# Добавляем корневую папку в PYTHONPATH
 export PYTHONPATH=.
 
 if [ "$BOT_MODE" = "true" ]; then

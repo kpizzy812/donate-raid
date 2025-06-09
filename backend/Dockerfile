@@ -1,24 +1,27 @@
-# Используем официальный минимальный образ Python
+# backend/Dockerfile
 FROM python:3.11-slim
 
-# Устанавливаем рабочую директорию внутри контейнера
+# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Устанавливаем системные зависимости (для psycopg2 и т.д.)
-RUN apt-get update && apt-get install -y gcc libpq-dev && apt-get clean
+# Ставим системные зависимости (включая bash для вашего shebang)
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      bash \
+      gcc \
+      libpq-dev \
+ && rm -rf /var/lib/apt/lists/*
 
 # Копируем зависимости и устанавливаем их
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем ВСЁ из backend: код, alembic.ini, alembic/, .env и т.д.
+# Копируем весь код (включая start.sh) и создаём папку для логов
 COPY . .
-
-# Создание папки логов на этапе сборки
 RUN mkdir -p /app/logs
 
-# Запуск через скрипт
-COPY start.sh .
-RUN chmod +x start.sh
-CMD ["./start.sh"]
+# Делаем start.sh исполняемым
+RUN chmod +x /app/start.sh
 
+# Запуск через скрипт
+CMD ["./start.sh"]
