@@ -1,0 +1,33 @@
+# frontend/Dockerfile.prod
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Установка зависимостей для сборки
+RUN apk add --no-cache libc6-compat
+
+# Копируем package files
+COPY package*.json ./
+
+# Устанавливаем все зависимости (включая dev)
+RUN npm ci
+
+# Копируем исходники
+COPY . .
+
+# Отключаем телеметрию Next.js
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Собираем приложение
+RUN npm run build
+
+# Устанавливаем только production зависимости
+RUN npm ci --only=production && npm cache clean --force
+
+EXPOSE 3000
+
+ENV PORT 3000
+ENV NODE_ENV production
+
+# Запускаем в production режиме
+CMD ["npm", "start"]
