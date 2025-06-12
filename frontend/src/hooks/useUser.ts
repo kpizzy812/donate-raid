@@ -1,3 +1,4 @@
+// frontend/src/hooks/useUser.ts - ИСПРАВЛЕННАЯ ВЕРСИЯ
 import { useEffect, useState } from 'react'
 
 export type User = {
@@ -47,6 +48,33 @@ export function useUser() {
 
   useEffect(() => {
     fetchUser()
+
+    // Слушаем изменения в localStorage для автообновления хедера
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'access_token') {
+        if (e.newValue) {
+          // Токен добавлен - загружаем пользователя
+          fetchUser()
+        } else {
+          // Токен удален - сбрасываем пользователя
+          setUser(null)
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    // Также слушаем кастомное событие для мгновенного обновления
+    const handleUserUpdate = () => {
+      fetchUser()
+    }
+
+    window.addEventListener('userUpdated', handleUserUpdate)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('userUpdated', handleUserUpdate)
+    }
   }, [])
 
   return {

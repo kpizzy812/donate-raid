@@ -1,3 +1,4 @@
+// frontend/src/components/ClientWrapper.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -11,8 +12,14 @@ export default function ClientWrapper({ children }: { children: React.ReactNode 
       <CartProvider>
         <Toaster position="top-right" richColors />
         <div className="flex flex-col flex-1 min-h-screen">
-          {children}
-          <Footer />
+          {/* Основной контент с отступом для мобильной навигации */}
+          <main className="flex-1 pb-20 md:pb-0">
+            {children}
+          </main>
+          {/* Footer теперь скрыт на мобилках, так как у нас есть мобильная навигация */}
+          <div className="hidden md:block">
+            <Footer />
+          </div>
         </div>
       </CartProvider>
     </ThemeProvider>

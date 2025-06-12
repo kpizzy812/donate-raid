@@ -1,4 +1,4 @@
-// frontend/src/app/auth/verify/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/auth/verify/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -21,14 +21,14 @@ export default function VerifyPage() {
 
       try {
         setStatus('verifying')
-        
+
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 сек таймаут
-        
+
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify?token=${token}`, {
           signal: controller.signal
         })
-        
+
         clearTimeout(timeoutId)
         const data = await res.json()
 
@@ -38,6 +38,10 @@ export default function VerifyPage() {
 
         // Сохраняем токен
         localStorage.setItem('access_token', data.token)
+
+        // Уведомляем о том, что пользователь обновился
+        window.dispatchEvent(new Event('userUpdated'))
+
         setStatus('success')
         
         // Редирект через 1 секунду для показа успеха
