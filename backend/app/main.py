@@ -1,7 +1,10 @@
+# backend/app/main.py - ОБНОВЛЕННАЯ ВЕРСИЯ
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 from app.routers import router as api_router
 from app.core.logger import logger
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 app = FastAPI()
 
@@ -12,6 +15,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 🆕 Создаем папку uploads и подключаем статические файлы
+uploads_dir = "uploads"
+if not os.path.exists(uploads_dir):
+    os.makedirs(uploads_dir)
+    # Создаем подпапки
+    for subfolder in ["products", "images", "blog", "games", "avatars"]:
+        os.makedirs(os.path.join(uploads_dir, subfolder), exist_ok=True)
+
+# Подключаем статические файлы для uploads
+app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):

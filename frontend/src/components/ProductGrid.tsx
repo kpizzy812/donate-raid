@@ -1,13 +1,13 @@
-// frontend/src/components/ProductGrid.tsx - НОВЫЙ КОМПОНЕНТ
+// frontend/src/components/ProductGrid.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useState } from 'react'
-import { ShoppingCart, AlertTriangle, Info, CheckCircle, XCircle } from 'lucide-react'
+import { ShoppingCart, X, AlertTriangle, Info, CheckCircle, XCircle } from 'lucide-react'
 
 interface InputField {
   name: string
   label: string
-  type: string
+  type: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea'
   required: boolean
   placeholder?: string
   help_text?: string
@@ -20,21 +20,23 @@ interface Product {
   price_rub: number
   old_price_rub?: number
   description?: string
+  type: 'currency' | 'item' | 'service'
+  subcategory?: string
   special_note?: string
   note_type: string
-  input_fields: InputField[]
-  subcategory?: string
-}
-
-interface ProductGridProps {
-  products: Product[]
-  onAddToCart: (product: Product, userData: Record<string, any>) => void
+  input_fields?: InputField[]
+  image_url?: string
 }
 
 interface CartItem {
   product: Product
   userData: Record<string, any>
   quantity: number
+}
+
+interface ProductGridProps {
+  products: Product[]
+  onAddToCart: (product: Product, userData: Record<string, any>) => void
 }
 
 export default function ProductGrid({ products, onAddToCart }: ProductGridProps) {
@@ -55,27 +57,27 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
 
   const getNoteColor = (noteType: string) => {
     switch (noteType) {
-      case 'warning': return 'bg-yellow-600/20 text-yellow-300 border-yellow-600/30'
-      case 'info': return 'bg-blue-600/20 text-blue-300 border-blue-600/30'
-      case 'success': return 'bg-green-600/20 text-green-300 border-green-600/30'
-      case 'error': return 'bg-red-600/20 text-red-300 border-red-600/30'
-      default: return 'bg-yellow-600/20 text-yellow-300 border-yellow-600/30'
+      case 'warning': return 'bg-yellow-900/30 border-yellow-600 text-yellow-300'
+      case 'info': return 'bg-blue-900/30 border-blue-600 text-blue-300'
+      case 'success': return 'bg-green-900/30 border-green-600 text-green-300'
+      case 'error': return 'bg-red-900/30 border-red-600 text-red-300'
+      default: return 'bg-yellow-900/30 border-yellow-600 text-yellow-300'
     }
   }
 
   const handleProductClick = (product: Product) => {
     if (product.input_fields && product.input_fields.length > 0) {
+      // Если есть поля для заполнения, показываем модалку
       setShowUserDataModal(product)
       setUserData({})
       setErrors({})
     } else {
-      // Если нет дополнительных полей, сразу добавляем в корзину
+      // Если полей нет, сразу добавляем в корзину
       addToCart(product, {})
     }
   }
 
   const addToCart = (product: Product, formData: Record<string, any>) => {
-    // Проверяем, есть ли уже этот товар в корзине
     const existingIndex = cartItems.findIndex(item => item.product.id === product.id)
 
     if (existingIndex >= 0) {
@@ -121,15 +123,81 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
     setCartItems(cartItems.filter(item => item.product.id !== productId))
   }
 
+  const renderInputField = (field: InputField) => {
+    const value = userData[field.name] || ''
+    const error = errors[field.name]
+
+    const baseInputClass = `w-full p-3 bg-zinc-700 text-white rounded border ${
+      error ? 'border-red-500' : 'border-zinc-600'
+    } focus:border-blue-500 focus:outline-none`
+
+    switch (field.type) {
+      case 'textarea':
+        return (
+          <textarea
+            className={baseInputClass}
+            value={value}
+            onChange={e => setUserData({ ...userData, [field.name]: e.target.value })}
+            placeholder={field.placeholder}
+            rows={3}
+          />
+        )
+      case 'select':
+        return (
+          <select
+            className={baseInputClass}
+            value={value}
+            onChange={e => setUserData({ ...userData, [field.name]: e.target.value })}
+          >
+            <option value="">Выберите...</option>
+            {field.options?.map(option => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+        )
+      default:
+        return (
+          <input
+            type={field.type}
+            className={baseInputClass}
+            value={value}
+            onChange={e => setUserData({ ...userData, [field.name]: e.target.value })}
+            placeholder={field.placeholder}
+          />
+        )
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Сетка товаров (2 столбца) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {products.map((product) => (
           <div key={product.id} className="bg-zinc-800 rounded-lg overflow-hidden hover:bg-zinc-750 transition-colors">
+            {/* 🆕 КАРТИНКА ТОВАРА */}
+            {product.image_url && (
+              <div className="relative h-48 bg-zinc-700">
+                <img
+                  src={product.image_url}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Скрываем картинку если она не загрузилась
+                    e.currentTarget.style.display = 'none'
+                  }}
+                />
+                {/* Подкатегория поверх картинки */}
+                {product.subcategory && (
+                  <div className="absolute top-2 left-2 bg-black/70 text-blue-400 text-xs px-2 py-1 rounded font-medium">
+                    {product.subcategory}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="p-6">
-              {/* Подкатегория */}
-              {product.subcategory && (
+              {/* Подкатегория (если нет картинки) */}
+              {product.subcategory && !product.image_url && (
                 <div className="text-xs text-blue-400 mb-2 font-medium">
                   {product.subcategory}
                 </div>
@@ -140,7 +208,7 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
 
               {/* Описание */}
               {product.description && (
-                <p className="text-zinc-400 text-sm mb-3">{product.description}</p>
+                <p className="text-zinc-400 text-sm mb-3 line-clamp-2">{product.description}</p>
               )}
 
               {/* Особая пометка */}
@@ -188,79 +256,59 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
             {cartItems.map((item) => (
               <div key={item.product.id} className="flex justify-between items-center bg-zinc-700 rounded p-2">
                 <div className="flex-1">
-                  <div className="font-medium text-sm">{item.product.name}</div>
-                  <div className="text-xs text-zinc-400">
-                    ₽{item.product.price_rub} × {item.quantity}
-                  </div>
+                  <div className="text-sm font-medium">{item.product.name}</div>
+                  <div className="text-xs text-zinc-400">₽{item.product.price_rub} × {item.quantity}</div>
                 </div>
                 <button
                   onClick={() => removeFromCart(item.product.id)}
-                  className="text-red-400 hover:text-red-300 text-xs"
+                  className="text-red-400 hover:text-red-300 ml-2"
                 >
-                  ✕
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             ))}
           </div>
 
           <div className="mt-3 pt-3 border-t border-zinc-600">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-semibold">Итого:</span>
-              <span className="font-bold text-green-400">
-                ₽{cartItems.reduce((sum, item) => sum + (item.product.price_rub * item.quantity), 0)}
-              </span>
+            <div className="flex justify-between items-center font-semibold">
+              <span>Итого:</span>
+              <span>₽{cartItems.reduce((sum, item) => sum + (item.product.price_rub * item.quantity), 0)}</span>
             </div>
-            <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded text-sm transition-colors">
-              Перейти к оплате
+            <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded mt-2 transition-colors">
+              Оформить заказ
             </button>
           </div>
         </div>
       )}
 
-      {/* Модальное окно для ввода данных пользователя */}
+      {/* Модалка для ввода данных пользователя */}
       {showUserDataModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-zinc-800 rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">
-              Заполните данные для "{showUserDataModal.name}"
-            </h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Данные для заказа</h3>
+              <button
+                onClick={() => setShowUserDataModal(null)}
+                className="text-zinc-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-            <form className="space-y-4">
+            <div className="mb-4 p-3 bg-zinc-700 rounded">
+              <div className="font-medium">{showUserDataModal.name}</div>
+              <div className="text-green-400 font-bold">₽{showUserDataModal.price_rub}</div>
+            </div>
+
+            <div className="space-y-4">
               {showUserDataModal.input_fields?.map((field) => (
                 <div key={field.name}>
                   <label className="block text-sm font-medium mb-1">
                     {field.label}
-                    {field.required && <span className="text-red-400"> *</span>}
+                    {field.required && <span className="text-red-400 ml-1">*</span>}
                   </label>
 
-                  {field.type === 'select' && field.options ? (
-                    <select
-                      className="w-full p-2 bg-zinc-700 text-white rounded border border-zinc-600 focus:border-blue-500"
-                      value={userData[field.name] || ''}
-                      onChange={(e) => setUserData({...userData, [field.name]: e.target.value})}
-                    >
-                      <option value="">Выберите...</option>
-                      {field.options.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                  ) : field.type === 'textarea' ? (
-                    <textarea
-                      className="w-full p-2 bg-zinc-700 text-white rounded border border-zinc-600 focus:border-blue-500"
-                      placeholder={field.placeholder}
-                      rows={3}
-                      value={userData[field.name] || ''}
-                      onChange={(e) => setUserData({...userData, [field.name]: e.target.value})}
-                    />
-                  ) : (
-                    <input
-                      type={field.type}
-                      className="w-full p-2 bg-zinc-700 text-white rounded border border-zinc-600 focus:border-blue-500"
-                      placeholder={field.placeholder}
-                      value={userData[field.name] || ''}
-                      onChange={(e) => setUserData({...userData, [field.name]: e.target.value})}
-                    />
-                  )}
+                  {renderInputField(field)}
 
                   {field.help_text && (
                     <p className="text-xs text-zinc-400 mt-1">{field.help_text}</p>
@@ -271,20 +319,20 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
                   )}
                 </div>
               ))}
-            </form>
+            </div>
 
             <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setShowUserDataModal(null)}
-                className="flex-1 bg-zinc-600 hover:bg-zinc-700 text-white py-2 rounded transition-colors"
-              >
-                Отмена
-              </button>
               <button
                 onClick={handleSubmitUserData}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition-colors"
               >
                 Добавить в корзину
+              </button>
+              <button
+                onClick={() => setShowUserDataModal(null)}
+                className="px-4 bg-zinc-600 hover:bg-zinc-700 text-white py-2 rounded transition-colors"
+              >
+                Отмена
               </button>
             </div>
           </div>

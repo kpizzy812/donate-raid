@@ -43,4 +43,6 @@ class Product(Base):
     # Подкатегория
     subcategory = Column(String(100), nullable=True)
 
+    image_url = Column(String(255), nullable=True)
+
     game = relationship("Game", back_populates="products")

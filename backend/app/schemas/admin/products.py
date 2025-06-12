@@ -50,6 +50,7 @@ class ProductBase(BaseModel):
     special_note: Optional[str] = None  # Особая пометка (например "Не подходит для РУ аккаунта")
     note_type: Optional[str] = "warning"  # warning, info, danger
     subcategory: Optional[str] = None  # Подкатегория товара
+    image_url: Optional[str] = None  # 🆕 URL картинки товара
 
 
 class ProductCreate(ProductBase):

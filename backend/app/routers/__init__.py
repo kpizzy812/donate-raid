@@ -1,7 +1,8 @@
+# backend/app/routers/__init__.py - ОБНОВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter
 
 # Public routes
-from . import games, orders, users, products, auth, support
+from . import games, orders, users, products, auth, support, upload  # 🆕 Добавляем upload
 from .blog import article
 
 # Admin routes
@@ -23,6 +24,7 @@ router.include_router(products.router, prefix="/api/products", tags=["Products"]
 router.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 router.include_router(article.router, prefix="/api/articles", tags=["Articles"])
 router.include_router(support.router, prefix="/api/support", tags=["Support"])
+router.include_router(upload.router, prefix="/api/upload", tags=["Upload"])
 
 # Admin API
 router.include_router(admin_games.router, prefix="/api/admin/games", tags=["Admin Games"])

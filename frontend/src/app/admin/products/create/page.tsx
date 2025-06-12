@@ -1,12 +1,12 @@
-// frontend/src/app/admin/products/create/page.tsx
-
+// frontend/src/app/admin/products/create/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
+import { Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 
-interface GameOption {
+interface Game {
   id: number
   name: string
 }
@@ -14,103 +14,198 @@ interface GameOption {
 interface InputField {
   name: string
   label: string
-  type: 'text' | 'email' | 'number' | 'password'
+  type: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea'
   required: boolean
   placeholder?: string
+  help_text?: string
+  options?: string[]
+  validation_regex?: string
+  min_length?: number
+  max_length?: number
 }
 
 export default function CreateProductPage() {
   const router = useRouter()
-  const [games, setGames] = useState<GameOption[]>([])
-  const [gameId, setGameId] = useState<number | null>(null)
+
+  // Основные поля
+  const [games, setGames] = useState<Game[]>([])
+  const [gameId, setGameId] = useState<number>(0)
   const [name, setName] = useState('')
-  const [price, setPrice] = useState(0)
-  const [minAmount, setMinAmount] = useState(1)
-  const [maxAmount, setMaxAmount] = useState(1)
+  const [priceRub, setPriceRub] = useState<number>(0)
+  const [oldPriceRub, setOldPriceRub] = useState<number | null>(null)
+  const [minAmount, setMinAmount] = useState<number>(1)
+  const [maxAmount, setMaxAmount] = useState<number>(1)
   const [type, setType] = useState<'currency' | 'item' | 'service'>('currency')
   const [description, setDescription] = useState('')
   const [instructions, setInstructions] = useState('')
-  const [enabled, setEnabled] = useState(true)
   const [delivery, setDelivery] = useState('auto')
-  const [sortOrder, setSortOrder] = useState(0)
-  const [oldPrice, setOldPrice] = useState(0)
+  const [sortOrder, setSortOrder] = useState<number>(0)
+  const [enabled, setEnabled] = useState(true)
+
+  // Новые поля из ТЗ
   const [specialNote, setSpecialNote] = useState('')
   const [noteType, setNoteType] = useState('warning')
   const [subcategory, setSubcategory] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
+  const [imageUploading, setImageUploading] = useState(false)
+
+  // Настраиваемые поля
   const [inputFields, setInputFields] = useState<InputField[]>([])
 
   useEffect(() => {
-    api.get('/admin/games')
-      .then(res => setGames(res.data))
-      .catch(err => console.error('Ошибка загрузки игр', err))
+    loadGames()
   }, [])
+
+  const loadGames = async () => {
+    try {
+      const response = await api.get('/admin/games/')
+      setGames(response.data)
+    } catch (error) {
+      console.error('Ошибка загрузки игр:', error)
+    }
+  }
+
+  const uploadImage = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Можно загружать только изображения')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Размер файла не должен превышать 5MB')
+      return
+    }
+
+    setImageUploading(true)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('subfolder', 'products')
+
+      const response = await api.post('/upload/admin/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      if (response.data.success) {
+        setImageUrl(response.data.file_url)
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки изображения:', error)
+      alert('Ошибка загрузки изображения')
+    } finally {
+      setImageUploading(false)
+    }
+  }
+
+  const handleImageUpload = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) uploadImage(file)
+    }
+    input.click()
+  }
+
+  const removeImage = () => {
+    setImageUrl('')
+  }
 
   const addInputField = () => {
     setInputFields([...inputFields, {
       name: '',
       label: '',
       type: 'text',
-      required: false,
-      placeholder: ''
+      required: true,
+      placeholder: '',
+      help_text: ''
     }])
-  }
-
-  const updateInputField = (index: number, field: keyof InputField, value: any) => {
-    const newFields = [...inputFields]
-    newFields[index] = { ...newFields[index], [field]: value }
-    setInputFields(newFields)
   }
 
   const removeInputField = (index: number) => {
     setInputFields(inputFields.filter((_, i) => i !== index))
   }
 
+  const updateInputField = (index: number, field: keyof InputField, value: any) => {
+    const updated = [...inputFields]
+    updated[index] = { ...updated[index], [field]: value }
+    setInputFields(updated)
+  }
+
   const handleSubmit = async () => {
+    if (!gameId || !name.trim() || priceRub <= 0) {
+      alert('Заполните обязательные поля')
+      return
+    }
+
     try {
-      await api.post('/admin/products', {
+      const productData = {
         game_id: gameId,
-        name,
-        price_rub: price,
-        old_price_rub: oldPrice || null,
+        name: name.trim(),
+        price_rub: priceRub,
+        old_price_rub: oldPriceRub || null,
         min_amount: minAmount,
         max_amount: maxAmount,
         type,
-        description,
-        instructions,
+        description: description.trim() || null,
+        instructions: instructions.trim() || null,
         enabled,
         delivery,
         sort_order: sortOrder,
-        special_note: specialNote || null,
+        input_fields: inputFields,
+        special_note: specialNote.trim() || null,
         note_type: noteType,
-        subcategory: subcategory || null,
-        input_fields: inputFields.filter(field => field.name && field.label), // Только заполненные поля
-      })
+        subcategory: subcategory.trim() || null,
+        image_url: imageUrl || null
+      }
+
+      await api.post('/admin/products/', productData)
+      alert('Товар успешно создан!')
       router.push('/admin/products')
-    } catch (err) {
-      console.error('Ошибка при создании товара', err)
+    } catch (error) {
+      console.error('Ошибка создания товара:', error)
+      alert('Ошибка создания товара')
     }
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-10">
+    <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Создание товара</h1>
 
-      <div className="space-y-4">
-        {/* Основные поля товара */}
+      <div className="space-y-6">
+        {/* Основная информация */}
         <div className="bg-zinc-800 p-4 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">Основная информация</h2>
 
-          <label className="text-sm text-zinc-400">Выберите игру</label>
-          <select
-            className="w-full mb-3 p-2 bg-zinc-700 text-white rounded"
-            value={gameId ?? ''}
-            onChange={e => setGameId(Number(e.target.value))}
-          >
-            <option value="">— Выбрать игру —</option>
-            {games.map(game => (
-              <option key={game.id} value={game.id}>{game.name}</option>
-            ))}
-          </select>
+          <div className="grid grid-cols-2 gap-4 mb-3">
+            <div>
+              <label className="text-sm text-zinc-400">Игра</label>
+              <select
+                className="w-full p-2 bg-zinc-700 text-white rounded"
+                value={gameId}
+                onChange={e => setGameId(Number(e.target.value))}
+              >
+                <option value={0}>Выберите игру</option>
+                {games.map(game => (
+                  <option key={game.id} value={game.id}>{game.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm text-zinc-400">Тип товара</label>
+              <select
+                className="w-full p-2 bg-zinc-700 text-white rounded"
+                value={type}
+                onChange={e => setType(e.target.value as 'currency' | 'item' | 'service')}
+              >
+                <option value="currency">Валюта (золото, кристаллы)</option>
+                <option value="item">Предмет (шмотки, ключи)</option>
+                <option value="service">Услуга (услуги буста и т.п.)</option>
+              </select>
+            </div>
+          </div>
 
           <label className="text-sm text-zinc-400">Название товара</label>
           <input
@@ -118,6 +213,7 @@ export default function CreateProductPage() {
             className="w-full mb-3 p-2 bg-zinc-700 text-white rounded"
             value={name}
             onChange={e => setName(e.target.value)}
+            placeholder="1000 золота, Легендарный меч, Буст до 80 уровня..."
           />
 
           <div className="grid grid-cols-3 gap-4 mb-3">
@@ -126,31 +222,29 @@ export default function CreateProductPage() {
               <input
                 type="number"
                 className="w-full p-2 bg-zinc-700 text-white rounded"
-                value={price}
-                onChange={e => setPrice(Number(e.target.value))}
+                value={priceRub}
+                onChange={e => setPriceRub(Number(e.target.value))}
               />
             </div>
             <div>
-              <label className="text-sm text-zinc-400">Старая цена (₽)</label>
+              <label className="text-sm text-zinc-400">Старая цена (₽) - необязательно</label>
               <input
                 type="number"
                 className="w-full p-2 bg-zinc-700 text-white rounded"
-                value={oldPrice}
-                onChange={e => setOldPrice(Number(e.target.value) || 0)}
-                placeholder="Оставьте пустым если нет"
+                value={oldPriceRub || ''}
+                onChange={e => setOldPriceRub(e.target.value ? Number(e.target.value) : null)}
+                placeholder="Для зачеркивания"
               />
             </div>
             <div>
-              <label className="text-sm text-zinc-400">Тип товара</label>
-              <select
+              <label className="text-sm text-zinc-400">Подкатегория</label>
+              <input
+                type="text"
                 className="w-full p-2 bg-zinc-700 text-white rounded"
-                value={type}
-                onChange={e => setType(e.target.value as any)}
-              >
-                <option value="currency">Валюта</option>
-                <option value="item">Предмет</option>
-                <option value="service">Услуга</option>
-              </select>
+                value={subcategory}
+                onChange={e => setSubcategory(e.target.value)}
+                placeholder="Валюта, Оружие, Буст..."
+              />
             </div>
           </div>
 
@@ -181,6 +275,7 @@ export default function CreateProductPage() {
             rows={3}
             value={description}
             onChange={e => setDescription(e.target.value)}
+            placeholder="Подробное описание товара..."
           />
 
           <label className="text-sm text-zinc-400">Инструкция после покупки</label>
@@ -189,19 +284,54 @@ export default function CreateProductPage() {
             rows={3}
             value={instructions}
             onChange={e => setInstructions(e.target.value)}
+            placeholder="Что делать после покупки..."
           />
+        </div>
+
+        {/* 🆕 КАРТИНКА ТОВАРА */}
+        <div className="bg-zinc-800 p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-4">Картинка товара</h2>
+
+          {imageUrl ? (
+            <div className="relative inline-block">
+              <img
+                src={imageUrl}
+                alt="Превью товара"
+                className="w-32 h-32 object-cover rounded border border-zinc-600"
+              />
+              <button
+                onClick={removeImage}
+                className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleImageUpload}
+              disabled={imageUploading}
+              className="border-2 border-dashed border-zinc-600 hover:border-zinc-500 rounded-lg p-8 w-full text-center transition-colors disabled:opacity-50"
+            >
+              <div className="flex flex-col items-center gap-2">
+                {imageUploading ? (
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                ) : (
+                  <ImageIcon className="w-8 h-8 text-zinc-400" />
+                )}
+                <span className="text-zinc-400">
+                  {imageUploading ? 'Загрузка...' : 'Нажмите для загрузки картинки'}
+                </span>
+                <span className="text-xs text-zinc-500">PNG, JPG, WEBP до 5MB</span>
+              </div>
+            </button>
+          )}
+        </div>
+
+        {/* Настройки и пометки */}
+        <div className="bg-zinc-800 p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-4">Настройки и пометки</h2>
 
           <div className="grid grid-cols-2 gap-4 mb-3">
-            <div>
-              <label className="text-sm text-zinc-400">Подкатегория</label>
-              <input
-                type="text"
-                className="w-full p-2 bg-zinc-700 text-white rounded"
-                value={subcategory}
-                onChange={e => setSubcategory(e.target.value)}
-                placeholder="Валюта, Оружие, Буст..."
-              />
-            </div>
             <div>
               <label className="text-sm text-zinc-400">Доставка</label>
               <select
@@ -212,6 +342,15 @@ export default function CreateProductPage() {
                 <option value="auto">Автоматическая</option>
                 <option value="manual">Ручная</option>
               </select>
+            </div>
+            <div>
+              <label className="text-sm text-zinc-400">Порядок сортировки</label>
+              <input
+                type="number"
+                className="w-full p-2 bg-zinc-700 text-white rounded"
+                value={sortOrder}
+                onChange={e => setSortOrder(Number(e.target.value))}
+              />
             </div>
           </div>
 
@@ -236,24 +375,13 @@ export default function CreateProductPage() {
             <option value="error">❌ Ошибка (красный)</option>
           </select>
 
-          <div className="grid grid-cols-2 gap-4 mb-3">
-            <div>
-              <label className="text-sm text-zinc-400">Порядок сортировки</label>
-              <input
-                type="number"
-                className="w-full p-2 bg-zinc-700 text-white rounded"
-                value={sortOrder}
-                onChange={e => setSortOrder(Number(e.target.value))}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={enabled}
-                onChange={e => setEnabled(e.target.checked)}
-              />
-              <label>Активен (отображается на сайте)</label>
-            </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={enabled}
+              onChange={e => setEnabled(e.target.checked)}
+            />
+            <label>Активен (отображается на сайте)</label>
           </div>
         </div>
 
@@ -264,9 +392,10 @@ export default function CreateProductPage() {
             <button
               type="button"
               onClick={addInputField}
-              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm flex items-center gap-1"
             >
-              + Добавить поле
+              <Plus className="w-4 h-4" />
+              Добавить поле
             </button>
           </div>
 
@@ -278,15 +407,14 @@ export default function CreateProductPage() {
           )}
 
           {inputFields.map((field, index) => (
-            <div key={index} className="bg-zinc-700 p-3 rounded mb-3">
+            <div key={index} className="border border-zinc-600 rounded p-3 mb-3">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Поле #{index + 1}</span>
+                <span className="text-sm font-medium">Поле {index + 1}</span>
                 <button
-                  type="button"
                   onClick={() => removeInputField(index)}
-                  className="text-red-400 hover:text-red-300 text-sm"
+                  className="text-red-400 hover:text-red-300"
                 >
-                  ✕ Удалить
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
@@ -295,68 +423,102 @@ export default function CreateProductPage() {
                   <label className="text-xs text-zinc-400">Название поля (name)</label>
                   <input
                     type="text"
-                    placeholder="player_id"
-                    className="w-full p-2 bg-zinc-600 text-white rounded text-sm"
+                    className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
                     value={field.name}
                     onChange={e => updateInputField(index, 'name', e.target.value)}
+                    placeholder="player_id, email, region..."
                   />
                 </div>
                 <div>
                   <label className="text-xs text-zinc-400">Отображаемое название</label>
                   <input
                     type="text"
-                    placeholder="Player ID"
-                    className="w-full p-2 bg-zinc-600 text-white rounded text-sm"
+                    className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
                     value={field.label}
                     onChange={e => updateInputField(index, 'label', e.target.value)}
+                    placeholder="Player ID, Email адрес, Регион..."
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mb-2">
+              <div className="grid grid-cols-3 gap-3 mb-2">
                 <div>
                   <label className="text-xs text-zinc-400">Тип поля</label>
                   <select
-                    className="w-full p-2 bg-zinc-600 text-white rounded text-sm"
+                    className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
                     value={field.type}
                     onChange={e => updateInputField(index, 'type', e.target.value)}
                   >
                     <option value="text">Текст</option>
                     <option value="email">Email</option>
-                    <option value="number">Число</option>
                     <option value="password">Пароль</option>
+                    <option value="number">Число</option>
+                    <option value="select">Выпадающий список</option>
+                    <option value="textarea">Многострочный текст</option>
                   </select>
                 </div>
                 <div>
                   <label className="text-xs text-zinc-400">Placeholder</label>
                   <input
                     type="text"
-                    placeholder="Введите ваш Player ID"
-                    className="w-full p-2 bg-zinc-600 text-white rounded text-sm"
+                    className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
                     value={field.placeholder || ''}
                     onChange={e => updateInputField(index, 'placeholder', e.target.value)}
+                    placeholder="Введите ваш Player ID..."
                   />
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={field.required}
+                    onChange={e => updateInputField(index, 'required', e.target.checked)}
+                  />
+                  <label className="ml-2 text-xs">Обязательное</label>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div>
+                <label className="text-xs text-zinc-400">Подсказка</label>
                 <input
-                  type="checkbox"
-                  checked={field.required}
-                  onChange={e => updateInputField(index, 'required', e.target.checked)}
+                  type="text"
+                  className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
+                  value={field.help_text || ''}
+                  onChange={e => updateInputField(index, 'help_text', e.target.value)}
+                  placeholder="Дополнительная информация для пользователя..."
                 />
-                <label className="text-xs text-zinc-400">Обязательное поле</label>
               </div>
+
+              {field.type === 'select' && (
+                <div className="mt-2">
+                  <label className="text-xs text-zinc-400">Варианты выбора (через запятую)</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
+                    value={field.options?.join(', ') || ''}
+                    onChange={e => updateInputField(index, 'options', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                    placeholder="Европа, Америка, Азия..."
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>
 
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold"
-        >
-          Создать товар
-        </button>
+        {/* Кнопки */}
+        <div className="flex gap-4">
+          <button
+            onClick={handleSubmit}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded flex items-center gap-2"
+          >
+            Создать товар
+          </button>
+          <button
+            onClick={() => router.push('/admin/products')}
+            className="bg-zinc-600 hover:bg-zinc-700 text-white px-6 py-2 rounded"
+          >
+            Отмена
+          </button>
+        </div>
       </div>
     </div>
   )
