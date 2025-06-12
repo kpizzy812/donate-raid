@@ -1,3 +1,4 @@
+# backend/app/models/order.py - ОБНОВЛЕННАЯ ВЕРСИЯ
 from sqlalchemy import Column, Integer, String, ForeignKey, Numeric, DateTime, Enum, Text, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -14,8 +15,13 @@ class OrderStatus(enum.Enum):
 
 
 class PaymentMethod(enum.Enum):
-    auto = "auto"
-    manual = "manual"
+    auto = "auto"  # Автоматический способ (для совместимости)
+    manual = "manual"  # Ручной способ (для совместимости)
+    sberbank = "sberbank"  # Сбербанк Касса
+    sbp = "sbp"  # Система быстрых платежей
+    ton = "ton"  # TON криптовалюта
+    usdt = "usdt"  # USDT TON стейблкоин
+    unitpay = "unitpay"  # UnitPay (резерв)
 
 
 class Order(Base):
@@ -28,13 +34,14 @@ class Order(Base):
     manual_game_name = Column(String(255), nullable=True)
 
     amount = Column(Numeric(10, 2), nullable=False)
-    currency = Column(String(10), nullable=False)  # TON, XGEN, USDT
+    currency = Column(String(10), nullable=False)  # RUB, TON, USDT
     status = Column(Enum(OrderStatus), default=OrderStatus.pending, nullable=False)
     payment_method = Column(Enum(PaymentMethod), nullable=False)
-    transaction_id = Column(String(255), nullable=True)
+    transaction_id = Column(String(255), nullable=True)  # ID транзакции от платежной системы
+    payment_url = Column(String(500), nullable=True)  # Ссылка для оплаты (для криптовалют)
     auto_processed = Column(Boolean, default=True)
 
-    comment = Column(Text, nullable=True)
+    comment = Column(Text, nullable=True)  # Данные пользователя в JSON
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -42,5 +49,3 @@ class Order(Base):
     user = relationship("User", back_populates="orders")
     game = relationship("Game")
     product = relationship("Product")
-
-

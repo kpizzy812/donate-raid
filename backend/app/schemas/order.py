@@ -1,7 +1,8 @@
+# backend/app/schemas/order.py - ОБНОВЛЕННАЯ ВЕРСИЯ
 from pydantic import BaseModel, Field
 from enum import Enum
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -30,8 +31,13 @@ class OrderStatus(str, Enum):
 
 
 class PaymentMethod(str, Enum):
-    auto = "auto"
-    manual = "manual"
+    auto = "auto"  # Для совместимости
+    manual = "manual"  # Для совместимости
+    sberbank = "sberbank"  # Сбербанк Касса
+    sbp = "sbp"  # СБП
+    ton = "ton"  # TON криптовалюта
+    usdt = "usdt"  # USDT TON
+    unitpay = "unitpay"  # UnitPay (резерв)
 
 
 class OrderCreate(BaseModel):
@@ -46,12 +52,27 @@ class OrderCreate(BaseModel):
     auto_processed: Optional[bool] = True
 
 
+class OrderBulkItem(BaseModel):
+    game_id: int
+    product_id: int
+    amount: Decimal
+    currency: str
+    payment_method: PaymentMethod
+    comment: str | None = None
+
+
+class OrderBulkCreate(BaseModel):
+    items: List[OrderBulkItem]
+
+
 class OrderRead(BaseModel):
     id: int
     amount: Decimal
     currency: str
     status: OrderStatus
     payment_method: PaymentMethod
+    transaction_id: Optional[str] = None
+    payment_url: Optional[str] = None
     comment: Optional[str]
     created_at: datetime
     game: Optional[GameShort]
@@ -60,3 +81,9 @@ class OrderRead(BaseModel):
     class Config:
         from_attributes = True
         use_enum_values = True
+
+
+class OrderUpdate(BaseModel):
+    status: Optional[OrderStatus] = None
+    transaction_id: Optional[str] = None
+    payment_url: Optional[str] = None
