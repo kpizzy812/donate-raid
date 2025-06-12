@@ -1,194 +1,127 @@
-# backend/app/routers/auth.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
+# backend/app/routers/auth.py - ИСПРАВЛЕННАЯ ВЕРСИЯ ДЛЯ ВАШЕЙ СИСТЕМЫ
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from typing import Optional
-import jwt
-from passlib.context import CryptContext
+from uuid import uuid4
+from pydantic import BaseModel, EmailStr
+from jose import jwt
 
 from app.core.database import get_db
 from app.core.config import settings
 from app.models.user import User
 from app.models.auth_token import AuthToken
-from app.services.auth import get_current_user, create_access_token
+from app.services.mailer import send_email, render_template
 from app.services.referral import ReferralService
-from pydantic import BaseModel, EmailStr
+from app.services.auth import get_current_user
 
 router = APIRouter()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class RegisterRequest(BaseModel):
-    email: Optional[EmailStr] = None
-    username: Optional[str] = None
-    password: str
-    telegram_id: Optional[int] = None
-    referral_code: Optional[str] = None
-
-
-class LoginResponse(BaseModel):
-    access_token: str
-    token_type: str
-    user: dict
+class EmailRequest(BaseModel):
+    email: EmailStr
+    referral_code: str = None  # Добавляем поддержку реферального кода
 
 
 class TelegramAuthRequest(BaseModel):
     telegram_id: int
-    username: Optional[str] = None
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    referral_code: Optional[str] = None
+    username: str = None
+    first_name: str = None
+    last_name: str = None
+    referral_code: str = None
 
 
-@router.post("/register", response_model=LoginResponse)
-def register(
-        request: RegisterRequest,
-        db: Session = Depends(get_db)
-):
-    """Регистрация нового пользователя"""
-
-    # Проверяем, что указан хотя бы email или telegram_id
-    if not request.email and not request.telegram_id:
-        raise HTTPException(
-            status_code=400,
-            detail="Необходимо указать email или telegram_id"
-        )
-
-    # Проверяем существование пользователя
-    existing_user = None
-    if request.email:
-        existing_user = db.query(User).filter(User.email == request.email).first()
-    if not existing_user and request.telegram_id:
-        existing_user = db.query(User).filter(User.telegram_id == request.telegram_id).first()
-
-    if existing_user:
-        raise HTTPException(
-            status_code=400,
-            detail="Пользователь с такими данными уже существует"
-        )
-
-    # Создаем нового пользователя
-    user = User(
-        email=request.email,
-        username=request.username,
-        telegram_id=request.telegram_id,
-        balance=0
-    )
-
-    # Генерируем реферальный код
-    user.generate_referral_code()
-
-    # Хешируем пароль (если указан)
-    if request.password:
-        user.password_hash = pwd_context.hash(request.password)
-
-    # Сохраняем пользователя
-    db.add(user)
-    db.flush()  # Получаем ID пользователя
-
-    # Обрабатываем реферальный код
-    if request.referral_code:
-        referral_success = ReferralService.register_referral(
-            db, user, request.referral_code
-        )
-        if not referral_success:
-            print(f"Предупреждение: Не удалось применить реферальный код {request.referral_code}")
-
-    db.commit()
-    db.refresh(user)
-
-    # Создаем токен доступа
-    access_token = create_access_token(data={"sub": str(user.id)})
-
-    # Сохраняем токен в базе
-    auth_token = AuthToken(
-        user_id=user.id,
-        token=access_token,
-        expires_at=datetime.utcnow() + timedelta(days=30)
-    )
-    db.add(auth_token)
-    db.commit()
-
-    return LoginResponse(
-        access_token=access_token,
-        token_type="bearer",
-        user={
-            "id": user.id,
-            "email": user.email,
-            "username": user.username,
-            "telegram_id": user.telegram_id,
-            "balance": float(user.balance),
-            "referral_code": user.referral_code,
-            "role": user.role.value
-        }
-    )
-
-
-@router.post("/login", response_model=LoginResponse)
-def login(
-        form_data: OAuth2PasswordRequestForm = Depends(),
-        db: Session = Depends(get_db)
-):
-    """Авторизация пользователя"""
-
-    # Ищем пользователя по email или username
-    user = db.query(User).filter(
-        (User.email == form_data.username) |
-        (User.username == form_data.username)
-    ).first()
+@router.post("/request-link")
+def request_login_link(data: EmailRequest, db: Session = Depends(get_db)):
+    """Запрос ссылки для входа на email"""
+    user = db.query(User).filter_by(email=data.email).first()
 
     if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Неверные учетные данные"
-        )
+        # Создаем нового пользователя
+        user = User(email=data.email)
 
-    # Проверяем пароль
-    if not user.password_hash or not pwd_context.verify(form_data.password, user.password_hash):
-        raise HTTPException(
-            status_code=401,
-            detail="Неверные учетные данные"
-        )
+        # Генерируем реферальный код сразу при создании
+        user.generate_referral_code()
 
-    # Генерируем реферальный код если его нет
+        db.add(user)
+        db.flush()  # Получаем ID пользователя
+
+        # Обрабатываем реферальный код если указан
+        if data.referral_code:
+            referral_success = ReferralService.register_referral(
+                db, user, data.referral_code
+            )
+            if not referral_success:
+                print(f"Предупреждение: Не удалось применить реферальный код {data.referral_code}")
+
+        db.commit()
+        db.refresh(user)
+    else:
+        # Генерируем реферальный код если его нет у существующего пользователя
+        if not user.referral_code:
+            user.generate_referral_code()
+            db.commit()
+            db.refresh(user)
+
+    # Создаем токен для авторизации
+    token = str(uuid4())
+    expires = datetime.utcnow() + timedelta(minutes=30)
+
+    db.add(AuthToken(user_id=user.id, token=token, expires_at=expires))
+    db.commit()
+
+    # Ссылка для входа
+    link = f"{settings.FRONTEND_URL}/auth/verify?token={token}"
+
+    # Рендер письма и отправка
+    html = render_template("login_link.html", {"link": link})
+    send_email(
+        to=user.email,
+        subject="🔐 Ваш вход в Donate Raid",
+        body=html
+    )
+
+    return {"message": "Login link sent to your email"}
+
+
+@router.get("/verify")
+def verify_token(token: str = Query(...), db: Session = Depends(get_db)):
+    """Верификация токена из email"""
+    auth_token = db.query(AuthToken).filter_by(token=token).first()
+
+    if not auth_token:
+        raise HTTPException(status_code=400, detail="Invalid token")
+    if auth_token.expires_at < datetime.utcnow():
+        # Удаляем истекший токен
+        db.delete(auth_token)
+        db.commit()
+        raise HTTPException(status_code=400, detail="Token expired")
+
+    user = auth_token.user
+
+    # Убеждаемся что у пользователя есть реферальный код
     if not user.referral_code:
         user.generate_referral_code()
         db.commit()
         db.refresh(user)
 
-    # Создаем токен доступа
-    access_token = create_access_token(data={"sub": str(user.id)})
+    # Создаем JWT токен
+    jwt_payload = {
+        "sub": str(user.id),
+        "email": user.email,
+        "exp": datetime.utcnow() + timedelta(days=7)
+    }
 
-    # Сохраняем токен в базе
-    auth_token = AuthToken(
-        user_id=user.id,
-        token=access_token,
-        expires_at=datetime.utcnow() + timedelta(days=30)
-    )
-    db.add(auth_token)
+    jwt_token = jwt.encode(jwt_payload, settings.JWT_SECRET, algorithm="HS256")
+
+    # Удаляем использованый токен авторизации
+    db.delete(auth_token)
     db.commit()
 
-    return LoginResponse(
-        access_token=access_token,
-        token_type="bearer",
-        user={
-            "id": user.id,
-            "email": user.email,
-            "username": user.username,
-            "telegram_id": user.telegram_id,
-            "balance": float(user.balance),
-            "referral_code": user.referral_code,
-            "role": user.role.value
-        }
-    )
+    return {"token": jwt_token}
 
 
-@router.post("/telegram-auth", response_model=LoginResponse)
-def telegram_auth(
-        request: TelegramAuthRequest,
-        db: Session = Depends(get_db)
-):
+@router.post("/telegram-auth")
+def telegram_auth(request: TelegramAuthRequest, db: Session = Depends(get_db)):
     """Авторизация через Telegram"""
 
     # Ищем существующего пользователя
@@ -196,7 +129,7 @@ def telegram_auth(
 
     if not user:
         # Создаем нового пользователя
-        display_name = request.first_name
+        display_name = request.first_name or "Telegram User"
         if request.last_name:
             display_name += f" {request.last_name}"
 
@@ -234,22 +167,19 @@ def telegram_auth(
         db.commit()
         db.refresh(user)
 
-    # Создаем токен доступа
-    access_token = create_access_token(data={"sub": str(user.id)})
+    # Создаем JWT токен
+    jwt_payload = {
+        "sub": str(user.id),
+        "email": user.email,
+        "telegram_id": user.telegram_id,
+        "exp": datetime.utcnow() + timedelta(days=7)
+    }
 
-    # Сохраняем токен в базе
-    auth_token = AuthToken(
-        user_id=user.id,
-        token=access_token,
-        expires_at=datetime.utcnow() + timedelta(days=30)
-    )
-    db.add(auth_token)
-    db.commit()
+    jwt_token = jwt.encode(jwt_payload, settings.JWT_SECRET, algorithm="HS256")
 
-    return LoginResponse(
-        access_token=access_token,
-        token_type="bearer",
-        user={
+    return {
+        "token": jwt_token,
+        "user": {
             "id": user.id,
             "email": user.email,
             "username": user.username,
@@ -258,21 +188,7 @@ def telegram_auth(
             "referral_code": user.referral_code,
             "role": user.role.value
         }
-    )
-
-
-@router.post("/logout")
-def logout(
-        current_user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
-):
-    """Выход из системы"""
-
-    # Удаляем все токены пользователя
-    db.query(AuthToken).filter(AuthToken.user_id == current_user.id).delete()
-    db.commit()
-
-    return {"message": "Успешный выход из системы"}
+    }
 
 
 @router.get("/me")
