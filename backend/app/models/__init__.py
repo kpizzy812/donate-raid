@@ -8,6 +8,8 @@ from app.models.blog.article import Article, ArticleTag
 from app.models.support import SupportMessage
 from app.models.referral import ReferralEarning
 from app.models.payment_terms import PaymentTerm
+from app.models.game_faq import GameFAQ
+from app.models.game_instruction import GameInstruction
 
 __all__ = [
     "Game",
@@ -20,6 +22,6 @@ __all__ = [
     "SupportMessage",
     "ReferralEarning",
     "PaymentTerm",
-    # "GameFAQ",
-    # "GameInstruction",
+    "GameFAQ",
+    "GameInstruction",
 ]

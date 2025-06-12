@@ -14,15 +14,17 @@ class Game(Base):
     instructions = Column(Text, nullable=True)
     sort_order = Column(Integer, default=0, nullable=False)
 
-    # Новые поля для customerTZ:
-    description = Column(Text, nullable=True)  # Описание игры
-    subcategory_description = Column(Text, nullable=True)  # Описание подразделов товаров
-    logo_url = Column(String(255), nullable=True)  # Лого для товаров (отдельно от баннера)
-    faq_content = Column(Text, nullable=True)  # FAQ в формате JSON или HTML
-    enabled = Column(Boolean, default=True)  # Активна ли игра
+    # Новые поля из миграции
+    description = Column(Text, nullable=True)
+    subcategory_description = Column(Text, nullable=True)
+    logo_url = Column(String(255), nullable=True)
+    faq_content = Column(Text, nullable=True)
+    enabled = Column(Boolean, default=True)
 
     # Relationships
     products = relationship("Product", back_populates="game")
+    faqs = relationship("GameFAQ", back_populates="game")
+    instructions_list = relationship("GameInstruction", back_populates="game")
 
     def get_faq_list(self):
         """Парсит FAQ контент в список вопросов-ответов"""

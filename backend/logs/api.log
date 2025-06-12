@@ -222,3 +222,1402 @@
 2025-06-12 at 13:32:14 | INFO | main:24 - 📤 200 http://localhost:8000/api/users/me
 2025-06-12 at 13:32:14 | INFO | main:18 - 📥 GET http://localhost:8000/api/orders/my
 2025-06-12 at 13:32:14 | INFO | main:24 - 📤 422 http://localhost:8000/api/orders/my
+2025-06-12 at 14:10:13 | INFO | main:18 - 📥 GET http://localhost:8000/api/games?q=
+2025-06-12 at 14:10:13 | INFO | main:24 - 📤 307 http://localhost:8000/api/games?q=
+2025-06-12 at 14:10:13 | INFO | main:18 - 📥 GET http://localhost:8000/api/games?q=
+2025-06-12 at 14:10:13 | INFO | main:24 - 📤 307 http://localhost:8000/api/games?q=
+2025-06-12 at 14:10:13 | INFO | main:18 - 📥 GET http://localhost:8000/api/games/?q=
+2025-06-12 at 14:10:13 | ERROR | main:22 - ❌ Exception during request: Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2522, in get_property
+    return self._props[key]
+           │    │      └ 'faqs'
+           │    └ {'products': <_RelationshipDeclared at 0x7fb3d70e2490; products>, 'id': <ColumnProperty at 0x7fb3d70dd140; id>, 'name': <Colu...
+           └ <Mapper at 0x7fb3d70f80d0; Game>
+
+KeyError: 'faqs'
+
+
+The above exception was the direct cause of the following exception:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7fb3da862200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7fb3da9337e0>
+           └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7fb3da932d40>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7fb3d9c59210>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    └ <function subprocess_started at 0x7fb3d9ac6de0>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7fb3d99fa450>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7fb3d9ac5bc0>
+           │       │   └ <uvicorn.server.Server object at 0x7fb3d99fa450>
+           │       └ <function run at 0x7fb3da2e3c40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7fb3d9967d30>
+           │      └ <function Runner.run at 0x7fb3da33b1a0>
+           └ <asyncio.runners.Runner object at 0x7fb3d9a0c090>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7fb3d95801e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7fb3d9a0c090>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fb3d34cbd50>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d2dc5c...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d2d...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7fb3d948c690>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fb3d34cbd50>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d2dc5c...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d2d...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d2dc5c...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d2d...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fb3d2e7b650>
+          └ <fastapi.applications.FastAPI object at 0x7fb3d948c690>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7fb3d2ab4fe0>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d2d...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fb3d2e7b650>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fb3d2ab4f40>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7fb3d2ec2cd0>
+                     │    └ <function log_requests at 0x7fb3d2b66d40>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+
+> File "/app/app/main.py", line 20, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7fb3d2ec2cd0>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fb3d2ab4f40>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ InvalidRequestError("Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers ...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fb3d2ab4e00>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2ab60c0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"macOS"', 'user-agent': 'Mozilla/5.0 (M...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fb3d2ab4e00>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2ab60c0>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7fb3d2b67420>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2ab60c0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fb3d2ec3fd0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2ab60c0>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7fb3d63efc50>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fb3d2ec3fd0>
+          └ <function wrap_app_handling_exceptions at 0x7fb3d864a020>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2ab4b80>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2ab60c0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2ab4b80>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2ab60c0>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7fb3d41efa10>>
+          └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2ab4b80>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2ab60c0>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7fb3d864b600>
+          └ APIRoute(path='/api/games/', name='list_games', methods=['GET'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2ab4b80>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2ab60c0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7fb3d2b65940>
+          └ APIRoute(path='/api/games/', name='list_games', methods=['GET'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2ab4b80>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2ab60c0>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7fb3d2a96110>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7fb3d2ab4c20>
+          └ <function wrap_app_handling_exceptions at 0x7fb3d864a020>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2ab5080>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2ab60c0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7fb3d2ab4c20>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7fb3d2a96110>
+                     └ <function get_request_handler.<locals>.app at 0x7fb3d2b656c0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7fb3d8669440>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7fb3d2d8b250>, 'q': ''}
+                 │                 │         └ <function list_games at 0x7fb3d86f0220>
+                 │                 └ Dependant(path_params=[], query_params=[ModelField(field_info=Query(), name='q', mode='validation')], header_params=[], cooki...
+                 └ <function run_in_threadpool at 0x7fb3d8bbd940>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function list_games at 0x7fb3d86f0220>, db=<sqlalchemy.orm.session.Session object at 0x7fb3d2d8b250>, q='')
+                 │     │         └ <function run_sync at 0x7fb3d9b5a520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7fb3d9b236a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=InvalidRequestError("Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was in...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/games.py", line 24, in list_games
+    query = db.query(Game).options(joinedload(Game.products))
+            │  │     │             │          │    └ <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x7fb3d70fc040>
+            │  │     │             │          └ <class 'app.models.game.Game'>
+            │  │     │             └ <function joinedload at 0x7fb3d7906f20>
+            │  │     └ <class 'app.models.game.Game'>
+            │  └ <function Session.query at 0x7fb3d7845760>
+            └ <sqlalchemy.orm.session.Session object at 0x7fb3d2d8b250>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2955, in query
+    return self._query_cls(entities, self, **kwargs)
+           │    │          │         │       └ {}
+           │    │          │         └ <sqlalchemy.orm.session.Session object at 0x7fb3d2d8b250>
+           │    │          └ (<class 'app.models.game.Game'>,)
+           │    └ <class 'sqlalchemy.orm.query.Query'>
+           └ <sqlalchemy.orm.session.Session object at 0x7fb3d2d8b250>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 276, in __init__
+    self._set_entities(entities)
+    │    │             └ (<class 'app.models.game.Game'>,)
+    │    └ <function Query._set_entities at 0x7fb3d7967560>
+    └ <sqlalchemy.orm.query.Query object at 0x7fb3d34d7190>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    self._raw_columns = [
+    └ <sqlalchemy.orm.query.Query object at 0x7fb3d34d7190>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 289, in <listcomp>
+    coercions.expect(
+    │         └ <function expect at 0x7fb3d7f5e8e0>
+    └ <module 'sqlalchemy.sql.coercions' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/coercions.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+    │    └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 1338, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+    │   │        │    │                    │    │    └ <Mapper at 0x7fb3d70f80d0; Game>
+    │   │        │    │                    │    └ <function Mapper._post_inspect at 0x7fb3d79637e0>
+    │   │        │    │                    └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    │   │        │    └ '_post_inspect'
+    │   │        └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    │   └ <attribute '__dict__' of 'Mapper' objects>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2724, in _post_inspect
+    self._check_configure()
+    │    └ <function Mapper._check_configure at 0x7fb3d7962a20>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2401, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+    │                      │    └ <sqlalchemy.orm.decl_api.registry object at 0x7fb3da581410>
+    │                      └ <Mapper at 0x7fb3d70f80d0; Game>
+    └ <function _configure_registries at 0x7fb3d79667a0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 4214, in _configure_registries
+    _do_configure_registries(registries, cascade)
+    │                        │           └ True
+    │                        └ set()
+    └ <function _do_configure_registries at 0x7fb3d79668e0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 4255, in _do_configure_registries
+    mapper._post_configure_properties()
+    │      └ <function Mapper._post_configure_properties at 0x7fb3d79628e0>
+    └ <Mapper at 0x7fb3d6fa5890; GameFAQ>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2418, in _post_configure_properties
+    prop.init()
+    │    └ <function MapperProperty.init at 0x7fb3d7a23240>
+    └ <_RelationshipDeclared at 0x7fb3d71877f0; game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/interfaces.py", line 589, in init
+    self.do_init()
+    │    └ <function RelationshipProperty.do_init at 0x7fb3d795d1c0>
+    └ <_RelationshipDeclared at 0x7fb3d71877f0; game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/relationships.py", line 1661, in do_init
+    self._generate_backref()
+    │    └ <function RelationshipProperty._generate_backref at 0x7fb3d795dbc0>
+    └ <_RelationshipDeclared at 0x7fb3d71877f0; game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/relationships.py", line 2145, in _generate_backref
+    self._add_reverse_property(self.back_populates)
+    │    │                     │    └ 'faqs'
+    │    │                     └ <_RelationshipDeclared at 0x7fb3d71877f0; game>
+    │    └ <function RelationshipProperty._add_reverse_property at 0x7fb3d795cfe0>
+    └ <_RelationshipDeclared at 0x7fb3d71877f0; game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/relationships.py", line 1592, in _add_reverse_property
+    other = self.mapper.get_property(key, _configure_mappers=False)
+            │    │      │            └ 'faqs'
+            │    │      └ <function Mapper.get_property at 0x7fb3d79631a0>
+            │    └ <Mapper at 0x7fb3d70f80d0; Game>
+            └ <_RelationshipDeclared at 0x7fb3d71877f0; game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2524, in get_property
+    raise sa_exc.InvalidRequestError(
+          │      └ <class 'sqlalchemy.exc.InvalidRequestError'>
+          └ <module 'sqlalchemy.exc' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/exc.py'>
+
+sqlalchemy.exc.InvalidRequestError: Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-06-12 at 14:10:13 | INFO | main:18 - 📥 GET http://localhost:8000/api/games/?q=
+2025-06-12 at 14:10:13 | ERROR | main:22 - ❌ Exception during request: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[GameFAQ(game_faqs)]'. Original exception was: Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 148, in call_next
+    message = await recv_stream.receive()
+                    │           └ <function MemoryObjectReceiveStream.receive at 0x7fb3d99dd8a0>
+                    └ MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_rece...
+  File "/usr/local/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+          └ <class 'anyio.EndOfStream'>
+
+anyio.EndOfStream
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7fb3da862200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7fb3da9337e0>
+           └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7fb3da932d40>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7fb3d9c59210>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    └ <function subprocess_started at 0x7fb3d9ac6de0>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7fb3d99fa450>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7fb3d9ac5bc0>
+           │       │   └ <uvicorn.server.Server object at 0x7fb3d99fa450>
+           │       └ <function run at 0x7fb3da2e3c40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7fb3d9967d30>
+           │      └ <function Runner.run at 0x7fb3da33b1a0>
+           └ <asyncio.runners.Runner object at 0x7fb3d9a0c090>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7fb3d95801e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7fb3d9a0c090>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fb3d34cbd50>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d294d4...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d29...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7fb3d948c690>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fb3d34cbd50>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d294d4...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d29...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d294d4...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d29...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fb3d2e7b650>
+          └ <fastapi.applications.FastAPI object at 0x7fb3d948c690>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7fb3d2be7a60>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d29...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fb3d2e7b650>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fb3d2be7c40>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7fb3d957b810>
+                     │    └ <function log_requests at 0x7fb3d2b66d40>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+
+> File "/app/app/main.py", line 20, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7fb3d957b810>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fb3d2be7c40>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggerin...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fb3d2957ba0>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957b00>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"macOS"', 'user-agent': 'Mozilla/5.0 (M...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fb3d2957ba0>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957b00>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7fb3d2b67420>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957b00>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fb3d2ec3fd0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957b00>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7fb3d1d4bd10>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fb3d2ec3fd0>
+          └ <function wrap_app_handling_exceptions at 0x7fb3d864a020>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2957e20>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957b00>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2957e20>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957b00>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7fb3d41efa10>>
+          └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2957e20>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957b00>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7fb3d864b600>
+          └ APIRoute(path='/api/games/', name='list_games', methods=['GET'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2957e20>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957b00>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7fb3d2b65940>
+          └ APIRoute(path='/api/games/', name='list_games', methods=['GET'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d2957e20>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957b00>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7fb3d1d4bc10>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7fb3d2957ec0>
+          └ <function wrap_app_handling_exceptions at 0x7fb3d864a020>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c040>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957b00>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7fb3d2957ec0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7fb3d1d4bc10>
+                     └ <function get_request_handler.<locals>.app at 0x7fb3d2b656c0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7fb3d8669440>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7fb3d2d75f50>, 'q': ''}
+                 │                 │         └ <function list_games at 0x7fb3d86f0220>
+                 │                 └ Dependant(path_params=[], query_params=[ModelField(field_info=Query(), name='q', mode='validation')], header_params=[], cooki...
+                 └ <function run_in_threadpool at 0x7fb3d8bbd940>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function list_games at 0x7fb3d86f0220>, db=<sqlalchemy.orm.session.Session object at 0x7fb3d2d75f50>, q='')
+                 │     │         └ <function run_sync at 0x7fb3d9b5a520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7fb3d9b236a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization ...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/games.py", line 24, in list_games
+    query = db.query(Game).options(joinedload(Game.products))
+            │  │     │             │          │    └ <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x7fb3d70fc040>
+            │  │     │             │          └ <class 'app.models.game.Game'>
+            │  │     │             └ <function joinedload at 0x7fb3d7906f20>
+            │  │     └ <class 'app.models.game.Game'>
+            │  └ <function Session.query at 0x7fb3d7845760>
+            └ <sqlalchemy.orm.session.Session object at 0x7fb3d2d75f50>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2955, in query
+    return self._query_cls(entities, self, **kwargs)
+           │    │          │         │       └ {}
+           │    │          │         └ <sqlalchemy.orm.session.Session object at 0x7fb3d2d75f50>
+           │    │          └ (<class 'app.models.game.Game'>,)
+           │    └ <class 'sqlalchemy.orm.query.Query'>
+           └ <sqlalchemy.orm.session.Session object at 0x7fb3d2d75f50>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 276, in __init__
+    self._set_entities(entities)
+    │    │             └ (<class 'app.models.game.Game'>,)
+    │    └ <function Query._set_entities at 0x7fb3d7967560>
+    └ <sqlalchemy.orm.query.Query object at 0x7fb3d34ca1d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    self._raw_columns = [
+    └ <sqlalchemy.orm.query.Query object at 0x7fb3d34ca1d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 289, in <listcomp>
+    coercions.expect(
+    │         └ <function expect at 0x7fb3d7f5e8e0>
+    └ <module 'sqlalchemy.sql.coercions' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/coercions.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+    │    └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 1338, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+    │   │        │    │                    │    │    └ <Mapper at 0x7fb3d70f80d0; Game>
+    │   │        │    │                    │    └ <function Mapper._post_inspect at 0x7fb3d79637e0>
+    │   │        │    │                    └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    │   │        │    └ '_post_inspect'
+    │   │        └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    │   └ <attribute '__dict__' of 'Mapper' objects>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2724, in _post_inspect
+    self._check_configure()
+    │    └ <function Mapper._check_configure at 0x7fb3d7962a20>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2401, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+    │                      │    └ <sqlalchemy.orm.decl_api.registry object at 0x7fb3da581410>
+    │                      └ <Mapper at 0x7fb3d70f80d0; Game>
+    └ <function _configure_registries at 0x7fb3d79667a0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 4214, in _configure_registries
+    _do_configure_registries(registries, cascade)
+    │                        │           └ True
+    │                        └ set()
+    └ <function _do_configure_registries at 0x7fb3d79668e0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 4251, in _do_configure_registries
+    raise e
+          └ InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggerin...
+
+sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[GameFAQ(game_faqs)]'. Original exception was: Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-06-12 at 14:10:13 | INFO | main:18 - 📥 GET http://localhost:8000/api/games/?q=
+2025-06-12 at 14:10:13 | ERROR | main:22 - ❌ Exception during request: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[GameFAQ(game_faqs)]'. Original exception was: Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 148, in call_next
+    message = await recv_stream.receive()
+                    │           └ <function MemoryObjectReceiveStream.receive at 0x7fb3d99dd8a0>
+                    └ MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_rece...
+  File "/usr/local/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+          └ <class 'anyio.EndOfStream'>
+
+anyio.EndOfStream
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7fb3da862200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7fb3da9337e0>
+           └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7fb3da932d40>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7fb3d9c59210>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    └ <function subprocess_started at 0x7fb3d9ac6de0>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7fb3d99fa450>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7fb3d9ac5bc0>
+           │       │   └ <uvicorn.server.Server object at 0x7fb3d99fa450>
+           │       └ <function run at 0x7fb3da2e3c40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7fb3d9967d30>
+           │      └ <function Runner.run at 0x7fb3da33b1a0>
+           └ <asyncio.runners.Runner object at 0x7fb3d9a0c090>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7fb3d95801e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7fb3d9a0c090>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fb3d34cbd50>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d867...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7fb3d948c690>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fb3d34cbd50>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d867...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d867...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fb3d2e7b650>
+          └ <fastapi.applications.FastAPI object at 0x7fb3d948c690>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7fb3d1d7c400>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fb3d2e7b650>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fb3d1d7c360>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7fb3d1d86410>
+                     │    └ <function log_requests at 0x7fb3d2b66d40>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+
+> File "/app/app/main.py", line 20, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7fb3d1d86410>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fb3d1d7c360>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggerin...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fb3d1d7c540>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7c0e0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"macOS"', 'user-agent': 'Mozilla/5.0 (M...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fb3d1d7c540>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7c0e0>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7fb3d2b67420>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7c0e0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fb3d2ec3fd0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7c0e0>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7fb3d1d86fd0>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fb3d2ec3fd0>
+          └ <function wrap_app_handling_exceptions at 0x7fb3d864a020>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c7c0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7c0e0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c7c0>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7c0e0>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7fb3d41efa10>>
+          └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c7c0>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7c0e0>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7fb3d864b600>
+          └ APIRoute(path='/api/games/', name='list_games', methods=['GET'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c7c0>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7c0e0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7fb3d2b65940>
+          └ APIRoute(path='/api/games/', name='list_games', methods=['GET'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c7c0>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7c0e0>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7fb3d1d86e90>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7fb3d1d7c860>
+          └ <function wrap_app_handling_exceptions at 0x7fb3d864a020>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c9a0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7c0e0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7fb3d1d7c860>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7fb3d1d86e90>
+                     └ <function get_request_handler.<locals>.app at 0x7fb3d2b656c0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7fb3d8669440>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7fb3d2ec38d0>, 'q': ''}
+                 │                 │         └ <function list_games at 0x7fb3d86f0220>
+                 │                 └ Dependant(path_params=[], query_params=[ModelField(field_info=Query(), name='q', mode='validation')], header_params=[], cooki...
+                 └ <function run_in_threadpool at 0x7fb3d8bbd940>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function list_games at 0x7fb3d86f0220>, db=<sqlalchemy.orm.session.Session object at 0x7fb3d2ec38d0>, q='')
+                 │     │         └ <function run_sync at 0x7fb3d9b5a520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7fb3d9b236a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization ...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/games.py", line 24, in list_games
+    query = db.query(Game).options(joinedload(Game.products))
+            │  │     │             │          │    └ <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x7fb3d70fc040>
+            │  │     │             │          └ <class 'app.models.game.Game'>
+            │  │     │             └ <function joinedload at 0x7fb3d7906f20>
+            │  │     └ <class 'app.models.game.Game'>
+            │  └ <function Session.query at 0x7fb3d7845760>
+            └ <sqlalchemy.orm.session.Session object at 0x7fb3d2ec38d0>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2955, in query
+    return self._query_cls(entities, self, **kwargs)
+           │    │          │         │       └ {}
+           │    │          │         └ <sqlalchemy.orm.session.Session object at 0x7fb3d2ec38d0>
+           │    │          └ (<class 'app.models.game.Game'>,)
+           │    └ <class 'sqlalchemy.orm.query.Query'>
+           └ <sqlalchemy.orm.session.Session object at 0x7fb3d2ec38d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 276, in __init__
+    self._set_entities(entities)
+    │    │             └ (<class 'app.models.game.Game'>,)
+    │    └ <function Query._set_entities at 0x7fb3d7967560>
+    └ <sqlalchemy.orm.query.Query object at 0x7fb3d1d87810>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    self._raw_columns = [
+    └ <sqlalchemy.orm.query.Query object at 0x7fb3d1d87810>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 289, in <listcomp>
+    coercions.expect(
+    │         └ <function expect at 0x7fb3d7f5e8e0>
+    └ <module 'sqlalchemy.sql.coercions' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/coercions.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+    │    └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 1338, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+    │   │        │    │                    │    │    └ <Mapper at 0x7fb3d70f80d0; Game>
+    │   │        │    │                    │    └ <function Mapper._post_inspect at 0x7fb3d79637e0>
+    │   │        │    │                    └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    │   │        │    └ '_post_inspect'
+    │   │        └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    │   └ <attribute '__dict__' of 'Mapper' objects>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2724, in _post_inspect
+    self._check_configure()
+    │    └ <function Mapper._check_configure at 0x7fb3d7962a20>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2401, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+    │                      │    └ <sqlalchemy.orm.decl_api.registry object at 0x7fb3da581410>
+    │                      └ <Mapper at 0x7fb3d70f80d0; Game>
+    └ <function _configure_registries at 0x7fb3d79667a0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 4214, in _configure_registries
+    _do_configure_registries(registries, cascade)
+    │                        │           └ True
+    │                        └ set()
+    └ <function _do_configure_registries at 0x7fb3d79668e0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 4251, in _do_configure_registries
+    raise e
+          └ InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggerin...
+
+sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[GameFAQ(game_faqs)]'. Original exception was: Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-06-12 at 14:10:13 | INFO | main:18 - 📥 GET http://localhost:8000/api/games?q=
+2025-06-12 at 14:10:13 | INFO | main:24 - 📤 307 http://localhost:8000/api/games?q=
+2025-06-12 at 14:10:13 | INFO | main:18 - 📥 GET http://localhost:8000/api/games/?q=
+2025-06-12 at 14:10:13 | ERROR | main:22 - ❌ Exception during request: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[GameFAQ(game_faqs)]'. Original exception was: Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 148, in call_next
+    message = await recv_stream.receive()
+                    │           └ <function MemoryObjectReceiveStream.receive at 0x7fb3d99dd8a0>
+                    └ MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_rece...
+  File "/usr/local/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+          └ <class 'anyio.EndOfStream'>
+
+anyio.EndOfStream
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7fb3da862200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7fb3da9337e0>
+           └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7fb3da932d40>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7fb3d9c59210>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    └ <function subprocess_started at 0x7fb3d9ac6de0>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7fb3d99fa450>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7fb3d9ac5bc0>
+           │       │   └ <uvicorn.server.Server object at 0x7fb3d99fa450>
+           │       └ <function run at 0x7fb3da2e3c40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7fb3d9967d30>
+           │      └ <function Runner.run at 0x7fb3da33b1a0>
+           └ <asyncio.runners.Runner object at 0x7fb3d9a0c090>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7fb3d95801e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7fb3d9a0c090>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fb3d34cbd50>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d840...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7fb3d948c690>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fb3d34cbd50>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d840...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d840...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fb3d2e7b650>
+          └ <fastapi.applications.FastAPI object at 0x7fb3d948c690>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7fb3d2957a60>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fb3d2e7b650>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fb3d2957ba0>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7fb3d1d84210>
+                     │    └ <function log_requests at 0x7fb3d2b66d40>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+
+> File "/app/app/main.py", line 20, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7fb3d1d84210>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fb3d2957ba0>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggerin...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fb3d2957d80>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957ec0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"macOS"', 'user-agent': 'Mozilla/5.0 (M...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fb3d2957d80>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957ec0>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7fb3d2b67420>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957ec0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fb3d2ec3fd0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957ec0>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7fb3d1d4be50>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fb3d2ec3fd0>
+          └ <function wrap_app_handling_exceptions at 0x7fb3d864a020>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c040>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957ec0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c040>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957ec0>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7fb3d41efa10>>
+          └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c040>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957ec0>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7fb3d864b600>
+          └ APIRoute(path='/api/games/', name='list_games', methods=['GET'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c040>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957ec0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7fb3d2b65940>
+          └ APIRoute(path='/api/games/', name='list_games', methods=['GET'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c040>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957ec0>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7fb3d1d4bf50>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7fb3d1d7c2c0>
+          └ <function wrap_app_handling_exceptions at 0x7fb3d864a020>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7c680>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d2957ec0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7fb3d1d7c2c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7fb3d1d4bf50>
+                     └ <function get_request_handler.<locals>.app at 0x7fb3d2b656c0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7fb3d8669440>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7fb3d1d87710>, 'q': ''}
+                 │                 │         └ <function list_games at 0x7fb3d86f0220>
+                 │                 └ Dependant(path_params=[], query_params=[ModelField(field_info=Query(), name='q', mode='validation')], header_params=[], cooki...
+                 └ <function run_in_threadpool at 0x7fb3d8bbd940>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function list_games at 0x7fb3d86f0220>, db=<sqlalchemy.orm.session.Session object at 0x7fb3d1d87710>, q='')
+                 │     │         └ <function run_sync at 0x7fb3d9b5a520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7fb3d9b236a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization ...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/games.py", line 24, in list_games
+    query = db.query(Game).options(joinedload(Game.products))
+            │  │     │             │          │    └ <sqlalchemy.orm.attributes.InstrumentedAttribute object at 0x7fb3d70fc040>
+            │  │     │             │          └ <class 'app.models.game.Game'>
+            │  │     │             └ <function joinedload at 0x7fb3d7906f20>
+            │  │     └ <class 'app.models.game.Game'>
+            │  └ <function Session.query at 0x7fb3d7845760>
+            └ <sqlalchemy.orm.session.Session object at 0x7fb3d1d87710>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2955, in query
+    return self._query_cls(entities, self, **kwargs)
+           │    │          │         │       └ {}
+           │    │          │         └ <sqlalchemy.orm.session.Session object at 0x7fb3d1d87710>
+           │    │          └ (<class 'app.models.game.Game'>,)
+           │    └ <class 'sqlalchemy.orm.query.Query'>
+           └ <sqlalchemy.orm.session.Session object at 0x7fb3d1d87710>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 276, in __init__
+    self._set_entities(entities)
+    │    │             └ (<class 'app.models.game.Game'>,)
+    │    └ <function Query._set_entities at 0x7fb3d7967560>
+    └ <sqlalchemy.orm.query.Query object at 0x7fb3d1d90fd0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    self._raw_columns = [
+    └ <sqlalchemy.orm.query.Query object at 0x7fb3d1d90fd0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 289, in <listcomp>
+    coercions.expect(
+    │         └ <function expect at 0x7fb3d7f5e8e0>
+    └ <module 'sqlalchemy.sql.coercions' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/coercions.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+    │    └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 1338, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+    │   │        │    │                    │    │    └ <Mapper at 0x7fb3d70f80d0; Game>
+    │   │        │    │                    │    └ <function Mapper._post_inspect at 0x7fb3d79637e0>
+    │   │        │    │                    └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    │   │        │    └ '_post_inspect'
+    │   │        └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    │   └ <attribute '__dict__' of 'Mapper' objects>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2724, in _post_inspect
+    self._check_configure()
+    │    └ <function Mapper._check_configure at 0x7fb3d7962a20>
+    └ <Mapper at 0x7fb3d70f80d0; Game>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2401, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+    │                      │    └ <sqlalchemy.orm.decl_api.registry object at 0x7fb3da581410>
+    │                      └ <Mapper at 0x7fb3d70f80d0; Game>
+    └ <function _configure_registries at 0x7fb3d79667a0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 4214, in _configure_registries
+    _do_configure_registries(registries, cascade)
+    │                        │           └ True
+    │                        └ set()
+    └ <function _do_configure_registries at 0x7fb3d79668e0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 4251, in _do_configure_registries
+    raise e
+          └ InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggerin...
+
+sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[GameFAQ(game_faqs)]'. Original exception was: Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+2025-06-12 at 14:10:26 | INFO | main:18 - 📥 OPTIONS http://localhost:8000/api/auth/request-link
+2025-06-12 at 14:10:26 | INFO | main:24 - 📤 200 http://localhost:8000/api/auth/request-link
+2025-06-12 at 14:10:26 | INFO | main:18 - 📥 POST http://localhost:8000/api/auth/request-link
+2025-06-12 at 14:10:26 | ERROR | main:22 - ❌ Exception during request: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[GameFAQ(game_faqs)]'. Original exception was: Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 148, in call_next
+    message = await recv_stream.receive()
+                    │           └ <function MemoryObjectReceiveStream.receive at 0x7fb3d99dd8a0>
+                    └ MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_rece...
+  File "/usr/local/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+          └ <class 'anyio.EndOfStream'>
+
+anyio.EndOfStream
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7fb3da862200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7fb3da9337e0>
+           └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7fb3da932d40>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7fb3d9c59210>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    └ <function subprocess_started at 0x7fb3d9ac6de0>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7fb3d99fa450>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7fb3d9ac5bc0>
+           │       │   └ <uvicorn.server.Server object at 0x7fb3d99fa450>
+           │       └ <function run at 0x7fb3da2e3c40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7fb3d9967d30>
+           │      └ <function Runner.run at 0x7fb3da33b1a0>
+           └ <asyncio.runners.Runner object at 0x7fb3d9a0c090>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7fb3d95801e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7fb3d9a0c090>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fb3d34cbd50>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d929...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7fb3d948c690>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fb3d34cbd50>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d929...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d929...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fb3d2e7b650>
+          └ <fastapi.applications.FastAPI object at 0x7fb3d948c690>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7fb3d1d7cea0>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fb3d1d...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fb3d2e7b650>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fb3d1d7d260>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7fb3d1d92fd0>
+                     │    └ <function log_requests at 0x7fb3d2b66d40>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+
+> File "/app/app/main.py", line 20, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7fb3d1d92fd0>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fb3d1d7d260>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggerin...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fb3d1d7d080>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7d1c0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fb3d2d9d610>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8000', 'connection': 'keep-alive', 'content-length': '30', 'sec-ch-ua-platform': '"macOS"', 'user...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fb3d1d7d080>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7d1c0>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7fb3d2b67420>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7d1c0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fb3d2ec3fd0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fb3d52f2010>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7d1c0>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7fb3d1d93690>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fb3d2ec3fd0>
+          └ <function wrap_app_handling_exceptions at 0x7fb3d864a020>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7d580>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7d1c0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7d580>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7d1c0>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7fb3d41efa10>>
+          └ <fastapi.routing.APIRouter object at 0x7fb3d41efa10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7d580>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7d1c0>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7fb3d864b600>
+          └ APIRoute(path='/api/auth/request-link', name='request_login_link', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7d580>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7d1c0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7fb3d2be5120>
+          └ APIRoute(path='/api/auth/request-link', name='request_login_link', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7d580>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7d1c0>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7fb3d1d93650>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7fb3d1d7d620>
+          └ <function wrap_app_handling_exceptions at 0x7fb3d864a020>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fb3d1d7d760>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fb3d1d7d1c0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7fb3d1d7d620>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7fb3d1d93650>
+                     └ <function get_request_handler.<locals>.app at 0x7fb3d2be4fe0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7fb3d8669440>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7fb3d1d914d0>, 'data': EmailRequest(email='kvpelvne@gmail.com')}
+                 │                 │         └ <function request_login_link at 0x7fb3d63df920>
+                 │                 └ Dependant(path_params=[], query_params=[], header_params=[], cookie_params=[], body_params=[ModelField(field_info=Body(Pydant...
+                 └ <function run_in_threadpool at 0x7fb3d8bbd940>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function request_login_link at 0x7fb3d63df920>, db=<sqlalchemy.orm.session.Session object at 0x7fb3d1d914d...
+                 │     │         └ <function run_sync at 0x7fb3d9b5a520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7fb3d9b236a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization ...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/auth.py", line 23, in request_login_link
+    user = db.query(User).filter_by(email=data.email).first()
+           │  │     │                     │    └ 'kvpelvne@gmail.com'
+           │  │     │                     └ EmailRequest(email='kvpelvne@gmail.com')
+           │  │     └ <class 'app.models.user.User'>
+           │  └ <function Session.query at 0x7fb3d7845760>
+           └ <sqlalchemy.orm.session.Session object at 0x7fb3d1d914d0>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2955, in query
+    return self._query_cls(entities, self, **kwargs)
+           │    │          │         │       └ {}
+           │    │          │         └ <sqlalchemy.orm.session.Session object at 0x7fb3d1d914d0>
+           │    │          └ (<class 'app.models.user.User'>,)
+           │    └ <class 'sqlalchemy.orm.query.Query'>
+           └ <sqlalchemy.orm.session.Session object at 0x7fb3d1d914d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 276, in __init__
+    self._set_entities(entities)
+    │    │             └ (<class 'app.models.user.User'>,)
+    │    └ <function Query._set_entities at 0x7fb3d7967560>
+    └ <sqlalchemy.orm.query.Query object at 0x7fb3d2eb4dd0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    self._raw_columns = [
+    └ <sqlalchemy.orm.query.Query object at 0x7fb3d2eb4dd0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 289, in <listcomp>
+    coercions.expect(
+    │         └ <function expect at 0x7fb3d7f5e8e0>
+    └ <module 'sqlalchemy.sql.coercions' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/coercions.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+    │    └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    └ <Mapper at 0x7fb3d7130e50; User>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 1338, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+    │   │        │    │                    │    │    └ <Mapper at 0x7fb3d7130e50; User>
+    │   │        │    │                    │    └ <function Mapper._post_inspect at 0x7fb3d79637e0>
+    │   │        │    │                    └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    │   │        │    └ '_post_inspect'
+    │   │        └ <sqlalchemy.util.langhelpers.HasMemoized.memoized_attribute object at 0x7fb3d79682d0>
+    │   └ <attribute '__dict__' of 'Mapper' objects>
+    └ <Mapper at 0x7fb3d7130e50; User>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2724, in _post_inspect
+    self._check_configure()
+    │    └ <function Mapper._check_configure at 0x7fb3d7962a20>
+    └ <Mapper at 0x7fb3d7130e50; User>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 2401, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+    │                      │    └ <sqlalchemy.orm.decl_api.registry object at 0x7fb3da581410>
+    │                      └ <Mapper at 0x7fb3d7130e50; User>
+    └ <function _configure_registries at 0x7fb3d79667a0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 4214, in _configure_registries
+    _do_configure_registries(registries, cascade)
+    │                        │           └ True
+    │                        └ set()
+    └ <function _do_configure_registries at 0x7fb3d79668e0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/mapper.py", line 4251, in _do_configure_registries
+    raise e
+          └ InvalidRequestError("One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggerin...
+
+sqlalchemy.exc.InvalidRequestError: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[GameFAQ(game_faqs)]'. Original exception was: Mapper 'Mapper[Game(games)]' has no property 'faqs'.  If this property was indicated from other mappers or configure events, ensure registry.configure() has been called.
