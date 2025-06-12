@@ -1,9 +1,10 @@
-# backend/alembic/versions/add_product_custom_fields.py
-"""add product custom fields
+# Замените содержимое файла backend/alembic/versions/7e3fb385c3eb_add_product_enhanced_fields.py
 
-Revision ID: add_product_custom_fields
-Revises: 3bf729303ce5
-Create Date: 2025-06-12
+"""add product enhanced fields
+
+Revision ID: 7e3fb385c3eb
+Revises: change_payment_and_banner
+Create Date: 2025-06-12 12:52:38.541501
 
 """
 from typing import Sequence, Union
@@ -13,23 +14,24 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'add_product_custom_fields'
-down_revision: Union[str, None] = '3bf729303ce5'
+revision: str = '7e3fb385c3eb'
+down_revision: Union[str, None] = 'change_payment_and_banner'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
     """Upgrade schema."""
-    # Добавляем новые поля к таблице products
+    # Добавляем только новые поля в products, НЕ трогаем banner_url
     op.add_column('products', sa.Column('old_price_rub', sa.Numeric(precision=10, scale=2), nullable=True))
     op.add_column('products', sa.Column('special_note', sa.String(length=255), nullable=True))
-    op.add_column('products', sa.Column('note_type', sa.String(length=20), nullable=True, server_default='warning'))
+    op.add_column('products', sa.Column('note_type', sa.String(length=20), nullable=True))
     op.add_column('products', sa.Column('subcategory', sa.String(length=100), nullable=True))
 
 
 def downgrade() -> None:
     """Downgrade schema."""
+    # Удаляем только добавленные поля
     op.drop_column('products', 'subcategory')
     op.drop_column('products', 'note_type')
     op.drop_column('products', 'special_note')
