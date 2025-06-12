@@ -20,6 +20,7 @@ class User(Base):
     telegram_id = Column(Integer, unique=True, nullable=True)
     username = Column(String(100), nullable=True)
     email = Column(String(255), unique=True, nullable=True)
+    password_hash = Column(String(255), nullable=True)  # Добавлено поле для пароля
 
     balance = Column(Numeric(12, 2), default=0, nullable=False)
     role = Column(Enum(UserRole), default=UserRole.user, nullable=False)
