@@ -1,3 +1,4 @@
+# backend/app/core/config.py - ОБНОВЛЕННАЯ ВЕРСИЯ
 from typing import Optional
 from pydantic_settings import BaseSettings
 from pydantic import Extra
@@ -22,6 +23,9 @@ class Settings(BaseSettings):
 
     # Фронт (для ссылок в письмах)
     FRONTEND_URL: str = "http://localhost:8000"  # fallback
+
+    # Реферальная система
+    REFERRAL_PERCENTAGE: Optional[str] = "1.0"  # Процент от покупок рефералов (по умолчанию 1%)
 
     class Config:
         env_file = ".env"  # или ".env.dev" — в зависимости от окружения

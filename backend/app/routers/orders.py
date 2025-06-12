@@ -6,6 +6,8 @@ from app.core.database import get_db
 from app.services.auth import get_current_user
 from app.models.order import Order, OrderStatus, PaymentMethod
 from app.models.user import User
+from app.services.referral import ReferralService
+from app.models.referral import ReferralEarning
 from app.schemas.order import OrderCreate, OrderRead
 from app.services.mailer import send_email, render_template
 from bot.notify import notify_manual_order_sync
@@ -76,6 +78,13 @@ def create_order(
     db.refresh(new_order)
 
     print(f"    → Новый заказ создан, id={new_order.id}, статус={new_order.status}")
+
+    # # Если заказ сразу помечается как оплаченный (например, для автоматических платежей)
+    if new_order.status == OrderStatus.paid:
+        try:
+            ReferralService.process_referral_earning(db, new_order)
+        except Exception as e:
+            print(f"Ошибка при обработке реферальной выплаты: {e}")
 
     if current_user.email:
         html = render_template("order_created.html", {
@@ -256,3 +265,95 @@ def create_bulk_order(
         print(f"    → Отправлено письмо пользователю {current_user.email}")
 
     return new_order
+
+
+@router.post("/{order_id}/mark-paid")
+def mark_order_as_paid(
+        order_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
+    """
+    Помечает заказ как оплаченный и обрабатывает реферальную выплату
+    Этот endpoint должен вызываться платежной системой или администратором
+    """
+    print(f"▶▶▶ Помечаем заказ {order_id} как оплаченный")
+
+    order = db.query(Order).filter_by(id=order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.status != OrderStatus.pending:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Заказ уже имеет статус {order.status.value}"
+        )
+
+    # Обновляем статус заказа
+    order.status = OrderStatus.paid
+    db.commit()
+
+    print(f"    → Заказ {order_id} помечен как оплаченный")
+
+    # Обрабатываем реферальную выплату
+    try:
+        referral_earning = ReferralService.process_referral_earning(db, order)
+        if referral_earning:
+            print(
+                f"    → Реферальная выплата {referral_earning.amount} произведена пользователю {referral_earning.referrer_id}")
+        else:
+            print(f"    → Реферальная выплата не требуется для заказа {order_id}")
+    except Exception as e:
+        print(f"    → Ошибка при обработке реферальной выплаты: {e}")
+        # Не прерываем выполнение, если реферальная система дала сбой
+
+    # Отправляем email об успешной оплате
+    if order.user and order.user.email:
+        html = render_template("order_success.html", {
+            "order_id": order.id,
+            "product_name": order.product.name if order.product else "Товар",
+            "amount": order.amount,
+            "currency": order.currency,
+            "username": order.user.username,
+        })
+        send_email(
+            to=order.user.email,
+            subject="✅ Заказ оплачен | Donate Raid",
+            body=html
+        )
+        print(f"    → Отправлено письмо об успешной оплате пользователю {order.user.email}")
+
+    return {
+        "status": "paid",
+        "order_id": order.id,
+        "referral_bonus": float(referral_earning.amount) if referral_earning else 0
+    }
+
+@router.get("/referral-stats")
+def get_order_referral_stats(
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
+):
+    """Получить статистику заказов, связанных с рефералами"""
+
+    # Заказы, по которым пользователь получил реферальные выплаты
+    referral_orders = db.query(Order).join(ReferralEarning).filter(
+        ReferralEarning.referrer_id == current_user.id
+    ).all()
+
+    total_referral_orders = len(referral_orders)
+    total_referral_amount = sum(order.amount for order in referral_orders)
+
+    return {
+        "total_referral_orders": total_referral_orders,
+        "total_referral_amount": float(total_referral_amount),
+        "recent_referral_orders": [
+            {
+                "id": order.id,
+                "amount": float(order.amount),
+                "currency": order.currency,
+                "created_at": order.created_at.isoformat()
+            }
+            for order in referral_orders[-10:]  # Последние 10 заказов
+        ]
+    }

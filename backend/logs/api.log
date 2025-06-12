@@ -208,3 +208,17 @@
 2025-06-12 at 13:20:32 | INFO | main:24 - 📤 307 http://localhost:8000/api/games?q=
 2025-06-12 at 13:20:32 | INFO | main:18 - 📥 GET http://localhost:8000/api/games/?q=
 2025-06-12 at 13:20:32 | INFO | main:24 - 📤 200 http://localhost:8000/api/games/?q=
+2025-06-12 at 13:32:13 | INFO | main:18 - 📥 OPTIONS http://localhost:8000/api/users/me
+2025-06-12 at 13:32:13 | INFO | main:18 - 📥 OPTIONS http://localhost:8000/api/users/me
+2025-06-12 at 13:32:13 | INFO | main:24 - 📤 200 http://localhost:8000/api/users/me
+2025-06-12 at 13:32:14 | INFO | main:24 - 📤 200 http://localhost:8000/api/users/me
+2025-06-12 at 13:32:14 | INFO | main:18 - 📥 GET http://localhost:8000/api/users/me
+2025-06-12 at 13:32:14 | INFO | main:24 - 📤 200 http://localhost:8000/api/users/me
+2025-06-12 at 13:32:14 | INFO | main:18 - 📥 GET http://localhost:8000/api/users/me
+2025-06-12 at 13:32:14 | INFO | main:18 - 📥 OPTIONS http://localhost:8000/api/orders/my
+2025-06-12 at 13:32:14 | INFO | main:24 - 📤 200 http://localhost:8000/api/orders/my
+2025-06-12 at 13:32:14 | INFO | main:18 - 📥 GET http://localhost:8000/api/orders/my
+2025-06-12 at 13:32:14 | INFO | main:24 - 📤 422 http://localhost:8000/api/orders/my
+2025-06-12 at 13:32:14 | INFO | main:24 - 📤 200 http://localhost:8000/api/users/me
+2025-06-12 at 13:32:14 | INFO | main:18 - 📥 GET http://localhost:8000/api/orders/my
+2025-06-12 at 13:32:14 | INFO | main:24 - 📤 422 http://localhost:8000/api/orders/my
