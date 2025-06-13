@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Параметры
 REMOTE_USER="root"
-REMOTE_HOST="194.169.160.101"
+REMOTE_HOST="93.123.84.232"
 REMOTE_DIR="/home/donate"
 LOCAL_DIR="$(pwd)"
 
@@ -69,7 +69,7 @@ ssh "${REMOTE_USER}@${REMOTE_HOST}" bash <<EOF
   echo "📊 Статус контейнеров:"
   docker-compose ps
 
-  echo "📝 Последние логи backend:"
+  echo "📝 Последние логи:"
   docker-compose logs --tail=20
 
   echo "✅ Деплой завершён!"

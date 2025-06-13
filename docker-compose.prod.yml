@@ -8,14 +8,14 @@ services:
     volumes:
       - pgdata_prod:/var/lib/postgresql/data
     ports:
-      - "5435:5432"
+      - "127.0.0.1:5435:5432"  # Только localhost
     restart: unless-stopped
 
   backend:
     build: ./backend
     env_file: .env
     ports:
-      - "8001:8000"
+      - "127.0.0.1:8001:8000"  # Только localhost
     depends_on:
       - postgres
     environment:
@@ -37,17 +37,14 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod  # Используем продакшн сборку
     ports:
-      - "3001:3000"
+      - "127.0.0.1:3001:3000"  # Только localhost
     depends_on:
       - backend
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
     restart: unless-stopped
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
 
 volumes:
   pgdata_prod:

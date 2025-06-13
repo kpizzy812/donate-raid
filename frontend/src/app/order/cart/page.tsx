@@ -1,119 +1,167 @@
+// frontend/src/app/order/cart/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useCart } from '@/context/CartContext'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart, Trash2, Plus, Minus, ArrowRight } from 'lucide-react'
 
 export default function CartPage() {
   const { items, clearCart, removeItem } = useCart()
   const router = useRouter()
-  const [method, setMethod] = useState<'card' | 'sbp' | null>(null)
 
   const total = items.reduce((sum, item) => sum + Number(item.product.price_rub), 0)
 
-  const handleSubmit = async () => {
-    if (!method) return alert('Выберите способ оплаты')
+  const handleProceedToCheckout = () => {
     if (items.length === 0) return
-
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/bulk`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify({
-          items: items.map((item) => ({
-            game_id: item.product.game_id,
-            product_id: item.product.id,
-            amount: item.product.price_rub,
-            currency: 'RUB',
-            payment_method: 'auto',
-            comment: JSON.stringify(item.inputs),
-          })),
-        }),
-      })
-
-      if (!res.ok) throw new Error('Ошибка при создании заказа')
-
-      const data = await res.json()
-      const orderId = Array.isArray(data) ? data[0]?.id : data.id
-      router.push(`/order/${orderId}`)
-      setTimeout(() => clearCart(), 500)
-    } catch (err) {
-      alert('Ошибка при создании заказа')
-      console.error(err)
-    }
+    router.push('/order/checkout')
   }
 
   return (
-    <div className="py-8 max-w-3xl mx-auto space-y-6 px-4">
-      <h1 className="text-2xl font-bold">Корзина</h1>
+    <div className="py-8 max-w-4xl mx-auto space-y-6 px-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold flex items-center gap-3">
+          <ShoppingCart className="w-8 h-8" />
+          Корзина ({items.length})
+        </h1>
+
+        {items.length > 0 && (
+          <button
+            onClick={clearCart}
+            className="text-red-600 hover:text-red-700 text-sm underline"
+          >
+            Очистить корзину
+          </button>
+        )}
+      </div>
 
       {items.length === 0 ? (
-        <div className="text-center text-zinc-500 space-y-2 py-10">
-          <ShoppingCart className="mx-auto w-10 h-10 text-zinc-400" />
-          <p>Ваша корзина пуста.</p>
+        <div className="text-center py-20">
+          <ShoppingCart className="mx-auto w-16 h-16 text-zinc-300 dark:text-zinc-600 mb-4" />
+          <h2 className="text-xl font-semibold mb-2">Ваша корзина пуста</h2>
+          <p className="text-zinc-500 dark:text-zinc-400 mb-6">
+            Добавьте товары из каталога для оформления заказа
+          </p>
+          <button
+            onClick={() => router.push('/')}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
+          >
+            Перейти в каталог
+          </button>
         </div>
       ) : (
-        <>
-          <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Список товаров */}
+          <div className="lg:col-span-2 space-y-4">
             {items.map((item, i) => (
               <div
                 key={i}
-                className="border rounded-xl p-4 space-y-2 relative dark:border-zinc-700"
+                className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6"
               >
-                <div className="font-semibold">{item.product.name}</div>
-                <div className="text-sm text-zinc-500">{item.product.price_rub} ₽</div>
-                {Object.entries(item.inputs).map(([k, v]) => (
-                  <div key={k} className="text-sm">
-                    <span className="text-zinc-500">{k}:</span> {v}
+                <div className="flex items-start gap-4">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-2">{item.product.name}</h3>
+
+                    <div className="text-2xl font-bold text-green-600 mb-4">
+                      ₽{item.product.price_rub}
+                    </div>
+
+                    {/* Пользовательские данные */}
+                    {Object.keys(item.inputs).length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium text-zinc-500 uppercase">
+                          Данные для заказа:
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {Object.entries(item.inputs).map(([key, value]) => (
+                            <div key={key} className="bg-zinc-50 dark:bg-zinc-800 px-3 py-2 rounded-lg">
+                              <div className="text-xs text-zinc-500 mb-1">{key}:</div>
+                              <div className="font-medium text-sm">{value}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ))}
-                <button
-                  onClick={() => removeItem(i)}
-                  className="absolute top-2 right-2 text-red-500 text-sm"
-                >
-                  ✕
-                </button>
+
+                  <button
+                    onClick={() => removeItem(i)}
+                    className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    title="Удалить товар"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="space-y-2">
-            <div className="text-lg">💳 Способ оплаты:</div>
-            <div className="flex gap-4">
+          {/* Боковая панель - итоги и оформление */}
+          <div className="lg:col-span-1">
+            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 sticky top-6">
+              <h3 className="text-lg font-semibold mb-4">Итого</h3>
+
+              {/* Детализация по товарам */}
+              <div className="space-y-3 mb-6">
+                {items.map((item, i) => (
+                  <div key={i} className="flex justify-between items-start text-sm">
+                    <span className="text-zinc-600 dark:text-zinc-400 flex-1 mr-2">
+                      {item.product.name}
+                    </span>
+                    <span className="font-medium whitespace-nowrap">
+                      ₽{item.product.price_rub}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4 mb-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-semibold">К оплате:</span>
+                  <span className="text-2xl font-bold text-green-600">
+                    ₽{total}
+                  </span>
+                </div>
+                <div className="text-sm text-zinc-500 mt-1">
+                  {items.length} {items.length === 1 ? 'товар' : 'товара'}
+                </div>
+              </div>
+
+              {/* Кнопка оформления заказа */}
               <button
-                onClick={() => setMethod('card')}
-                className={`px-4 py-2 rounded-md border ${
-                  method === 'card'
-                    ? 'bg-blue-600 text-white'
-                    : 'border-zinc-300 dark:border-zinc-700'
-                }`}
+                onClick={handleProceedToCheckout}
+                className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center gap-2 mb-4"
               >
-                Карта
+                Оформить заказ
+                <ArrowRight className="w-5 h-5" />
               </button>
+
+              {/* Дополнительная информация */}
+              <div className="text-xs text-zinc-500 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>Быстрая обработка заказов</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span>Безопасная оплата</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <span>Поддержка 24/7</span>
+                </div>
+              </div>
+
+              {/* Кнопка продолжить покупки */}
               <button
-                onClick={() => setMethod('sbp')}
-                className={`px-4 py-2 rounded-md border ${
-                  method === 'sbp'
-                    ? 'bg-blue-600 text-white'
-                    : 'border-zinc-300 dark:border-zinc-700'
-                }`}
+                onClick={() => router.push('/')}
+                className="w-full mt-4 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 px-6 py-3 rounded-lg transition-colors"
               >
-                СБП
+                Продолжить покупки
               </button>
             </div>
           </div>
-
-          <button
-            onClick={handleSubmit}
-            className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-md text-lg"
-          >
-            Создать покупку на {total.toFixed(2)} ₽
-          </button>
-        </>
+        </div>
       )}
     </div>
   )

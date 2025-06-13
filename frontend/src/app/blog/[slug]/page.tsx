@@ -1,4 +1,4 @@
-// frontend/src/app/blog/[slug]/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/blog/[slug]/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 import { notFound } from 'next/navigation'
 import { Calendar, User, Tag, Share2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -19,6 +19,12 @@ interface ArticlePageProps {
   params: {
     slug: string
   }
+}
+
+// Вынесем функцию за пределы компонента, чтобы она была доступна в generateMetadata
+function getImageFromContent(content: string) {
+  const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i)
+  return imgMatch ? imgMatch[1] : null
 }
 
 async function getArticle(slug: string): Promise<Article | null> {
@@ -59,12 +65,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   const relatedArticles = await getRelatedArticles(article.category, article.slug)
-
-  const getImageFromContent = (content: string) => {
-    const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i)
-    return imgMatch ? imgMatch[1] : null
-  }
-
   const featuredImage = article.featured_image || getImageFromContent(article.content)
 
   const shareArticle = () => {

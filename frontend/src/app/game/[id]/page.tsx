@@ -1,4 +1,4 @@
-// frontend/src/app/game/[id]/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/game/[id]/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -29,6 +29,9 @@ interface Product {
   note_type: string
   input_fields?: InputField[]
   image_url?: string
+  min_amount: number
+  max_amount: number
+  game_id: number
 }
 
 interface Game {
@@ -44,7 +47,7 @@ interface Game {
 export default function GamePage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  
+
   const [game, setGame] = useState<Game | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -55,8 +58,18 @@ export default function GamePage() {
   const loadGame = async () => {
     try {
       setLoading(true)
-      const response = await api.get(`/api/games/${id}`)
-      setGame(response.data)
+      const response = await api.get(`/games/${id}`)
+
+      // Убеждаемся, что у всех продуктов есть game_id
+      const gameData = {
+        ...response.data,
+        products: response.data.products?.map((product: Product) => ({
+          ...product,
+          game_id: parseInt(id as string)
+        })) || []
+      }
+
+      setGame(gameData)
     } catch (error) {
       console.error('Ошибка загрузки игры:', error)
       toast.error('Ошибка загрузки игры')
@@ -66,15 +79,8 @@ export default function GamePage() {
   }
 
   const handleAddToCart = (product: Product, userData: Record<string, any>) => {
-    // Здесь будет логика добавления в корзину
-    console.log('Добавляем в корзину:', product, userData)
-    
     toast.success(`${product.name} добавлен в корзину!`, {
       description: `Цена: ₽${product.price_rub}`,
-      action: {
-        label: 'Оформить заказ',
-        onClick: () => router.push('/order/checkout'),
-      },
     })
   }
 
@@ -100,9 +106,9 @@ export default function GamePage() {
       {/* Баннер игры */}
       {game.banner_url && (
         <div className="rounded-xl overflow-hidden border border-zinc-300 dark:border-zinc-700">
-          <img 
-            src={game.banner_url} 
-            alt={game.name} 
+          <img
+            src={game.banner_url}
+            alt={game.name}
             className="w-full h-48 md:h-64 object-cover"
           />
         </div>
@@ -111,7 +117,7 @@ export default function GamePage() {
       {/* Название и описание */}
       <div className="space-y-4">
         <h1 className="text-3xl font-bold text-center md:text-left">{game.name}</h1>
-        
+
         {game.description && (
           <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
             {game.description}
@@ -130,8 +136,8 @@ export default function GamePage() {
           </div>
 
           {game.products && game.products.length > 0 ? (
-            <ProductGrid 
-              products={game.products} 
+            <ProductGrid
+              products={game.products}
               onAddToCart={handleAddToCart}
             />
           ) : (
@@ -150,9 +156,9 @@ export default function GamePage() {
                 Ручная обработка заказов
               </h2>
             </div>
-            
+
             <p className="text-yellow-700 dark:text-yellow-300 mb-4">
-              Для этой игры заказы обрабатываются вручную нашими операторами. 
+              Для этой игры заказы обрабатываются вручную нашими операторами.
               Время выполнения: от 5 минут до 24 часов в зависимости от сложности заказа.
             </p>
 
