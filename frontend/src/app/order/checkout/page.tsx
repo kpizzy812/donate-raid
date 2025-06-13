@@ -3,6 +3,7 @@
 import { useCart } from '@/context/CartContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { api } from '@/lib/api'
 import { toast } from 'sonner'
 import { CreditCard, Smartphone, Bitcoin, DollarSign, Trash2, ArrowLeft, Lock } from 'lucide-react'
@@ -285,35 +286,57 @@ export default function CheckoutPage() {
           </div>
 
           {/* Пользовательские соглашения */}
-          {paymentTerms.length > 0 && (
-            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6">
-              <h2 className="text-lg font-semibold mb-4">📋 Условия и соглашения</h2>
-              <div className="space-y-4">
-                {paymentTerms.map((term) => (
-                  <label key={term.id} className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={acceptedTerms[term.id] || false}
-                      onChange={() => handleTermToggle(term.id)}
-                      className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium text-sm">
-                        {term.title}
-                        {term.is_required && <span className="text-red-500 ml-1">*</span>}
-                      </div>
-                      {term.description && (
-                        <div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                          {term.description}
-                        </div>
-                      )}
-                    </div>
-                  </label>
-                ))}
-              </div>
+{paymentTerms.length > 0 && (
+  <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6">
+    <h2 className="text-lg font-semibold mb-4">📋 Условия и соглашения</h2>
+    <div className="space-y-4">
+      {paymentTerms.map((term) => (
+        <label key={term.id} className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={acceptedTerms[term.id] || false}
+            onChange={() => handleTermToggle(term.id)}
+            className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <div className="flex-1">
+            <div className="font-medium text-sm">
+              {term.title}
+              {term.is_required && <span className="text-red-500 ml-1">*</span>}
             </div>
-          )}
-        </div>
+            {term.description && (
+              <div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                {term.description}
+              </div>
+            )}
+          </div>
+        </label>
+      ))}
+
+      {/* Дополнительная информация с ссылками на правовые документы */}
+      <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          Совершая покупку, вы соглашаетесь с{' '}
+          <Link href="/legal/terms" target="_blank" className="text-blue-600 hover:underline">
+            пользовательским соглашением
+          </Link>
+          ,{' '}
+          <Link href="/legal/privacy" target="_blank" className="text-blue-600 hover:underline">
+            политикой конфиденциальности
+          </Link>
+          {' '}и{' '}
+          <Link href="/legal/offer" target="_blank" className="text-blue-600 hover:underline">
+            публичной офертой
+          </Link>
+          . В случае возврата средства зачисляются на баланс аккаунта согласно{' '}
+          <Link href="/legal/refund" target="_blank" className="text-blue-600 hover:underline">
+            политике возврата
+          </Link>
+          .
+        </p>
+      </div>
+    </div>
+  </div>
+)}
 
         {/* Боковая панель - итоги */}
         <div className="lg:col-span-1">

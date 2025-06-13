@@ -1,4 +1,4 @@
-// frontend/src/components/ChatSupport.tsx - НОВЫЙ КОМПОНЕНТ
+// frontend/src/components/ChatSupport.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
@@ -58,13 +58,12 @@ export default function ChatSupport({ isOpen, onToggle }: ChatSupportProps) {
       const guestId = localStorage.getItem('guest_id') || generateGuestId()
 
       const response = await fetch('/api/support/messages', {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
         method: 'POST',
-        body: JSON.stringify({ guest_id: guestId }),
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        }
+        },
+        body: JSON.stringify({ guest_id: guestId })
       })
 
       if (response.ok) {
