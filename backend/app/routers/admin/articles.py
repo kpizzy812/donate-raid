@@ -24,6 +24,8 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db), admin:
     # Конвертируем данные для модели
     article_data = article.dict()
 
+    print(f"Получены данные статьи: {article_data}")  # Отладка
+
     # Обрабатываем base64 изображение
     featured_image_url = None
     if article_data.get('featured_image') and article_data['featured_image'].startswith('data:image/'):
@@ -33,8 +35,8 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db), admin:
                 article_data['featured_image'],
                 subfolder="blog"
             )
-            # ИСПРАВЛЕНО: передаем пустую строку вместо settings.FRONTEND_URL
             featured_image_url = FileUploadService.get_file_url(file_path, "")
+            print(f"Изображение сохранено: {featured_image_url}")
         except Exception as e:
             print(f"Ошибка сохранения base64 изображения: {e}")
             featured_image_url = None
@@ -50,15 +52,25 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db), admin:
     tags_list = article_data.pop('tags', None)
     categories_list = article_data.pop('categories', None)
 
-    # Если category не задан, берем первый из categories
-    if not article_data.get('category') and categories_list:
+    # ИСПРАВЛЕНО: Правильная обработка категорий
+    if categories_list and len(categories_list) > 0:
+        # Берем первую выбранную категорию
         article_data['category'] = categories_list[0]
+        print(f"Установлена категория: {categories_list[0]}")
+    elif not article_data.get('category'):
+        # Если категория не указана, ставим по умолчанию
+        article_data['category'] = 'Новости'
+        print("Установлена категория по умолчанию: Новости")
+
+    print(f"Финальные данные для создания: {article_data}")
 
     # Создаем статью
     new_article = Article(**article_data)
     db.add(new_article)
     db.commit()
     db.refresh(new_article)
+
+    print(f"Статья создана с ID: {new_article.id}, категория: {new_article.category}")
 
     # Обрабатываем теги (если нужно)
     if tags_list:
@@ -70,10 +82,12 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db), admin:
                 tag = ArticleTag(name=tag_name, slug=tag_slug)
                 db.add(tag)
                 db.commit()
+                print(f"Создан тег: {tag_name}")
 
             # Добавляем тег к статье
             if tag not in new_article.tags:
                 new_article.tags.append(tag)
+                print(f"Добавлен тег '{tag_name}' к статье")
 
     db.commit()
     db.refresh(new_article)

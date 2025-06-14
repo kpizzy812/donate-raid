@@ -1,10 +1,10 @@
-# backend/app/routers/blog/article.py - ФИНАЛЬНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/routers/blog/article.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from app.core.database import get_db
 from app.models.blog.article import Article
-from app.schemas.blog.article import ArticleCreate, ArticleRead
+from app.schemas.blog.article import ArticleRead
 
 router = APIRouter()
 
@@ -16,6 +16,7 @@ def get_articles(
         category: Optional[str] = None,
         game_id: Optional[int] = None
 ):
+    """Получить список всех опубликованных статей"""
     # Используем joinedload для загрузки тегов
     query = db.query(Article).options(joinedload(Article.tags)).filter(Article.published == True)
 
@@ -29,14 +30,19 @@ def get_articles(
     articles = query.order_by(Article.created_at.desc()).all()
 
     # Логируем для отладки
+    print(f"Найдено {len(articles)} статей")
     for article in articles:
-        print(f"Статья '{article.title}' имеет {len(article.tags)} тегов: {[tag.name for tag in article.tags]}")
+        print(
+            f"Статья '{article.title}' (slug: {article.slug}) имеет {len(article.tags)} тегов: {[tag.name for tag in article.tags]}")
 
     return articles
 
 
 @router.get("/{slug}", response_model=ArticleRead)
 def get_article(slug: str, db: Session = Depends(get_db)):
+    """Получить статью по slug"""
+    print(f"Поиск статьи по slug: '{slug}'")
+
     # Используем joinedload для загрузки тегов
     article = (
         db.query(Article)
@@ -46,6 +52,11 @@ def get_article(slug: str, db: Session = Depends(get_db)):
     )
 
     if not article:
+        print(f"Статья с slug '{slug}' не найдена")
+        # Для отладки - покажем все доступные slug
+        all_articles = db.query(Article).filter(Article.published == True).all()
+        available_slugs = [a.slug for a in all_articles]
+        print(f"Доступные slug: {available_slugs}")
         raise HTTPException(status_code=404, detail="Article not found")
 
     # Логируем для отладки

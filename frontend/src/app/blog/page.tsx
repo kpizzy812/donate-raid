@@ -32,6 +32,7 @@ export default function BlogPage() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -44,6 +45,8 @@ export default function BlogPage() {
         const res = await api.get(`/articles?${params.toString()}`)
         console.log('Загруженные статьи:', res.data)
         setArticles(res.data)
+        // Сбрасываем ошибки изображений при новой загрузке
+        setImageErrors({})
       } catch (error) {
         console.error('Ошибка загрузки статей:', error)
       } finally {
@@ -76,9 +79,20 @@ export default function BlogPage() {
   // ИСПРАВЛЕНО: функция для получения изображения статьи
   const getArticleImage = (article: Article) => {
     // Проверяем все возможные источники изображения
-    return article.featured_image_url ||
-           article.featured_image ||
-           getImageFromContent(article.content)
+    let imageUrl = article.featured_image_url ||
+                   article.featured_image ||
+                   getImageFromContent(article.content)
+
+    if (!imageUrl) return null
+
+    // Если URL уже полный, возвращаем как есть
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl
+    }
+
+    // Если URL относительный, добавляем базовый URL
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    return `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
   }
 
   const formatDate = (dateString: string) => {
@@ -87,6 +101,11 @@ export default function BlogPage() {
       month: 'long',
       day: 'numeric'
     })
+  }
+
+  // Функция для обработки ошибок загрузки изображений
+  const handleImageError = (articleId: number) => {
+    setImageErrors(prev => ({ ...prev, [articleId]: true }))
   }
 
   return (
@@ -183,6 +202,9 @@ export default function BlogPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {articles.map(article => {
                 const featuredImage = getArticleImage(article)
+                const hasImageError = imageErrors[article.id]
+
+                console.log(`Статья "${article.title}": featuredImage = ${featuredImage}, hasImageError = ${hasImageError}`) // Отладка
 
                 return (
                   <Link
@@ -192,19 +214,25 @@ export default function BlogPage() {
                   >
                     {/* Image */}
                     <div className="aspect-video bg-zinc-100 dark:bg-zinc-800 overflow-hidden relative">
-                      {featuredImage ? (
+                      {featuredImage && !hasImageError ? (
                         <img
                           src={featuredImage}
                           alt={article.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onLoad={() => console.log('Изображение загружено успешно:', featuredImage)}
                           onError={(e) => {
-                            // Если изображение не загрузилось, скрываем его
-                            e.currentTarget.style.display = 'none'
+                            console.error('Ошибка загрузки изображения:', featuredImage)
+                            handleImageError(article.id)
                           }}
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <div className="text-3xl text-zinc-400">📰</div>
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-800">
+                          <div className="text-center">
+                            <div className="text-4xl text-zinc-400 mb-2">📰</div>
+                            <div className="text-xs text-zinc-500">
+                              {hasImageError ? 'Ошибка загрузки' : 'Без изображения'}
+                            </div>
+                          </div>
                         </div>
                       )}
 
