@@ -1,5 +1,6 @@
+# backend/app/schemas/blog/article.py - ФИНАЛЬНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from enum import Enum
 
@@ -13,14 +14,28 @@ class ArticleCategory(str, Enum):
     mobile = "Мобильные игры"
 
 
+class ArticleTagRead(BaseModel):
+    """Схема для чтения тегов"""
+    id: int
+    name: str
+    slug: str
+    color: Optional[str] = "#3B82F6"
+
+    class Config:
+        from_attributes = True
+
+
 class ArticleBase(BaseModel):
     title: str
     slug: str
     content: str
-    category: ArticleCategory
+    category: Optional[str] = None
+    excerpt: Optional[str] = None
     game_id: Optional[int] = None
     published: Optional[bool] = True
     author_name: Optional[str] = None
+    featured_image_url: Optional[str] = None
+    featured_image_alt: Optional[str] = None
 
 
 class ArticleCreate(ArticleBase):
@@ -30,6 +45,16 @@ class ArticleCreate(ArticleBase):
 class ArticleRead(ArticleBase):
     id: int
     created_at: datetime
+    updated_at: Optional[datetime] = None
+    published_at: Optional[datetime] = None
+
+    # Добавляем теги в ответ
+    tags: Optional[List[ArticleTagRead]] = []
+
+    # Для совместимости с фронтендом - возвращаем featured_image как featured_image_url
+    @property
+    def featured_image(self) -> Optional[str]:
+        return self.featured_image_url
 
     class Config:
         from_attributes = True

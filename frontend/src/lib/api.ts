@@ -5,7 +5,6 @@ export async function fetchGames(query = '') {
   return res.json();
 }
 
-
 export async function fetchGameById(id: number) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/games/${id}`)
   if (!res.ok) throw new Error('Game not found')
@@ -24,7 +23,7 @@ export async function fetchOrderById(id: number) {
 }
 
 export function getTokenHeader() {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('access_token') // Исправлено: было 'token', теперь 'access_token'
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
@@ -32,6 +31,7 @@ export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 })
 
+// Исправлен интерцептор - везде используем 'access_token'
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token')
   if (token) {

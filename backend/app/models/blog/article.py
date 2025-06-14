@@ -1,4 +1,4 @@
-# backend/app/models/blog/article.py - ОБНОВЛЕННАЯ ВЕРСИЯ
+# backend/app/models/blog/article.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, Table, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -36,6 +36,15 @@ class Article(Base):
     content = Column(Text, nullable=False)
     excerpt = Column(String(500), nullable=True)  # Краткое описание
 
+    # Добавляем поле category для обратной совместимости
+    category = Column(String(100), nullable=True)  # Основная категория для совместимости
+
+    # Связь с игрой (опционально)
+    game_id = Column(Integer, ForeignKey('games.id'), nullable=True)
+
+    # Автор статьи
+    author_name = Column(String(100), nullable=True)
+
     # Новые поля для изображений
     featured_image_url = Column(String(500), nullable=True)  # Главное изображение статьи
     featured_image_alt = Column(String(255), nullable=True)  # Alt текст для изображения
@@ -47,6 +56,7 @@ class Article(Base):
 
     # Relationships
     tags = relationship("ArticleTag", secondary=article_tags, back_populates="articles")
+    game = relationship("Game", back_populates="articles")  # Связь с игрой
 
     def get_tag_names(self):
         """Получить список названий тегов"""

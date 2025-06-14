@@ -1,5 +1,6 @@
+# backend/app/routers/blog/article.py - ФИНАЛЬНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from app.core.database import get_db
 from app.models.blog.article import Article
@@ -7,14 +8,16 @@ from app.schemas.blog.article import ArticleCreate, ArticleRead
 
 router = APIRouter()
 
+
 @router.get("/", response_model=List[ArticleRead])
 def get_articles(
-    db: Session = Depends(get_db),
-    q: str = Query("", alias="q"),
-    category: Optional[str] = None,
-    game_id: Optional[int] = None
+        db: Session = Depends(get_db),
+        q: str = Query("", alias="q"),
+        category: Optional[str] = None,
+        game_id: Optional[int] = None
 ):
-    query = db.query(Article).filter(Article.published == True)
+    # Используем joinedload для загрузки тегов
+    query = db.query(Article).options(joinedload(Article.tags)).filter(Article.published == True)
 
     if q:
         query = query.filter(Article.title.ilike(f"%{q}%"))
@@ -23,13 +26,29 @@ def get_articles(
     if game_id:
         query = query.filter(Article.game_id == game_id)
 
-    return query.order_by(Article.created_at.desc()).all()
+    articles = query.order_by(Article.created_at.desc()).all()
+
+    # Логируем для отладки
+    for article in articles:
+        print(f"Статья '{article.title}' имеет {len(article.tags)} тегов: {[tag.name for tag in article.tags]}")
+
+    return articles
 
 
 @router.get("/{slug}", response_model=ArticleRead)
 def get_article(slug: str, db: Session = Depends(get_db)):
-    article = db.query(Article).filter(Article.slug == slug, Article.published == True).first()
+    # Используем joinedload для загрузки тегов
+    article = (
+        db.query(Article)
+        .options(joinedload(Article.tags))
+        .filter(Article.slug == slug, Article.published == True)
+        .first()
+    )
+
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
-    return article
 
+    # Логируем для отладки
+    print(f"Найдена статья '{article.title}' с {len(article.tags)} тегами: {[tag.name for tag in article.tags]}")
+
+    return article

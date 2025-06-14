@@ -1,4 +1,4 @@
-# backend/app/models/game.py - ОБНОВЛЕНИЕ СУЩЕСТВУЮЩЕЙ МОДЕЛИ
+# backend/app/models/game.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -25,6 +25,7 @@ class Game(Base):
     products = relationship("Product", back_populates="game")
     faqs = relationship("GameFAQ", back_populates="game")
     instructions_list = relationship("GameInstruction", back_populates="game")
+    articles = relationship("Article", back_populates="game")  # НОВАЯ СВЯЗЬ
 
     def get_faq_list(self):
         """Парсит FAQ контент в список вопросов-ответов"""

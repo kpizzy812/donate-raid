@@ -1,10 +1,17 @@
-// frontend/src/app/blog/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/blog/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Search, Calendar, User, Tag, Eye } from 'lucide-react'
 import { api } from '@/lib/api'
+
+interface ArticleTag {
+  id: number
+  name: string
+  slug: string
+  color?: string
+}
 
 interface Article {
   id: number
@@ -14,8 +21,9 @@ interface Article {
   category: string
   created_at: string
   author_name?: string
+  featured_image_url?: string
   featured_image?: string
-  tags?: string[]
+  tags?: ArticleTag[]
   views?: number
 }
 
@@ -34,6 +42,7 @@ export default function BlogPage() {
         if (category) params.append('category', category)
 
         const res = await api.get(`/articles?${params.toString()}`)
+        console.log('Загруженные статьи:', res.data)
         setArticles(res.data)
       } catch (error) {
         console.error('Ошибка загрузки статей:', error)
@@ -62,6 +71,11 @@ export default function BlogPage() {
   const getImageFromContent = (content: string) => {
     const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i)
     return imgMatch ? imgMatch[1] : null
+  }
+
+  // Функция для получения изображения статьи
+  const getArticleImage = (article: Article) => {
+    return article.featured_image_url || article.featured_image || getImageFromContent(article.content)
   }
 
   return (
@@ -157,7 +171,7 @@ export default function BlogPage() {
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {articles.map(article => {
-                const featuredImage = article.featured_image || getImageFromContent(article.content)
+                const featuredImage = getArticleImage(article)
 
                 return (
                   <Link
@@ -178,46 +192,59 @@ export default function BlogPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <div className="text-4xl">📰</div>
+                          <div className="text-2xl">📰</div>
                         </div>
                       )}
                     </div>
 
                     {/* Content */}
                     <div className="p-4">
-                      {/* Category & Date */}
-                      <div className="flex items-center justify-between mb-2 text-sm">
-                        <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full">
-                          {article.category}
-                        </span>
-                        <div className="flex items-center gap-1 text-zinc-500">
-                          <Calendar size={14} />
-                          {new Date(article.created_at).toLocaleDateString('ru-RU')}
-                        </div>
+                      {/* Category */}
+                      <div className="text-xs text-blue-600 dark:text-blue-400 mb-2">
+                        {article.category || 'Статья'}
                       </div>
 
                       {/* Title */}
-                      <h2 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition line-clamp-2">
+                      <h3 className="font-semibold group-hover:text-blue-600 transition line-clamp-2 mb-2">
                         {article.title}
-                      </h2>
+                      </h3>
 
                       {/* Excerpt */}
-                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 line-clamp-3">
-                        {truncateText(article.content, 120)}
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 mb-3">
+                        {truncateText(article.content, 100)}
                       </p>
 
-                      {/* Footer */}
-                      <div className="flex items-center justify-between text-xs text-zinc-500">
-                        <div className="flex items-center gap-1">
-                          <User size={12} />
-                          {article.author_name || 'DonateRaid'}
+                      {/* Tags */}
+                      {article.tags && article.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {article.tags.slice(0, 3).map((tag) => (
+                            <span
+                              key={tag.id}
+                              className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded text-xs"
+                            >
+                              #{tag.name}
+                            </span>
+                          ))}
+                          {article.tags.length > 3 && (
+                            <span className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded text-xs">
+                              +{article.tags.length - 3}
+                            </span>
+                          )}
                         </div>
-                        {article.views && (
-                          <div className="flex items-center gap-1">
-                            <Eye size={12} />
-                            {article.views}
-                          </div>
-                        )}
+                      )}
+
+                      {/* Meta */}
+                      <div className="flex items-center justify-between text-xs text-zinc-500">
+                        <div className="flex items-center gap-2">
+                          <User size={12} />
+                          <span>{article.author_name || 'DonateRaid'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar size={12} />
+                          <time dateTime={article.created_at}>
+                            {new Date(article.created_at).toLocaleDateString('ru-RU')}
+                          </time>
+                        </div>
                       </div>
                     </div>
                   </Link>
