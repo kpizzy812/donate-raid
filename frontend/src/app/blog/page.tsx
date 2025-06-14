@@ -1,4 +1,4 @@
-// frontend/src/app/blog/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/blog/page.tsx - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -22,7 +22,7 @@ interface Article {
   created_at: string
   author_name?: string
   featured_image_url?: string
-  featured_image?: string
+  featured_image?: string  // Свойство из схемы для совместимости
   tags?: ArticleTag[]
   views?: number
 }
@@ -73,9 +73,20 @@ export default function BlogPage() {
     return imgMatch ? imgMatch[1] : null
   }
 
-  // Функция для получения изображения статьи
+  // ИСПРАВЛЕНО: функция для получения изображения статьи
   const getArticleImage = (article: Article) => {
-    return article.featured_image_url || article.featured_image || getImageFromContent(article.content)
+    // Проверяем все возможные источники изображения
+    return article.featured_image_url ||
+           article.featured_image ||
+           getImageFromContent(article.content)
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
   }
 
   return (
@@ -180,72 +191,85 @@ export default function BlogPage() {
                     className="group bg-white dark:bg-zinc-900 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                   >
                     {/* Image */}
-                    <div className="aspect-video bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                    <div className="aspect-video bg-zinc-100 dark:bg-zinc-800 overflow-hidden relative">
                       {featuredImage ? (
                         <img
                           src={featuredImage}
                           alt={article.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
+                            // Если изображение не загрузилось, скрываем его
                             e.currentTarget.style.display = 'none'
                           }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <div className="text-2xl">📰</div>
+                          <div className="text-3xl text-zinc-400">📰</div>
                         </div>
                       )}
+
+                      {/* Category Badge */}
+                      <div className="absolute top-3 left-3">
+                        <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-md font-medium">
+                          {article.category}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Content */}
                     <div className="p-4">
-                      {/* Category */}
-                      <div className="text-xs text-blue-600 dark:text-blue-400 mb-2">
-                        {article.category || 'Статья'}
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="font-semibold group-hover:text-blue-600 transition line-clamp-2 mb-2">
+                      <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition line-clamp-2">
                         {article.title}
                       </h3>
 
-                      {/* Excerpt */}
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 mb-3">
-                        {truncateText(article.content, 100)}
+                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 line-clamp-3">
+                        {truncateText(article.content, 150)}
                       </p>
+
+                      {/* Meta information */}
+                      <div className="flex items-center justify-between text-xs text-zinc-500">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1">
+                            <Calendar size={12} />
+                            <span>{formatDate(article.created_at)}</span>
+                          </div>
+
+                          {article.author_name && (
+                            <div className="flex items-center gap-1">
+                              <User size={12} />
+                              <span>{article.author_name}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {article.views && (
+                          <div className="flex items-center gap-1">
+                            <Eye size={12} />
+                            <span>{article.views}</span>
+                          </div>
+                        )}
+                      </div>
 
                       {/* Tags */}
                       {article.tags && article.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-3">
+                        <div className="flex flex-wrap gap-1 mt-3">
                           {article.tags.slice(0, 3).map((tag) => (
                             <span
                               key={tag.id}
-                              className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded text-xs"
+                              className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-full"
+                              style={{ color: tag.color || '#3B82F6' }}
                             >
-                              #{tag.name}
+                              <Tag size={10} />
+                              {tag.name}
                             </span>
                           ))}
                           {article.tags.length > 3 && (
-                            <span className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded text-xs">
+                            <span className="text-xs text-zinc-400">
                               +{article.tags.length - 3}
                             </span>
                           )}
                         </div>
                       )}
-
-                      {/* Meta */}
-                      <div className="flex items-center justify-between text-xs text-zinc-500">
-                        <div className="flex items-center gap-2">
-                          <User size={12} />
-                          <span>{article.author_name || 'DonateRaid'}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar size={12} />
-                          <time dateTime={article.created_at}>
-                            {new Date(article.created_at).toLocaleDateString('ru-RU')}
-                          </time>
-                        </div>
-                      </div>
                     </div>
                   </Link>
                 )

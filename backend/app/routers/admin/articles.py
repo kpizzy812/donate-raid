@@ -1,4 +1,4 @@
-# backend/app/routers/admin/articles.py - ФИНАЛЬНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/routers/admin/articles.py - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
@@ -33,7 +33,8 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db), admin:
                 article_data['featured_image'],
                 subfolder="blog"
             )
-            featured_image_url = FileUploadService.get_file_url(file_path)
+            # ИСПРАВЛЕНО: передаем пустую строку вместо settings.FRONTEND_URL
+            featured_image_url = FileUploadService.get_file_url(file_path, "")
         except Exception as e:
             print(f"Ошибка сохранения base64 изображения: {e}")
             featured_image_url = None
@@ -76,40 +77,44 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db), admin:
 
     db.commit()
     db.refresh(new_article)
+
     return new_article
-
-
-@router.put("/{article_id}", response_model=ArticleRead)
-def update_article(article_id: int, article: ArticleUpdate, db: Session = Depends(get_db),
-                   admin: User = Depends(admin_required)):
-    db_article = db.query(Article).filter(Article.id == article_id).first()
-    if not db_article:
-        raise HTTPException(status_code=404, detail="Article not found")
-
-    # Обновляем поля
-    for field, value in article.dict(exclude_unset=True).items():
-        if hasattr(db_article, field):
-            setattr(db_article, field, value)
-
-    db_article.updated_at = datetime.utcnow()
-    db.commit()
-    db.refresh(db_article)
-    return db_article
-
-
-@router.delete("/{article_id}")
-def delete_article(article_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
-    db_article = db.query(Article).filter(Article.id == article_id).first()
-    if not db_article:
-        raise HTTPException(status_code=404, detail="Article not found")
-    db.delete(db_article)
-    db.commit()
-    return {"detail": "Article deleted"}
 
 
 @router.get("/{article_id}", response_model=ArticleRead)
 def get_article(article_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     article = db.query(Article).filter(Article.id == article_id).first()
     if not article:
-        raise HTTPException(status_code=404, detail="Article not found")
+        raise HTTPException(status_code=404, detail="Статья не найдена")
     return article
+
+
+@router.put("/{article_id}", response_model=ArticleRead)
+def update_article(
+    article_id: int,
+    article_update: ArticleUpdate,
+    db: Session = Depends(get_db),
+    admin: User = Depends(admin_required)
+):
+    article = db.query(Article).filter(Article.id == article_id).first()
+    if not article:
+        raise HTTPException(status_code=404, detail="Статья не найдена")
+
+    # Обновляем данные
+    for field, value in article_update.dict(exclude_unset=True).items():
+        setattr(article, field, value)
+
+    db.commit()
+    db.refresh(article)
+    return article
+
+
+@router.delete("/{article_id}")
+def delete_article(article_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
+    article = db.query(Article).filter(Article.id == article_id).first()
+    if not article:
+        raise HTTPException(status_code=404, detail="Статья не найдена")
+
+    db.delete(article)
+    db.commit()
+    return {"message": "Статья удалена"}

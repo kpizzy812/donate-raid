@@ -1,4 +1,4 @@
-# backend/app/services/file_upload.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/services/file_upload.py - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
 import os
 import uuid
 import base64
@@ -171,14 +171,24 @@ class FileUploadService:
 
     @staticmethod
     def get_file_url(file_path: str, base_url: str = "") -> str:
-        """Генерирует URL для доступа к файлу"""
+        """
+        Генерирует URL для доступа к файлу
+
+        Args:
+            file_path: Путь к файлу относительно UPLOAD_DIR
+            base_url: Базовый URL (необязательно)
+
+        Returns:
+            Полный URL к файлу
+        """
         if not file_path:
             return ""
 
         # Убираем слеши в начале и нормализуем путь
         normalized_path = file_path.lstrip('/').replace('\\', '/')
 
-        if base_url:
+        # ИСПРАВЛЕНО: Если base_url не задан, возвращаем просто путь от корня
+        if base_url and base_url.strip():
             base_url = base_url.rstrip('/')
             return f"{base_url}/uploads/{normalized_path}"
 

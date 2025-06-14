@@ -1,4 +1,4 @@
-// frontend/src/app/admin/games/create/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/admin/games/create/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useState } from 'react'
@@ -30,8 +30,14 @@ export default function CreateGamePage() {
       formData.append('file', file)
       formData.append('subfolder', 'games')
 
+      // ИСПРАВЛЕНО: правильный endpoint
       const response = await adminApi.post('/upload/image', formData)
-      setBannerUrl(response.data.file_url)
+
+      if (response.data.success) {
+        setBannerUrl(response.data.file_url)
+      } else {
+        throw new Error('Неожиданный ответ сервера')
+      }
     } catch (error) {
       console.error('Ошибка загрузки:', error)
       alert('Ошибка загрузки файла')
@@ -149,46 +155,39 @@ export default function CreateGamePage() {
             >
               <div className="flex flex-col items-center gap-2">
                 {bannerUploading ? (
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  <Upload className="w-8 h-8 text-zinc-400 animate-spin" />
                 ) : (
                   <ImageIcon className="w-8 h-8 text-zinc-400" />
                 )}
                 <span className="text-zinc-400">
                   {bannerUploading ? 'Загрузка...' : 'Нажмите для загрузки баннера'}
                 </span>
-                <span className="text-xs text-zinc-500">PNG, JPG, WEBP до 5MB</span>
+                <span className="text-xs text-zinc-500">Форматы: JPG, PNG, GIF. Макс. 5MB</span>
               </div>
             </button>
           )}
         </div>
 
-        {/* Инструкции */}
+        {/* Детальная информация */}
         <div className="bg-zinc-800 p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">📖 Инструкции к игре</h2>
-          <p className="text-sm text-zinc-400 mb-3">
-            Здесь вы можете добавить подробные инструкции о том, как работает процесс пополнения в данной игре
-          </p>
+          <h2 className="text-lg font-semibold mb-4">Детальная информация</h2>
+
+          <label className="text-sm text-zinc-400">Инструкции</label>
           <textarea
-            className="w-full p-3 bg-zinc-700 text-white rounded"
-            rows={6}
+            className="w-full mb-3 p-2 bg-zinc-700 text-white rounded"
+            rows={4}
             value={instructions}
             onChange={e => setInstructions(e.target.value)}
-            placeholder="Например:&#10;1. Укажите ваш игровой ID&#10;2. Выберите сервер&#10;3. После оплаты валюта поступит в течение 5-15 минут&#10;4. Проверьте почту - мы отправим подтверждение"
+            placeholder="Инструкции по игре..."
           />
-        </div>
 
-        {/* FAQ */}
-        <div className="bg-zinc-800 p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">❓ Часто задаваемые вопросы (FAQ)</h2>
-          <p className="text-sm text-zinc-400 mb-3">
-            Добавьте ответы на часто задаваемые вопросы по данной игре
-          </p>
+          <label className="text-sm text-zinc-400">FAQ</label>
           <textarea
-            className="w-full p-3 bg-zinc-700 text-white rounded"
-            rows={8}
+            className="w-full mb-3 p-2 bg-zinc-700 text-white rounded"
+            rows={4}
             value={faq}
             onChange={e => setFaq(e.target.value)}
-            placeholder="Например:&#10;&#10;Q: Как найти мой игровой ID?&#10;A: Зайдите в настройки игры, там будет указан ваш уникальный ID&#10;&#10;Q: Сколько времени занимает пополнение?&#10;A: Обычно 5-15 минут, максимум до 2 часов&#10;&#10;Q: Что делать если валюта не пришла?&#10;A: Обратитесь в поддержку с номером заказа"
+            placeholder="Часто задаваемые вопросы..."
           />
         </div>
 
@@ -197,45 +196,41 @@ export default function CreateGamePage() {
           <h2 className="text-lg font-semibold mb-4">Настройки</h2>
 
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={autoSupport}
                 onChange={e => setAutoSupport(e.target.checked)}
-                id="auto-support"
+                className="form-checkbox"
               />
-              <label htmlFor="auto-support">
-                Автоматическая поддержка (если выключено - заказы обрабатываются вручную)
-              </label>
-            </div>
+              <span className="text-sm">Автоматическая поддержка</span>
+            </label>
 
-            <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={enabled}
                 onChange={e => setEnabled(e.target.checked)}
-                id="enabled"
+                className="form-checkbox"
               />
-              <label htmlFor="enabled">
-                Активна (отображается на сайте)
-              </label>
-            </div>
+              <span className="text-sm">Игра активна</span>
+            </label>
           </div>
         </div>
 
         {/* Кнопки действий */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => router.push('/admin/games')}
-            className="bg-zinc-600 hover:bg-zinc-700 text-white px-4 py-2 rounded"
-          >
-            Отмена
-          </button>
+        <div className="flex gap-4">
           <button
             onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
           >
             Создать игру
+          </button>
+          <button
+            onClick={() => router.push('/admin/games')}
+            className="bg-zinc-600 hover:bg-zinc-700 text-white px-6 py-2 rounded"
+          >
+            Отмена
           </button>
         </div>
       </div>

@@ -140,12 +140,15 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       formData.append('file', file)
       formData.append('subfolder', 'products')
 
-      const response = await api.post('/upload/admin/image/', formData, {
+      // ИСПРАВЛЕНО: правильный endpoint
+      const response = await api.post('/upload/image', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
 
       if (response.data.success) {
         setImageUrl(response.data.file_url)
+      } else {
+        throw new Error('Неожиданный ответ сервера')
       }
     } catch (error) {
       console.error('Ошибка загрузки изображения:', error)

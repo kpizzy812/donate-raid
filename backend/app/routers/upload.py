@@ -1,4 +1,4 @@
-# backend/app/routers/upload.py - НОВЫЙ ФАЙЛ
+# backend/app/routers/upload.py - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
@@ -6,7 +6,6 @@ from app.core.database import get_db
 from app.services.auth import get_current_user, admin_required
 from app.models.user import User
 from app.services.file_upload import FileUploadService
-from app.core.config import settings
 import os
 
 router = APIRouter()
@@ -27,7 +26,8 @@ async def upload_image(
 
     try:
         file_path = await FileUploadService.save_image(file, subfolder)
-        file_url = FileUploadService.get_file_url(file_path, settings.FRONTEND_URL)
+        # ИСПРАВЛЕНО: убираем лишние параметры
+        file_url = FileUploadService.get_file_url(file_path)
 
         return {
             "success": True,
@@ -48,9 +48,15 @@ async def admin_upload_image(
 ):
     """Загрузка изображения для администраторов (расширенные права)"""
 
+    # Для админов разрешаем больше подпапок
+    allowed_subfolders = ["images", "blog", "games", "products", "avatars", "admin", "temp"]
+    if subfolder not in allowed_subfolders:
+        raise HTTPException(status_code=400, detail="Недопустимая подпапка")
+
     try:
         file_path = await FileUploadService.save_image(file, subfolder)
-        file_url = FileUploadService.get_file_url(file_path, settings.FRONTEND_URL)
+        # ИСПРАВЛЕНО: убираем лишние параметры
+        file_url = FileUploadService.get_file_url(file_path)
 
         return {
             "success": True,
@@ -107,8 +113,7 @@ async def list_files(
         file_path = os.path.join(upload_path, filename)
         if os.path.isfile(file_path):
             file_url = FileUploadService.get_file_url(
-                os.path.join(subfolder, filename),
-                settings.FRONTEND_URL
+                os.path.join(subfolder, filename)
             )
             file_size = os.path.getsize(file_path)
 
