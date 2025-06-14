@@ -5,11 +5,6 @@ const path = require('path');
 module.exports = {
   // output: 'standalone', // Временно отключаем для упрощения
 
-  // Принудительно используем IPv4
-  env: {
-    NODE_OPTIONS: '--dns-result-order=ipv4first',
-  },
-
   webpack: (config) => {
     config.resolve.alias['@'] = path.resolve(__dirname, 'src');
     return config;
@@ -40,5 +35,14 @@ module.exports = {
   // Настройки для исправления проблем с fetch в SSR
   experimental: {
     serverComponentsExternalPackages: [],
+  },
+
+  // Настройка для принудительного использования IPv4
+  serverRuntimeConfig: {
+    // Будет доступно только на сервере
+  },
+  publicRuntimeConfig: {
+    // Будет доступно как на сервере, так и на клиенте
+    API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
 };
