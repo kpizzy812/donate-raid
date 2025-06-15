@@ -1,4 +1,4 @@
-# backend/app/schemas/admin/articles.py - ФИНАЛЬНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/schemas/admin/articles.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
@@ -39,16 +39,29 @@ class ArticleBase(BaseModel):
 
 
 class ArticleCreate(ArticleBase):
-    # Поддерживаем старые поля для совместимости с фронтендом
-    featured_image: Optional[str] = None  # Для совместимости
-    tags: Optional[List[str]] = []
-    categories: Optional[List[str]] = []
+    # ИСПРАВЛЕНО: Поддерживаем все необходимые поля для фронтенда
+    featured_image: Optional[str] = None  # Base64 изображение
+    tags: Optional[List[str]] = []  # Обычные теги
+    categories: Optional[List[str]] = []  # Множественные категории
 
 
-class ArticleUpdate(ArticleBase):
+class ArticleUpdate(BaseModel):
+    # ИСПРАВЛЕНО: Все поля опциональные для обновления
     title: Optional[str] = None
     slug: Optional[str] = None
     content: Optional[str] = None
+    category: Optional[str] = None
+    excerpt: Optional[str] = None
+    game_id: Optional[int] = None
+    published: Optional[bool] = None
+    author_name: Optional[str] = None
+    featured_image_url: Optional[str] = None
+    featured_image_alt: Optional[str] = None
+
+    # Дополнительные поля для обновления
+    featured_image: Optional[str] = None  # Base64 изображение
+    tags: Optional[List[str]] = None  # Теги
+    categories: Optional[List[str]] = None  # Категории
 
 
 class ArticleRead(ArticleBase):
@@ -57,13 +70,19 @@ class ArticleRead(ArticleBase):
     updated_at: Optional[datetime] = None
     published_at: Optional[datetime] = None
 
-    # Добавляем теги в ответ
+    # ИСПРАВЛЕНО: Добавляем теги в ответ
     tags: Optional[List[ArticleTagRead]] = []
 
-    # Для совместимости с фронтендом добавляем список названий тегов
+    # ИСПРАВЛЕНО: Вычисляемые свойства для совместимости с фронтендом
     @property
     def tag_names(self) -> List[str]:
+        """Возвращает список названий тегов для совместимости"""
         return [tag.name for tag in self.tags] if self.tags else []
+
+    @property
+    def featured_image(self) -> Optional[str]:
+        """Возвращает featured_image_url как featured_image для совместимости"""
+        return self.featured_image_url
 
     class Config:
         from_attributes = True

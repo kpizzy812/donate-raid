@@ -1,7 +1,7 @@
-// frontend/src/app/admin/articles/create/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/admin/articles/create/page.tsx - ФИНАЛЬНАЯ ВЕРСИЯ С НОВОЙ СИСТЕМОЙ
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
 import { EditorContent, useEditor } from '@tiptap/react'
@@ -14,24 +14,40 @@ import Dropcursor from '@tiptap/extension-dropcursor'
 import TextAlign from '@tiptap/extension-text-align'
 import Highlight from '@tiptap/extension-highlight'
 import TextStyle from '@tiptap/extension-text-style'
-import { 
-  Bold, Italic, Link as LinkIcon, Image as ImageIcon, Youtube as YoutubeIcon, 
-  AlignLeft, AlignCenter, AlignRight, Maximize2, Upload, Plus, X, Highlighter 
+import {
+  Bold, Italic, Link as LinkIcon, Image as ImageIcon, Youtube as YoutubeIcon,
+  AlignLeft, AlignCenter, AlignRight, Maximize2, Upload, Plus, X, Highlighter, Filter, Tag
 } from 'lucide-react'
+
+interface CategoryInfo {
+  name: string
+  slug: string
+  color: string
+}
+
+interface TagInfo {
+  name: string
+  slug: string
+  color: string
+}
 
 export default function CreateArticlePage() {
   const router = useRouter()
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
-  const [categories, setCategories] = useState<string[]>(['Новости'])
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(['Новости'])
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [authorName, setAuthorName] = useState('')
   const [featuredImage, setFeaturedImage] = useState('')
-  const [tags, setTags] = useState<string[]>([])
   const [newTag, setNewTag] = useState('')
   const [fullscreen, setFullscreen] = useState(false)
   const [imageUploading, setImageUploading] = useState(false)
 
-  const allCategories = ['Новости', 'Гайды', 'Промокоды', 'Обзоры', 'ПК Игры', 'Мобильные игры']
+  // Загруженные категории и теги
+  const [availableCategories, setAvailableCategories] = useState<CategoryInfo[]>([])
+  const [availableTags, setAvailableTags] = useState<TagInfo[]>([])
+
+  const defaultCategories = ['Новости', 'Гайды', 'Промокоды', 'Обзоры', 'ПК Игры', 'Мобильные игры']
 
   const editor = useEditor({
     extensions: [
@@ -52,7 +68,7 @@ export default function CreateArticlePage() {
       handleDrop(view, event, _slice, moved) {
         const files = event.dataTransfer?.files
         if (!files || files.length === 0) return false
-        
+
         const file = files[0]
         if (file.type.startsWith('image/')) {
           uploadImage(file)
@@ -63,7 +79,7 @@ export default function CreateArticlePage() {
       handlePaste(view, event, slice) {
         const items = event.clipboardData?.items
         if (!items) return false
-        
+
         for (const item of items) {
           if (item.type.indexOf('image') === 0) {
             const file = item.getAsFile()
@@ -81,7 +97,25 @@ export default function CreateArticlePage() {
     }
   })
 
-  // Автогенерация slug из заголовка
+  // Загружаем доступные категории и теги
+  useEffect(() => {
+    const loadOptions = async () => {
+      try {
+        const [categoriesRes, tagsRes] = await Promise.all([
+          api.get('/admin/articles/categories/available'),
+          api.get('/admin/articles/tags/available')
+        ])
+        setAvailableCategories(categoriesRes.data)
+        setAvailableTags(tagsRes.data)
+      } catch (error) {
+        console.error('Ошибка загрузки опций:', error)
+        // Используем стандартные категории как fallback
+        setAvailableCategories(defaultCategories.map(name => ({ name, slug: name.toLowerCase(), color: '#3B82F6' })))
+      }
+    }
+    loadOptions()
+  }, [])
+
   const generateSlug = (title: string) => {
     return title
       .toLowerCase()
@@ -103,9 +137,8 @@ export default function CreateArticlePage() {
     }
 
     setImageUploading(true)
-    
+
     try {
-      // Конвертируем в base64 для простоты (в продакшне лучше использовать отдельный сервис)
       const reader = new FileReader()
       reader.onload = () => {
         const src = reader.result as string
@@ -148,23 +181,31 @@ export default function CreateArticlePage() {
     input.click()
   }
 
-  const toggleCategory = (category: string) => {
-    setCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
+  const toggleCategory = (categoryName: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(categoryName)
+        ? prev.filter(c => c !== categoryName)
+        : [...prev, categoryName]
     )
   }
 
-  const addTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()])
+  const toggleTag = (tagName: string) => {
+    setSelectedTags(prev =>
+      prev.includes(tagName)
+        ? prev.filter(t => t !== tagName)
+        : [...prev, tagName]
+    )
+  }
+
+  const addCustomTag = () => {
+    if (newTag.trim() && !selectedTags.includes(newTag.trim())) {
+      setSelectedTags([...selectedTags, newTag.trim()])
       setNewTag('')
     }
   }
 
   const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove))
+    setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove))
   }
 
   const handleSubmit = async () => {
@@ -178,30 +219,41 @@ export default function CreateArticlePage() {
       return
     }
 
-    if (categories.length === 0) {
+    if (selectedCategories.length === 0) {
       alert('Выберите хотя бы одну категорию')
       return
     }
 
     const content = editor?.getHTML() || ''
-    
+
     try {
-      await api.post('/admin/articles', {
+      const requestData = {
         title: title.trim(),
         slug: slug.trim(),
         content,
-        category: categories[0], // Основная категория (для совместимости)
-        categories, // Массив всех категорий
+        categories: selectedCategories, // Множественные категории
         author_name: authorName.trim() || 'DonateRaid Team',
         featured_image: featuredImage,
-        tags,
+        tags: selectedTags, // Обычные теги
         published: true,
-      })
-      
+      }
+
+      console.log('Отправляем данные:', requestData)
+
+      await api.post('/admin/articles', requestData)
+
+      alert('Статья успешно создана!')
       router.push('/admin/articles')
-    } catch (err) {
+    } catch (err: any) {
       console.error('Ошибка при создании статьи', err)
-      alert('Ошибка при создании статьи')
+
+      if (err.response) {
+        console.error('Статус ошибки:', err.response.status)
+        console.error('Данные ошибки:', err.response.data)
+        alert(`Ошибка при создании статьи: ${err.response.data.detail || err.response.statusText}`)
+      } else {
+        alert('Ошибка при создании статьи')
+      }
     }
   }
 
@@ -219,12 +271,14 @@ export default function CreateArticlePage() {
     }
   }
 
+  const allCategories = availableCategories.length > 0 ? availableCategories : defaultCategories.map(name => ({ name, slug: name.toLowerCase(), color: '#3B82F6' }))
+
   return (
     <div className={`w-full ${fullscreen ? 'fixed top-0 left-0 right-0 bottom-0 z-50 bg-zinc-950' : 'min-h-screen'} text-white p-6`}>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Создание статьи</h1>
-        <button 
-          onClick={() => setFullscreen(prev => !prev)} 
+        <button
+          onClick={() => setFullscreen(prev => !prev)}
           className="p-2 rounded bg-zinc-800 hover:bg-zinc-700"
           title="Полноэкранный режим"
         >
@@ -282,65 +336,102 @@ export default function CreateArticlePage() {
             <label className="block text-sm font-medium mb-2">Главное изображение</label>
             {featuredImage ? (
               <div className="relative">
-                <img src={featuredImage} alt="Preview" className="w-full h-32 object-cover rounded" />
+                <img src={featuredImage} alt="Превью" className="w-full h-48 object-cover rounded" />
                 <button
                   onClick={() => setFeaturedImage('')}
-                  className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full"
+                  className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1"
                 >
-                  <X size={14} />
+                  <X size={16} />
                 </button>
               </div>
             ) : (
               <button
                 onClick={addFeaturedImage}
-                className="w-full h-32 border-2 border-dashed border-zinc-600 rounded flex flex-col items-center justify-center hover:border-zinc-500 transition"
+                className="w-full h-48 border-2 border-dashed border-zinc-600 rounded flex flex-col items-center justify-center hover:border-blue-500 transition-colors"
               >
-                <Upload size={20} className="mb-2" />
-                <span className="text-sm">Загрузить изображение</span>
+                <Upload size={24} className="mb-2" />
+                <span>Загрузить изображение</span>
               </button>
             )}
           </div>
 
           {/* Категории */}
           <div>
-            <label className="block text-sm font-medium mb-2">Категории *</label>
-            <div className="space-y-2">
+            <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+              <Filter size={16} />
+              Категории *
+              <span className="text-xs text-zinc-400 font-normal">(статья попадет во все выбранные)</span>
+            </label>
+            <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
               {allCategories.map(category => (
-                <label key={category} className="flex items-center">
+                <label key={category.name} className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={categories.includes(category)}
-                    onChange={() => toggleCategory(category)}
-                    className="mr-2"
+                    checked={selectedCategories.includes(category.name)}
+                    onChange={() => toggleCategory(category.name)}
+                    className="rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm">{category}</span>
+                  <span className="text-sm">{category.name}</span>
                 </label>
               ))}
             </div>
+            <p className="text-xs text-zinc-400 mt-1">
+              Выбрано: {selectedCategories.length} категорий
+            </p>
           </div>
 
           {/* Теги */}
           <div>
-            <label className="block text-sm font-medium mb-2">Теги</label>
+            <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+              <Tag size={16} />
+              Теги
+              <span className="text-xs text-zinc-400 font-normal">(для поиска и детализации)</span>
+            </label>
+
+            {/* Популярные теги */}
+            {availableTags.length > 0 && (
+              <div className="mb-3">
+                <p className="text-xs text-zinc-400 mb-2">Популярные теги:</p>
+                <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto">
+                  {availableTags.slice(0, 15).map(tag => (
+                    <button
+                      key={tag.name}
+                      onClick={() => toggleTag(tag.name)}
+                      className={`px-2 py-1 text-xs rounded-full border transition ${
+                        selectedTags.includes(tag.name)
+                          ? 'bg-green-600 text-white border-green-600'
+                          : 'bg-zinc-700 text-zinc-300 border-zinc-600 hover:bg-zinc-600'
+                      }`}
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Добавление нового тега */}
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
                 placeholder="Новый тег"
-                className="flex-1 p-2 bg-zinc-800 text-white rounded text-sm border border-zinc-700"
+                className="flex-1 p-2 bg-zinc-800 text-white rounded border border-zinc-700 focus:border-blue-500 focus:outline-none text-sm"
                 value={newTag}
                 onChange={e => setNewTag(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addCustomTag())}
               />
               <button
-                onClick={addTag}
+                onClick={addCustomTag}
                 className="p-2 bg-blue-600 rounded hover:bg-blue-700"
               >
                 <Plus size={16} />
               </button>
             </div>
+
+            {/* Выбранные теги */}
             <div className="flex flex-wrap gap-2">
-              {tags.map(tag => (
-                <span key={tag} className="flex items-center gap-1 px-2 py-1 bg-zinc-700 rounded text-xs">
+              {selectedTags.map(tag => (
+                <span key={tag} className="flex items-center gap-1 px-2 py-1 bg-green-700 rounded text-xs">
                   #{tag}
                   <button onClick={() => removeTag(tag)} className="text-red-400 hover:text-red-300">
                     <X size={12} />

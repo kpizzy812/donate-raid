@@ -1,17 +1,18 @@
-// frontend/src/app/blog/page.tsx - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/blog/page.tsx - НОВЫЙ БЛОГ С ТЕГАМИ И КАТЕГОРИЯМИ
 'use client'
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Search, Calendar, User, Tag, Eye } from 'lucide-react'
+import { Search, Calendar, User, Tag, Eye, Filter, X } from 'lucide-react'
 import { api } from '@/lib/api'
-import { getImageUrl } from '@/lib/imageUtils' // ИСПРАВЛЕНО: добавлен импорт getImageUrl
+import { getImageUrl } from '@/lib/imageUtils'
 
 interface ArticleTag {
   id: number
   name: string
   slug: string
   color?: string
+  is_category?: boolean
 }
 
 interface Article {
@@ -20,33 +21,77 @@ interface Article {
   title: string
   content: string
   category: string
+  categories: string[]  // Множественные категории
+  regular_tags: string[]  // Обычные теги
   created_at: string
   author_name?: string
   featured_image_url?: string
-  featured_image?: string  // Свойство из схемы для совместимости
+  featured_image?: string
   tags?: ArticleTag[]
   views?: number
 }
 
+interface CategoryInfo {
+  id: number
+  name: string
+  slug: string
+  color: string
+  article_count: number
+}
+
+interface TagInfo {
+  id: number
+  name: string
+  slug: string
+  color: string
+  article_count: number
+}
+
 export default function BlogPage() {
   const [articles, setArticles] = useState<Article[]>([])
+  const [allCategories, setAllCategories] = useState<CategoryInfo[]>([])
+  const [allTags, setAllTags] = useState<TagInfo[]>([])
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<string | null>(null)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
 
+  // Загружаем категории и теги
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const [categoriesRes, tagsRes] = await Promise.all([
+          api.get('/articles/categories'),
+          api.get('/articles/tags')
+        ])
+        setAllCategories(categoriesRes.data)
+        setAllTags(tagsRes.data)
+      } catch (error) {
+        console.error('Ошибка загрузки фильтров:', error)
+      }
+    }
+    loadFilters()
+  }, [])
+
+  // Загружаем статьи с фильтрами
   useEffect(() => {
     const fetchArticles = async () => {
       try {
         setLoading(true)
         const params = new URLSearchParams()
+
         if (search) params.append('q', search)
-        if (category) params.append('category', category)
+        if (selectedCategories.length > 0) {
+          params.append('categories', selectedCategories.join(','))
+        }
+        if (selectedTags.length > 0) {
+          params.append('tags', selectedTags.join(','))
+        }
 
         const res = await api.get(`/articles?${params.toString()}`)
         console.log('Загруженные статьи:', res.data)
         setArticles(res.data)
-        // Сбрасываем ошибки изображений при новой загрузке
         setImageErrors({})
       } catch (error) {
         console.error('Ошибка загрузки статей:', error)
@@ -56,16 +101,7 @@ export default function BlogPage() {
     }
 
     fetchArticles()
-  }, [search, category])
-
-  const categories = [
-    'Новости',
-    'Гайды',
-    'Промокоды',
-    'Обзоры',
-    'ПК Игры',
-    'Мобильные игры',
-  ]
+  }, [search, selectedCategories, selectedTags])
 
   const truncateText = (text: string, maxLength: number) => {
     const plainText = text.replace(/<[^>]*>/g, '')
@@ -85,22 +121,42 @@ export default function BlogPage() {
     })
   }
 
-  // ИСПРАВЛЕНО: функция для получения изображения статьи
   const getArticleImage = (article: Article) => {
-    // Проверяем все возможные источники изображения
     let imagePath = article.featured_image_url ||
                     article.featured_image ||
                     getImageFromContent(article.content)
 
     if (!imagePath) return null
-
-    return getImageUrl(imagePath) // Теперь функция доступна благодаря импорту
+    return getImageUrl(imagePath)
   }
 
-  // Функция для обработки ошибок загрузки изображений
   const handleImageError = (articleId: number) => {
     setImageErrors(prev => ({ ...prev, [articleId]: true }))
   }
+
+  const toggleCategory = (categoryName: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(categoryName)
+        ? prev.filter(c => c !== categoryName)
+        : [...prev, categoryName]
+    )
+  }
+
+  const toggleTag = (tagName: string) => {
+    setSelectedTags(prev =>
+      prev.includes(tagName)
+        ? prev.filter(t => t !== tagName)
+        : [...prev, tagName]
+    )
+  }
+
+  const clearAllFilters = () => {
+    setSelectedCategories([])
+    setSelectedTags([])
+    setSearch('')
+  }
+
+  const hasActiveFilters = selectedCategories.length > 0 || selectedTags.length > 0 || search.length > 0
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -127,38 +183,106 @@ export default function BlogPage() {
             />
           </div>
 
+          {/* Active Filters */}
+          {hasActiveFilters && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="font-medium text-blue-800 dark:text-blue-200">Активные фильтры</h4>
+                <button
+                  onClick={clearAllFilters}
+                  className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1"
+                >
+                  <X size={14} />
+                  Очистить все
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                {/* Active Categories */}
+                {selectedCategories.map(cat => (
+                  <span
+                    key={cat}
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs rounded-full mr-1 mb-1"
+                  >
+                    {cat}
+                    <button
+                      onClick={() => toggleCategory(cat)}
+                      className="hover:bg-blue-200 dark:hover:bg-blue-700 rounded-full p-0.5"
+                    >
+                      <X size={10} />
+                    </button>
+                  </span>
+                ))}
+
+                {/* Active Tags */}
+                {selectedTags.map(tag => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-xs rounded-full mr-1 mb-1"
+                  >
+                    #{tag}
+                    <button
+                      onClick={() => toggleTag(tag)}
+                      className="hover:bg-green-200 dark:hover:bg-green-700 rounded-full p-0.5"
+                    >
+                      <X size={10} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Categories */}
           <div>
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Tag size={18} />
+              <Filter size={18} />
               Категории
             </h3>
             <div className="space-y-2">
-              <button
-                onClick={() => setCategory(null)}
-                className={`w-full text-left px-3 py-2 rounded-md transition ${
-                  category === null
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
-                    : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                }`}
-              >
-                Все статьи
-              </button>
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setCategory(cat === category ? null : cat)}
-                  className={`w-full text-left px-3 py-2 rounded-md transition ${
-                    cat === category
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
-                      : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                  }`}
-                >
-                  {cat}
-                </button>
+              {allCategories.map(category => (
+                <label key={category.id} className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(category.name)}
+                    onChange={() => toggleCategory(category.name)}
+                    className="rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm group-hover:text-blue-600 transition">
+                    {category.name}
+                  </span>
+                  <span className="text-xs text-zinc-400 ml-auto">
+                    ({category.article_count})
+                  </span>
+                </label>
               ))}
             </div>
           </div>
+
+          {/* Tags */}
+          {allTags.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Tag size={18} />
+                Популярные теги
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {allTags.slice(0, 20).map(tag => (
+                  <button
+                    key={tag.id}
+                    onClick={() => toggleTag(tag.name)}
+                    className={`px-3 py-1 text-xs rounded-full border transition ${
+                      selectedTags.includes(tag.name)
+                        ? 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-300 dark:border-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                    }`}
+                  >
+                    #{tag.name} ({tag.article_count})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </aside>
 
         {/* Main content */}
@@ -171,115 +295,126 @@ export default function BlogPage() {
           ) : articles.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-zinc-500 text-lg">Статьи не найдены</p>
-              {search && (
-                <p className="text-sm text-zinc-400 mt-2">
-                  По запросу "{search}" ничего не найдено
-                </p>
+              {hasActiveFilters && (
+                <div className="mt-4">
+                  <p className="text-sm text-zinc-400 mb-3">
+                    По выбранным фильтрам ничего не найдено
+                  </p>
+                  <button
+                    onClick={clearAllFilters}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                  >
+                    Сбросить фильтры
+                  </button>
+                </div>
               )}
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {articles.map(article => {
-                const featuredImage = getArticleImage(article)
-                const hasImageError = imageErrors[article.id]
+            <>
+              {/* Results info */}
+              <div className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
+                {hasActiveFilters ? (
+                  <p>Найдено {articles.length} статей по фильтрам</p>
+                ) : (
+                  <p>Показано {articles.length} статей</p>
+                )}
+              </div>
 
-                console.log(`Статья "${article.title}": featuredImage = ${featuredImage}, hasImageError = ${hasImageError}`) // Отладка
+              {/* Articles grid */}
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {articles.map(article => {
+                  const featuredImage = getArticleImage(article)
+                  const hasImageError = imageErrors[article.id]
 
-                return (
-                  <Link
-                    key={article.id}
-                    href={`/blog/${article.slug}`}
-                    className="group bg-white dark:bg-zinc-900 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-                  >
-                    {/* Image */}
-                    <div className="aspect-video bg-zinc-100 dark:bg-zinc-800 overflow-hidden relative">
-                      {featuredImage && !hasImageError ? (
-                        <img
-                          src={featuredImage}
-                          alt={article.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          onLoad={() => console.log('Изображение загружено успешно:', featuredImage)}
-                          onError={(e) => {
-                            console.error('Ошибка загрузки изображения:', featuredImage)
-                            handleImageError(article.id)
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-800">
-                          <div className="text-center">
-                            <div className="text-4xl text-zinc-400 mb-2">📰</div>
-                            <div className="text-xs text-zinc-500">
-                              {hasImageError ? 'Ошибка загрузки' : 'Нет изображения'}
+                  return (
+                    <Link
+                      key={article.id}
+                      href={`/blog/${article.slug}`}
+                      className="group bg-white dark:bg-zinc-900 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                    >
+                      {/* Image */}
+                      <div className="aspect-video bg-zinc-100 dark:bg-zinc-800 overflow-hidden relative">
+                        {featuredImage && !hasImageError ? (
+                          <img
+                            src={featuredImage}
+                            alt={article.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={() => handleImageError(article.id)}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <div className="text-center text-zinc-400">
+                              <div className="w-12 h-12 bg-zinc-300 dark:bg-zinc-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <Tag size={20} />
+                              </div>
+                              <p className="text-xs">Нет изображения</p>
                             </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-4">
-                      {/* Category */}
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
-                          {article.category}
-                        </span>
-                        {article.views && (
-                          <div className="flex items-center gap-1 text-xs text-zinc-500">
-                            <Eye size={12} />
-                            <span>{article.views}</span>
-                          </div>
                         )}
                       </div>
 
-                      {/* Title */}
-                      <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-                        {article.title}
-                      </h3>
-
-                      {/* Excerpt */}
-                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 line-clamp-2">
-                        {truncateText(article.content, 120)}
-                      </p>
-
-                      {/* Meta */}
-                      <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                        <div className="flex items-center gap-1">
-                          <Calendar size={12} />
-                          <span>
-                            {new Date(article.created_at).toLocaleDateString('ru-RU')}
-                          </span>
-                        </div>
-                        {article.author_name && (
-                          <div className="flex items-center gap-1">
-                            <User size={12} />
-                            <span>{article.author_name}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Tags */}
-                      {article.tags && article.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-3">
-                          {article.tags.slice(0, 3).map(tag => (
+                      {/* Content */}
+                      <div className="p-4">
+                        {/* Categories and Tags */}
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {/* Categories */}
+                          {article.categories?.slice(0, 2).map(category => (
                             <span
-                              key={tag.id}
-                              className="text-xs px-2 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                              key={category}
+                              className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full"
                             >
-                              {tag.name}
+                              {category}
                             </span>
                           ))}
-                          {article.tags.length > 3 && (
-                            <span className="text-xs text-zinc-500">
-                              +{article.tags.length - 3}
+
+                          {/* Regular Tags */}
+                          {article.regular_tags?.slice(0, 2).map(tag => (
+                            <span
+                              key={tag}
+                              className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Title */}
+                        <h2 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                          {article.title}
+                        </h2>
+
+                        {/* Excerpt */}
+                        <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 line-clamp-3">
+                          {truncateText(article.content, 120)}
+                        </p>
+
+                        {/* Meta */}
+                        <div className="flex items-center justify-between text-xs text-zinc-500">
+                          <div className="flex items-center gap-4">
+                            <span className="flex items-center gap-1">
+                              <Calendar size={12} />
+                              {formatDate(article.created_at)}
+                            </span>
+                            {article.author_name && (
+                              <span className="flex items-center gap-1">
+                                <User size={12} />
+                                {article.author_name}
+                              </span>
+                            )}
+                          </div>
+                          {article.views && (
+                            <span className="flex items-center gap-1">
+                              <Eye size={12} />
+                              {article.views}
                             </span>
                           )}
                         </div>
-                      )}
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </>
           )}
         </main>
       </div>

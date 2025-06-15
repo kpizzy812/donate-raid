@@ -1,4 +1,4 @@
-# backend/app/services/file_upload.py - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/services/file_upload.py - ДОПОЛНЕННАЯ ВЕРСИЯ
 import os
 import uuid
 import base64
@@ -49,33 +49,26 @@ class FileUploadService:
         file_extension = file.filename.split('.')[-1].lower() if file.filename else 'jpg'
         unique_filename = f"{uuid.uuid4().hex}.{file_extension}"
 
-        # Создаем директорию если не существует
-        upload_path = os.path.join(UPLOAD_DIR, subfolder)
-        os.makedirs(upload_path, exist_ok=True)
+        # Создаем путь для сохранения
+        save_dir = os.path.join(UPLOAD_DIR, subfolder)
+        os.makedirs(save_dir, exist_ok=True)
 
-        # Полный путь к файлу
-        file_path = os.path.join(upload_path, unique_filename)
+        file_path = os.path.join(save_dir, unique_filename)
 
         # Сохраняем файл
         async with aiofiles.open(file_path, 'wb') as f:
             await f.write(content)
 
-        # Оптимизируем изображение
-        try:
-            await FileUploadService._optimize_image(file_path)
-        except Exception as e:
-            print(f"Ошибка оптимизации изображения: {e}")
-
         # Возвращаем относительный путь
         return os.path.join(subfolder, unique_filename).replace('\\', '/')
 
     @staticmethod
-    def save_base64_image(base64_data: str, subfolder: str = "blog") -> str:
+    def save_base64_image(base64_data: str, subfolder: str = "images") -> str:
         """
-        Конвертирует base64 изображение в файл и сохраняет его
+        ИСПРАВЛЕНО: Синхронное сохранение base64 изображения
 
         Args:
-            base64_data: Base64 строка с изображением (data:image/jpeg;base64,...)
+            base64_data: Base64 строка с изображением (с префиксом data:image/...)
             subfolder: Подпапка для сохранения
 
         Returns:
@@ -86,79 +79,84 @@ class FileUploadService:
             if not base64_data.startswith('data:image/'):
                 raise ValueError("Неверный формат base64 изображения")
 
-            # Извлекаем тип изображения и данные
+            # Извлекаем тип и данные
             header, encoded = base64_data.split(',', 1)
-            image_type = header.split('/')[1].split(';')[0].lower()
+            mime_type = header.split(';')[0].split(':')[1]
 
-            # Проверяем поддерживаемые форматы
-            allowed_types = ['jpeg', 'jpg', 'png', 'gif', 'webp']
-            if image_type not in allowed_types:
-                raise ValueError(f"Неподдерживаемый тип изображения: {image_type}")
+            # Проверяем тип изображения
+            if mime_type not in ALLOWED_IMAGE_TYPES:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Неподдерживаемый тип файла: {mime_type}"
+                )
 
             # Декодируем base64
             image_data = base64.b64decode(encoded)
 
             # Проверяем размер
             if len(image_data) > MAX_FILE_SIZE:
-                raise ValueError(f"Файл слишком большой: {len(image_data)} байт")
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Файл слишком большой. Максимальный размер: {MAX_FILE_SIZE // (1024 * 1024)}MB"
+                )
+
+            # Определяем расширение файла
+            extension_map = {
+                'image/jpeg': 'jpg',
+                'image/png': 'png',
+                'image/gif': 'gif',
+                'image/webp': 'webp'
+            }
+            file_extension = extension_map.get(mime_type, 'jpg')
 
             # Генерируем уникальное имя файла
-            file_extension = 'jpg' if image_type == 'jpeg' else image_type
             unique_filename = f"{uuid.uuid4().hex}.{file_extension}"
 
-            # Создаем директорию если не существует
-            upload_path = os.path.join(UPLOAD_DIR, subfolder)
-            os.makedirs(upload_path, exist_ok=True)
+            # Создаем путь для сохранения
+            save_dir = os.path.join(UPLOAD_DIR, subfolder)
+            os.makedirs(save_dir, exist_ok=True)
 
-            # Полный путь к файлу
-            file_path = os.path.join(upload_path, unique_filename)
+            file_path = os.path.join(save_dir, unique_filename)
 
-            # Оптимизируем и сохраняем изображение
-            with Image.open(io.BytesIO(image_data)) as img:
-                # Конвертируем в RGB если нужно
-                if img.mode in ('RGBA', 'LA', 'P'):
-                    img = img.convert('RGB')
-
-                # Изменяем размер если изображение слишком большое
-                max_width = 1920
-                if img.width > max_width:
-                    ratio = max_width / img.width
-                    new_height = int(img.height * ratio)
-                    img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
-
-                # Сохраняем с оптимизацией
-                img.save(file_path, 'JPEG', quality=85, optimize=True)
+            # Сохраняем файл
+            with open(file_path, 'wb') as f:
+                f.write(image_data)
 
             # Возвращаем относительный путь
             return os.path.join(subfolder, unique_filename).replace('\\', '/')
 
         except Exception as e:
-            raise ValueError(f"Ошибка обработки base64 изображения: {str(e)}")
+            print(f"Ошибка сохранения base64 изображения: {e}")
+            raise HTTPException(status_code=400, detail=f"Ошибка обработки изображения: {str(e)}")
 
     @staticmethod
-    async def _optimize_image(file_path: str, max_width: int = 1920, quality: int = 85):
-        """Оптимизирует изображение: сжимает и изменяет размер если нужно"""
-        try:
-            with Image.open(file_path) as img:
-                # Конвертируем в RGB если нужно
-                if img.mode in ('RGBA', 'LA', 'P'):
-                    img = img.convert('RGB')
+    def get_file_url(file_path: str) -> str:
+        """
+        ИСПРАВЛЕНО: Получает полный URL файла
 
-                # Изменяем размер если изображение слишком большое
-                if img.width > max_width:
-                    ratio = max_width / img.width
-                    new_height = int(img.height * ratio)
-                    img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
+        Args:
+            file_path: Относительный путь к файлу
 
-                # Сохраняем с оптимизацией
-                img.save(file_path, 'JPEG', quality=quality, optimize=True)
+        Returns:
+            Полный URL файла
+        """
+        # Убираем ведущий слеш если есть
+        clean_path = file_path.lstrip('/')
 
-        except Exception as e:
-            print(f"Ошибка при оптимизации изображения {file_path}: {e}")
+        # Возвращаем путь с /uploads/ префиксом
+        return f"/uploads/{clean_path}"
 
     @staticmethod
     def delete_file(file_path: str) -> bool:
-        """Удаляет файл"""
+        """
+        Удаляет файл
+
+        Args:
+            file_path: Путь к файлу относительно UPLOAD_DIR
+
+        Returns:
+            True если файл удален успешно
+        """
         try:
             full_path = os.path.join(UPLOAD_DIR, file_path)
             if os.path.exists(full_path):
@@ -170,27 +168,35 @@ class FileUploadService:
             return False
 
     @staticmethod
-    def get_file_url(file_path: str) -> str:
+    def optimize_image(file_path: str, max_width: int = 1920, max_height: int = 1080, quality: int = 85) -> bool:
         """
-        Генерирует URL для доступа к файлу
+        Оптимизирует изображение (сжимает и изменяет размер при необходимости)
 
         Args:
-            file_path: Путь к файлу относительно UPLOAD_DIR
+            file_path: Путь к файлу
+            max_width: Максимальная ширина
+            max_height: Максимальная высота
+            quality: Качество сжатия (1-100)
 
         Returns:
-            Полный URL к файлу
+            True если оптимизация прошла успешно
         """
-        if not file_path:
-            return ""
+        try:
+            full_path = os.path.join(UPLOAD_DIR, file_path)
 
-        # Убираем слеши в начале и нормализуем путь
-        normalized_path = file_path.lstrip('/').replace('\\', '/')
+            with Image.open(full_path) as img:
+                # Конвертируем в RGB если нужно
+                if img.mode in ('RGBA', 'LA', 'P'):
+                    img = img.convert('RGB')
 
-        # ИСПРАВЛЕНО: Возвращаем полный URL, минуя axios baseURL
-        import os
-        base_url = os.getenv('STATIC_FILES_BASE_URL', 'http://localhost:8001')
+                # Изменяем размер если изображение слишком большое
+                if img.width > max_width or img.height > max_height:
+                    img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
 
-        full_url = f"{base_url}/uploads/{normalized_path}"
-        print(f"🔗 Генерируем URL файла: {file_path} -> {full_url}")
+                # Сохраняем с оптимизацией
+                img.save(full_path, format='JPEG', quality=quality, optimize=True)
 
-        return full_url
+            return True
+        except Exception as e:
+            print(f"Ошибка оптимизации изображения {file_path}: {e}")
+            return False

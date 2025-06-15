@@ -1,12 +1,20 @@
-// frontend/src/app/blog/[slug]/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ С КЛИЕНТСКИМ РЕНДЕРИНГОМ
+// frontend/src/app/blog/[slug]/page.tsx - ОБНОВЛЕННАЯ СТРАНИЦА СТАТЬИ
 'use client'
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Calendar, User, Tag, Share2, ArrowLeft } from 'lucide-react'
+import { Calendar, User, Tag, Share2, ArrowLeft, Filter } from 'lucide-react'
 import Link from 'next/link'
 import { api } from '@/lib/api'
 import { getImageUrl } from '@/lib/imageUtils'
+
+interface ArticleTag {
+  id: number
+  name: string
+  slug: string
+  color?: string
+  is_category?: boolean
+}
 
 interface Article {
   id: number
@@ -14,11 +22,13 @@ interface Article {
   title: string
   content: string
   category: string
+  categories: string[]  // Множественные категории
+  regular_tags: string[]  // Обычные теги
   created_at: string
   author_name?: string
   featured_image_url?: string
   featured_image?: string
-  tags?: Array<{id: number, name: string, slug: string}>
+  tags?: ArticleTag[]
 }
 
 export default function ArticlePage() {
@@ -48,10 +58,10 @@ export default function ArticlePage() {
         console.log('Получена статья:', articleData)
         setArticle(articleData)
 
-        // Загружаем похожие статьи
-        if (articleData.category) {
+        // Загружаем похожие статьи по категориям
+        if (articleData.categories && articleData.categories.length > 0) {
           try {
-            const relatedResponse = await api.get(`/articles?category=${articleData.category}`)
+            const relatedResponse = await api.get(`/articles?categories=${articleData.categories[0]}`)
             const related = relatedResponse.data
               .filter((a: Article) => a.slug !== slug)
               .slice(0, 3)
@@ -111,6 +121,11 @@ export default function ArticlePage() {
     }
   }
 
+  const truncateText = (text: string, maxLength: number) => {
+    const plainText = text.replace(/<[^>]*>/g, '')
+    return plainText.length > maxLength ? plainText.slice(0, maxLength) + '...' : plainText
+  }
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -159,11 +174,31 @@ export default function ArticlePage() {
 
       {/* Article header */}
       <header className="mb-8">
-        {/* Category badge */}
-        <div className="mb-4">
-          <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2.5 py-0.5 rounded-full">
-            {article.category}
-          </span>
+        {/* Categories and Tags */}
+        <div className="mb-4 flex flex-wrap gap-2">
+          {/* Categories */}
+          {article.categories?.map(category => (
+            <Link
+              key={category}
+              href={`/blog?categories=${encodeURIComponent(category)}`}
+              className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm font-medium px-3 py-1 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 transition"
+            >
+              <Filter size={12} />
+              {category}
+            </Link>
+          ))}
+
+          {/* Regular Tags */}
+          {article.regular_tags?.map(tag => (
+            <Link
+              key={tag}
+              href={`/blog?tags=${encodeURIComponent(tag)}`}
+              className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm font-medium px-3 py-1 rounded-full hover:bg-green-200 dark:hover:bg-green-800 transition"
+            >
+              <Tag size={12} />
+              {tag}
+            </Link>
+          ))}
         </div>
 
         {/* Title */}
@@ -172,7 +207,7 @@ export default function ArticlePage() {
         </h1>
 
         {/* Meta information */}
-        <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 dark:text-gray-400 mb-6">
+        <div className="flex flex-wrap items-center gap-4 text-gray-600 dark:text-gray-400 text-sm mb-6">
           <div className="flex items-center gap-1">
             <Calendar size={16} />
             <time dateTime={article.created_at}>
@@ -192,7 +227,7 @@ export default function ArticlePage() {
             className="flex items-center gap-1 text-blue-600 hover:text-blue-700 transition"
           >
             <Share2 size={16} />
-            <span>Поделиться</span>
+            Поделиться
           </button>
         </div>
 
@@ -202,73 +237,75 @@ export default function ArticlePage() {
             <img
               src={featuredImage}
               alt={article.title}
-              className="w-full h-64 md:h-80 object-cover rounded-lg shadow-lg"
-              onError={(e) => {
-                console.error('Ошибка загрузки изображения статьи:', featuredImage)
-                e.currentTarget.style.display = 'none'
-              }}
+              className="w-full h-auto rounded-lg shadow-lg"
             />
-          </div>
-        )}
-
-        {/* Tags */}
-        {article.tags && article.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
-            {article.tags.map((tag) => (
-              <span
-                key={tag.id}
-                className="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full"
-              >
-                <Tag size={12} />
-                {tag.name}
-              </span>
-            ))}
           </div>
         )}
       </header>
 
       {/* Article content */}
-      <main className="mb-12">
-        <div
-          className="prose prose-lg max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-blue-600 prose-strong:text-gray-900 dark:prose-strong:text-gray-100"
-          dangerouslySetInnerHTML={{ __html: article.content }}
-        />
-      </main>
+      <article className="prose prose-lg max-w-none dark:prose-invert mb-12">
+        <div dangerouslySetInnerHTML={{ __html: article.content }} />
+      </article>
 
       {/* Related articles */}
       {relatedArticles.length > 0 && (
-        <section className="border-t border-gray-200 dark:border-gray-700 pt-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Похожие статьи</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {relatedArticles.map((relatedArticle) => {
+        <section className="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
+          <h2 className="text-2xl font-bold mb-6">Похожие статьи</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {relatedArticles.map(relatedArticle => {
               const relatedImage = getArticleImage(relatedArticle)
 
               return (
                 <Link
                   key={relatedArticle.id}
                   href={`/blog/${relatedArticle.slug}`}
-                  className="group block"
+                  className="group bg-white dark:bg-zinc-900 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700 hover:shadow-lg transition-all duration-300"
                 >
-                  <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-transform group-hover:scale-105">
-                    {relatedImage && (
+                  {/* Image */}
+                  <div className="aspect-video bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                    {relatedImage ? (
                       <img
                         src={relatedImage}
                         alt={relatedArticle.title}
-                        className="w-full h-40 object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none'
-                        }}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div className="text-center text-zinc-400">
+                          <Tag size={24} className="mx-auto mb-2" />
+                          <p className="text-xs">Нет изображения</p>
+                        </div>
+                      </div>
                     )}
-                    <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 transition">
-                        {relatedArticle.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {formatDate(relatedArticle.created_at)}
-                      </p>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-4">
+                    {/* Categories */}
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {relatedArticle.categories?.slice(0, 2).map(category => (
+                        <span
+                          key={category}
+                          className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full"
+                        >
+                          {category}
+                        </span>
+                      ))}
                     </div>
-                  </article>
+
+                    <h3 className="font-semibold mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      {relatedArticle.title}
+                    </h3>
+
+                    <p className="text-zinc-600 dark:text-zinc-400 text-sm line-clamp-2">
+                      {truncateText(relatedArticle.content, 100)}
+                    </p>
+
+                    <div className="mt-2 text-xs text-zinc-500">
+                      {formatDate(relatedArticle.created_at)}
+                    </div>
+                  </div>
                 </Link>
               )
             })}
