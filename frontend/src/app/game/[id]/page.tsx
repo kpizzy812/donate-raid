@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
 import ProductGrid from '@/components/ProductGrid'
 import { toast } from 'sonner'
+import { getImageUrl } from '@/lib/imageUtils' // ИСПРАВЛЕНО: добавлен импорт
 
 interface InputField {
   name: string
@@ -101,15 +102,23 @@ export default function GamePage() {
     )
   }
 
+  // ИСПРАВЛЕНО: Получаем правильный URL баннера
+  const bannerImageUrl = getImageUrl(game.banner_url)
+
   return (
     <div className="py-6 space-y-6 max-w-6xl mx-auto px-4">
       {/* Баннер игры */}
-      {game.banner_url && (
+      {bannerImageUrl && (
         <div className="rounded-xl overflow-hidden border border-zinc-300 dark:border-zinc-700">
           <img
-            src={game.banner_url}
+            src={bannerImageUrl}
             alt={game.name}
             className="w-full h-48 md:h-64 object-cover"
+            onError={(e) => {
+              console.error('❌ Ошибка загрузки баннера игры:', bannerImageUrl)
+              // Скрываем изображение при ошибке
+              e.currentTarget.style.display = 'none'
+            }}
           />
         </div>
       )}
@@ -162,58 +171,26 @@ export default function GamePage() {
               Время выполнения: от 5 минут до 24 часов в зависимости от сложности заказа.
             </p>
 
+            {game.instructions && (
+              <div className="bg-yellow-100 dark:bg-yellow-900/30 rounded-lg p-4 mb-4">
+                <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+                  Инструкции:
+                </h3>
+                <div className="text-yellow-700 dark:text-yellow-300 whitespace-pre-wrap">
+                  {game.instructions}
+                </div>
+              </div>
+            )}
+
             <button
               onClick={() => router.push('/manual-request')}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
-              Создать ручной заказ
+              Оставить заявку
             </button>
           </div>
-
-          {/* Инструкции */}
-          {game.instructions && (
-            <div className="bg-zinc-50 dark:bg-zinc-900 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-3">Инструкции для заказа</h3>
-              <p className="text-zinc-600 dark:text-zinc-400 whitespace-pre-line leading-relaxed">
-                {game.instructions}
-              </p>
-            </div>
-          )}
         </div>
       )}
-
-      {/* FAQ и дополнительная информация */}
-      <div className="bg-zinc-50 dark:bg-zinc-900 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4">Информация о доставке</h3>
-        <div className="space-y-3 text-sm text-zinc-600 dark:text-zinc-400">
-          <div className="flex items-start gap-2">
-            <span className="text-green-500 mt-1">•</span>
-            <span>Безопасная доставка через официальные методы игры</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-green-500 mt-1">•</span>
-            <span>Поддержка 24/7 в случае возникновения вопросов</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-green-500 mt-1">•</span>
-            <span>Гарантия возврата средств при невыполнении заказа</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <span className="text-green-500 mt-1">•</span>
-            <span>Все транзакции защищены и конфиденциальны</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Кнопка обратно */}
-      <div className="text-center pt-6">
-        <button
-          onClick={() => router.push('/')}
-          className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
-        >
-          ← Вернуться к списку игр
-        </button>
-      </div>
     </div>
   )
 }

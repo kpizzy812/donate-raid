@@ -160,10 +160,19 @@ export default function CreateGamePage() {
 
           {bannerUrl ? (
             <div className="relative inline-block">
+              {/* ИСПРАВЛЕНО: Используем getImageUrl для правильного отображения */}
               <img
-                src={bannerUrl}
+                src={bannerUrl.startsWith('http') ? bannerUrl : (() => {
+                  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api'
+                  const baseUrl = apiUrl.replace('/api', '')
+                  return bannerUrl.startsWith('/') ? `${baseUrl}${bannerUrl}` : `${baseUrl}/${bannerUrl}`
+                })()}
                 alt="Баннер игры"
                 className="w-full max-w-md h-32 object-cover rounded border border-zinc-600"
+                onError={(e) => {
+                  console.error('❌ Ошибка загрузки баннера:', bannerUrl)
+                  e.currentTarget.style.display = 'none'
+                }}
               />
               <button
                 onClick={removeBanner}

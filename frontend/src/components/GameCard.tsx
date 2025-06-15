@@ -14,18 +14,25 @@ export default function GameCard({ game }: Props) {
   const [imageError, setImageError] = useState(false)
   const [imageLoading, setImageLoading] = useState(true)
 
-  // Функция для получения полного URL изображения
+  // ИСПРАВЛЕНО: Функция для получения полного URL изображения
   const getImageUrl = (url?: string) => {
     if (!url) return null
 
     // Если URL уже полный, возвращаем как есть
     if (url.startsWith('http://') || url.startsWith('https://')) {
+      console.log('🔗 URL уже полный:', url)
       return url
     }
 
-    // Если URL относительный, добавляем базовый URL
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-    return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`
+    // ИСПРАВЛЕНО: Получаем базовый URL БЕЗ /api суффикса
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api'
+    const baseUrl = apiUrl.replace('/api', '') // Убираем /api
+
+    // Формируем полный URL
+    const fullUrl = `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`
+    console.log('🔗 GameCard формирует URL:', url, '->', fullUrl)
+
+    return fullUrl
   }
 
   const imageUrl = getImageUrl(game.banner_url)
@@ -49,7 +56,7 @@ export default function GameCard({ game }: Props) {
               className="w-full h-full object-cover"
               onLoad={() => setImageLoading(false)}
               onError={() => {
-                console.error('Ошибка загрузки изображения:', imageUrl)
+                console.error('❌ Ошибка загрузки изображения:', imageUrl)
                 setImageError(true)
                 setImageLoading(false)
               }}
