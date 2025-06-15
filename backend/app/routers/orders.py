@@ -174,18 +174,18 @@ def create_manual_order(
 
     print(f"    → Новый ручной заказ создан, id={new_order.id}, игра={data.manual_game_name}")
 
-    # 🔔 Telegram уведомление
+    # 🔔 Telegram уведомление С ORDER_ID - ИСПРАВЛЕНО!
     notify_manual_order_sync(
-        f"📥 <b>Новая ручная заявка</b>\n"
+        f"📥 <b>Новая ручная заявка #{new_order.id}</b>\n"
         f"👤 <b>{current_user.username or 'No username'}</b> (ID: {current_user.id})\n"
         f"🎮 Игра: <code>{data.manual_game_name}</code>\n"
         f"💵 Сумма: {data.amount} {data.currency}\n"
-        f"📝 Комментарий: {data.comment or '-'}"
+        f"📝 Комментарий: {data.comment or '-'}",
+        order_id=new_order.id  # 🆕 ДОБАВЬТЕ ЭТУ СТРОКУ!
     )
-    print(f"    → Отправлено Telegram-уведомление о новом ручном заказе")
+    print(f"    → Отправлено Telegram-уведомление о новом ручном заказе #{new_order.id}")
 
     return new_order
-
 
 # ------------------------------------------------------------
 # 6) Endpoint для просмотра только ручных заказов (GET /manual/me)

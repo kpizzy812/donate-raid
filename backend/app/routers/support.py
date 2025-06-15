@@ -1,19 +1,37 @@
-# backend/app/routers/support.py - ФИНАЛЬНАЯ ВЕРСИЯ С СИНХРОННОЙ ФУНКЦИЕЙ
+# backend/app/routers/support.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter, Depends, Request, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.support import SupportMessage, SupportStatus
-from app.services.auth import get_current_user_from_request_sync  # ИСПРАВЛЕНО: используем синхронную версию
-from app.schemas.support import SupportMessageCreate, SupportMessageRead
-from bot.handlers.support import notify_new_support_message
+from app.services.auth import get_current_user_from_request_sync
 from app.models.user import User
 from datetime import datetime
 from typing import Optional
+from pydantic import BaseModel
+from bot.handlers.support import notify_new_support_message
 
 router = APIRouter()
 
 
-@router.post("/message", response_model=SupportMessageRead)
+# Pydantic схемы
+class SupportMessageCreate(BaseModel):
+    message: str
+
+
+class SupportMessageRead(BaseModel):
+    id: int
+    user_id: Optional[int] = None
+    guest_id: Optional[str] = None
+    message: str
+    is_from_user: bool
+    created_at: datetime
+    status: str
+
+    class Config:
+        from_attributes = True
+
+
+@router.post("/send", response_model=SupportMessageRead)  # ✅ Изменили endpoint на /send
 async def create_support_message(
         data: SupportMessageCreate,
         request: Request,
@@ -23,12 +41,11 @@ async def create_support_message(
     """Создать сообщение в поддержку"""
     user = None
 
-    # ИСПРАВЛЕНО: Используем синхронную функцию
+    # Пытаемся получить авторизованного пользователя
     try:
-        # Проверяем есть ли токен авторизации
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
-            user = get_current_user_from_request_sync(request, db)  # СИНХРОННАЯ!
+            user = get_current_user_from_request_sync(request, db)
             print(f"✅ Авторизованный пользователь найден: ID={user.id}, email={user.email}")
         else:
             print("ℹ️ Токен авторизации не найден, работаем как гость")
@@ -73,12 +90,11 @@ def get_my_support_history(
 ):
     """Получить историю сообщений"""
 
-    # ИСПРАВЛЕНО: Используем синхронную функцию
+    # Пытаемся получить авторизованного пользователя
     try:
-        # Проверяем есть ли токен авторизации
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
-            current_user = get_current_user_from_request_sync(request, db)  # СИНХРОННАЯ!
+            current_user = get_current_user_from_request_sync(request, db)
             print(f"✅ Загружаем сообщения для авторизованного пользователя: ID={current_user.id}")
             return (
                 db.query(SupportMessage)

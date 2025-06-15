@@ -1,11 +1,11 @@
-# backend/app/routers/notifications.py - НОВЫЙ ФАЙЛ
+# backend/app/routers/notifications.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, desc
 from app.core.database import get_db
 from app.models.support import SupportMessage, SupportStatus
 from app.models.order import Order, OrderStatus
-from app.services.auth import get_current_user_optional
+from app.services.auth import get_current_user_optional  # ✅ Теперь эта функция существует
 from app.models.user import User
 from typing import Optional, List
 from datetime import datetime, timedelta
@@ -60,13 +60,12 @@ def get_notifications(
                 data={"message_id": reply.id}
             ))
 
-        # Проверяем обновления заказов
+        # Проверяем обновления заказов - ИСПРАВЛЕНО: используем created_at если updated_at is None
         order_updates = (
             db.query(Order)
             .filter(
                 and_(
                     Order.user_id == current_user.id,
-                    Order.updated_at >= datetime.utcnow() - timedelta(hours=24),
                     Order.status.in_([OrderStatus.done, OrderStatus.canceled])
                 )
             )
@@ -76,14 +75,17 @@ def get_notifications(
         )
 
         for order in order_updates:
-            status_text = "выполнен" if order.status == OrderStatus.done else "отменен"
-            notifications.append(NotificationResponse(
-                type="order_update",
-                title=f"Заказ #{order.id} {status_text}",
-                message=f"Ваш заказ на сумму {order.amount} {order.currency} {status_text}",
-                created_at=order.updated_at.isoformat() if order.updated_at else order.created_at.isoformat(),
-                data={"order_id": order.id, "status": order.status}
-            ))
+            # Проверяем, что заказ был обновлен недавно
+            check_time = order.updated_at if order.updated_at else order.created_at
+            if check_time >= datetime.utcnow() - timedelta(hours=24):
+                status_text = "выполнен" if order.status == OrderStatus.done else "отменен"
+                notifications.append(NotificationResponse(
+                    type="order_update",
+                    title=f"Заказ #{order.id} {status_text}",
+                    message=f"Ваш заказ на сумму {order.amount} {order.currency} {status_text}",
+                    created_at=check_time.isoformat(),
+                    data={"order_id": order.id, "status": order.status.value}
+                ))
 
     # Для гостей - только ответы поддержки
     elif guest_id:
@@ -142,18 +144,23 @@ def get_notification_count(
             .count()
         )
 
-        # Обновления заказов
-        order_count = (
+        # Обновления заказов (за последние 24 часа)
+        order_count = 0
+        recent_orders = (
             db.query(Order)
             .filter(
                 and_(
                     Order.user_id == current_user.id,
-                    Order.updated_at >= datetime.utcnow() - timedelta(hours=24),
                     Order.status.in_([OrderStatus.done, OrderStatus.canceled])
                 )
             )
-            .count()
+            .all()
         )
+
+        for order in recent_orders:
+            check_time = order.updated_at if order.updated_at else order.created_at
+            if check_time >= datetime.utcnow() - timedelta(hours=24):
+                order_count += 1
 
         count = support_count + order_count
 

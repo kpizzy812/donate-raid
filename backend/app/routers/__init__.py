@@ -1,9 +1,9 @@
-# backend/app/routers/__init__.py - ОБНОВЛЕННАЯ ВЕРСИЯ
+# backend/app/routers/__init__.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 
 from fastapi import APIRouter
 
 # Public routes
-from . import games, orders, users, products, auth, support, upload, payment_terms  # 🆕 Добавляем payment_terms
+from . import games, orders, users, products, auth, support, upload, payment_terms, notifications  # 🆕 ДОБАВЬТЕ notifications
 from .blog import article
 
 # Admin routes
@@ -26,7 +26,8 @@ router.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 router.include_router(article.router, prefix="/api/articles", tags=["Articles"])
 router.include_router(support.router, prefix="/api/support", tags=["Support"])
 router.include_router(upload.router, prefix="/api/upload", tags=["Upload"])
-router.include_router(payment_terms.router, prefix="/api/payment-terms", tags=["Payment Terms"])  # 🆕
+router.include_router(payment_terms.router, prefix="/api/payment-terms", tags=["Payment Terms"])
+router.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])  # 🆕 ДОБАВЬТЕ ЭТУ СТРОКУ!
 
 # Admin API
 router.include_router(admin_games.router, prefix="/api/admin/games", tags=["Admin Games"])

@@ -6,8 +6,10 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.database import get_db
 from app.models.user import User, UserRole
+from typing import Optional
 
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 
 def get_current_user(
@@ -30,6 +32,25 @@ def get_current_user(
 
     return user
 
+
+def get_current_user_optional(
+        credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security),
+        db: Session = Depends(get_db),
+) -> Optional[User]:
+    """Опциональная версия get_current_user - возвращает None если пользователь не авторизован"""
+    if not credentials:
+        return None
+
+    try:
+        payload = jwt.decode(credentials.credentials, settings.JWT_SECRET, algorithms=["HS256"])
+        user_id = payload.get("sub")
+        if not user_id:
+            return None
+
+        user = db.query(User).filter_by(id=int(user_id)).first()
+        return user
+    except JWTError:
+        return None
 
 # СТАРАЯ АСИНХРОННАЯ ВЕРСИЯ (оставляем для совместимости)
 async def get_current_user_from_request(request: Request, db: Session = Depends(get_db)) -> User:
