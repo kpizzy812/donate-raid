@@ -79,28 +79,13 @@ export default function BlogPage() {
   // ИСПРАВЛЕНО: функция для получения изображения статьи
   const getArticleImage = (article: Article) => {
     // Проверяем все возможные источники изображения
-    let imageUrl = article.featured_image_url ||
-                   article.featured_image ||
-                   getImageFromContent(article.content)
+    let imagePath = article.featured_image_url ||
+                    article.featured_image ||
+                    getImageFromContent(article.content)
 
-    if (!imageUrl) return null
+    if (!imagePath) return null
 
-    // Если URL уже полный, возвращаем как есть
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      return imageUrl
-    }
-
-    // Если URL относительный, добавляем базовый URL
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-    return `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ru-RU', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+    return getImageUrl(imagePath)
   }
 
   // Функция для обработки ошибок загрузки изображений

@@ -19,46 +19,46 @@ export default function CreateGamePage() {
   const [bannerUploading, setBannerUploading] = useState(false)
 
   const uploadBanner = async (file: File) => {
-  if (file.size > 5 * 1024 * 1024) {
-    alert('Файл слишком большой (максимум 5MB)')
-    return
-  }
-
-  setBannerUploading(true)
-  try {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('subfolder', 'games')
-
-    // ИСПРАВЛЕНО: правильный endpoint без /admin/
-    const response = await api.post('/upload/image', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-
-    console.log('Ответ загрузки:', response.data) // Для отладки
-
-    if (response.data.success || response.data.file_url) {
-      const fileUrl = response.data.file_url || response.data.url
-      setBannerUrl(fileUrl)
-      console.log('URL изображения установлен:', fileUrl)
-    } else {
-      throw new Error('Неожиданный ответ сервера')
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Файл слишком большой (максимум 5MB)')
+      return
     }
-  } catch (error: any) {
-    console.error('Ошибка загрузки:', error)
 
-    // Дополнительная диагностика
-    if (error.response) {
-      console.error('Статус ошибки:', error.response.status)
-      console.error('Данные ошибки:', error.response.data)
-      alert(`Ошибка загрузки: ${error.response.data.detail || error.response.statusText}`)
-    } else {
-      alert('Ошибка загрузки файла')
+    setBannerUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('subfolder', 'games')
+
+      // ИСПРАВЛЕНО: правильный endpoint с импортом api
+      const response = await api.post('/upload/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      console.log('Ответ загрузки:', response.data) // Для отладки
+
+      if (response.data.success && response.data.file_url) {
+        const fileUrl = response.data.file_url
+        setBannerUrl(fileUrl)
+        console.log('URL изображения установлен:', fileUrl)
+      } else {
+        throw new Error('Неожиданный ответ сервера')
+      }
+    } catch (error: any) {
+      console.error('Ошибка загрузки:', error)
+
+      // Дополнительная диагностика
+      if (error.response) {
+        console.error('Статус ошибки:', error.response.status)
+        console.error('Данные ошибки:', error.response.data)
+        alert(`Ошибка загрузки: ${error.response.data.detail || error.response.statusText}`)
+      } else {
+        alert('Ошибка загрузки файла')
+      }
+    } finally {
+      setBannerUploading(false)
     }
-  } finally {
-    setBannerUploading(false)
   }
-}
 
   const handleBannerUpload = () => {
     const input = document.createElement('input')

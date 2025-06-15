@@ -17,12 +17,12 @@ export default function GameCard({ game }: Props) {
   // Функция для получения полного URL изображения
   const getImageUrl = (url?: string) => {
     if (!url) return null
-    
+
     // Если URL уже полный, возвращаем как есть
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url
     }
-    
+
     // Если URL относительный, добавляем базовый URL
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
     return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`
