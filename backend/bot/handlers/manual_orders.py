@@ -95,26 +95,42 @@ async def reject_with_refund_amount(msg: Message, state: FSMContext):
     data = await state.get_data()
     order_id = data["order_id"]
 
+    # ПРИНУДИТЕЛЬНО ОЧИЩАЕМ СОСТОЯНИЕ В НАЧАЛЕ
+    await state.clear()
+
     try:
-        refund = float(msg.text)
+        refund = float(msg.text.strip())
+        if refund <= 0:
+            return await msg.answer("❌ Сумма должна быть больше 0.")
     except ValueError:
-        return await msg.answer("❌ Введите корректную сумму.")
+        return await msg.answer("❌ Введите корректную сумму. Используйте только цифры.")
 
     db = get_db()
     try:
         order = db.query(Order).get(order_id)
-        user = db.query(User).get(order.user_id)
+        if not order:
+            return await msg.answer("❌ Заявка не найдена.")
 
-        if not order or order.status != OrderStatus.pending:
-            return await msg.answer("❌ Заявка не найдена или уже обработана.")
+        if order.status != OrderStatus.pending:
+            return await msg.answer(f"❌ Заявка уже обработана. Статус: {order.status.value}")
+
+        user = db.query(User).get(order.user_id)
+        if not user:
+            return await msg.answer("❌ Пользователь не найден.")
 
         if refund > float(order.amount):
-            return await msg.answer(f"❌ Сумма возврата не может превышать {order.amount} {order.currency}")
+            return await msg.answer(
+                f"❌ Сумма возврата ({refund}) не может превышать сумму заказа ({order.amount} {order.currency})")
 
-        # ИСПРАВЛЕНО: правильная работа с Decimal
-        user.balance = (user.balance or Decimal('0')) + Decimal(str(refund))
+        # Выполняем возврат
+        old_balance = user.balance or Decimal('0')
+        user.balance = old_balance + Decimal(str(refund))
         order.status = OrderStatus.canceled
+
+        # Принудительно коммитим изменения
         db.commit()
+        db.refresh(user)
+        db.refresh(order)
 
         username = user.username or user.email or f"ID: {user.id}"
 
@@ -122,13 +138,18 @@ async def reject_with_refund_amount(msg: Message, state: FSMContext):
             f"✅ <b>Заявка #{order.id} отклонена с возвратом</b>\n\n"
             f"👤 Пользователь: {username}\n"
             f"💸 Возврат: {refund} {order.currency}\n"
-            f"💰 Средства зачислены на баланс пользователя",
+            f"💰 Баланс был: {old_balance}\n"
+            f"💰 Баланс стал: {user.balance}\n"
+            f"📅 Время: сейчас",
             parse_mode="HTML"
         )
-        await state.clear()
+
+        print(f"[SUCCESS] Refund processed: Order #{order_id}, Amount: {refund}, User: {username}")
 
     except Exception as e:
-        await msg.answer(f"❌ Ошибка при возврате: {e}")
+        print(f"[ERROR] Refund failed: {e}")
+        db.rollback()
+        await msg.answer(f"❌ Ошибка при возврате: {str(e)}")
     finally:
         db.close()
 
