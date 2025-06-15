@@ -186,5 +186,11 @@ class FileUploadService:
         # Убираем слеши в начале и нормализуем путь
         normalized_path = file_path.lstrip('/').replace('\\', '/')
 
-        # ИСПРАВЛЕНО: Возвращаем путь от корня с uploads
-        return f"/uploads/{normalized_path}"
+        # ИСПРАВЛЕНО: Возвращаем полный URL, минуя axios baseURL
+        import os
+        base_url = os.getenv('STATIC_FILES_BASE_URL', 'http://localhost:8001')
+
+        full_url = f"{base_url}/uploads/{normalized_path}"
+        print(f"🔗 Генерируем URL файла: {file_path} -> {full_url}")
+
+        return full_url
