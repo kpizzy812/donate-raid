@@ -4,6 +4,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { adminApi } from '@/lib/adminApi'
+import { api } from '@/lib/api' // ИСПРАВЛЕНО: добавлен импорт api
 import { Upload, X, ImageIcon } from 'lucide-react'
 
 export default function CreateGamePage() {
@@ -30,7 +31,7 @@ export default function CreateGamePage() {
       formData.append('file', file)
       formData.append('subfolder', 'games')
 
-      // ИСПРАВЛЕНО: правильный endpoint с импортом api
+      // ИСПРАВЛЕНО: используем правильный endpoint для загрузки
       const response = await api.post('/upload/image', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
@@ -93,12 +94,22 @@ export default function CreateGamePage() {
         sort_order: sortOrder
       }
 
+      console.log('Отправляем данные игры:', gameData) // Отладка
+
       await adminApi.post('/admin/games/', gameData)
       alert('Игра успешно создана!')
       router.push('/admin/games')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка создания игры:', error)
-      alert('Ошибка создания игры')
+
+      // Лучшая диагностика ошибок
+      if (error.response) {
+        console.error('Статус ошибки:', error.response.status)
+        console.error('Данные ошибки:', error.response.data)
+        alert(`Ошибка создания игры: ${error.response.data.detail || error.response.statusText}`)
+      } else {
+        alert('Ошибка создания игры')
+      }
     }
   }
 

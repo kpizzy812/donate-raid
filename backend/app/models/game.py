@@ -21,11 +21,11 @@ class Game(Base):
     faq_content = Column(Text, nullable=True)
     enabled = Column(Boolean, default=True)
 
-    # Relationships
-    products = relationship("Product", back_populates="game")
-    faqs = relationship("GameFAQ", back_populates="game")
-    instructions_list = relationship("GameInstruction", back_populates="game")
-    articles = relationship("Article", back_populates="game")  # НОВАЯ СВЯЗЬ
+    # Relationships - ИСПРАВЛЕНО: добавлено каскадное удаление
+    products = relationship("Product", back_populates="game", cascade="all, delete-orphan")
+    faqs = relationship("GameFAQ", back_populates="game", cascade="all, delete-orphan")
+    instructions_list = relationship("GameInstruction", back_populates="game", cascade="all, delete-orphan")
+    articles = relationship("Article", back_populates="game")
 
     def get_faq_list(self):
         """Парсит FAQ контент в список вопросов-ответов"""

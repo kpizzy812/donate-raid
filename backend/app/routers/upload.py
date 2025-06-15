@@ -19,15 +19,23 @@ async def upload_image(
 ):
     """Загрузка изображения (доступно авторизованным пользователям)"""
 
+    print(f"🔍 Начало загрузки файла: {file.filename}, размер: {file.size if hasattr(file, 'size') else 'неизвестно'}")
+    print(f"🔍 Пользователь: {current_user.id}, подпапка: {subfolder}")
+
     # Ограничиваем подпапки для безопасности
     allowed_subfolders = ["images", "blog", "games", "products", "avatars"]
     if subfolder not in allowed_subfolders:
+        print(f"❌ Недопустимая подпапка: {subfolder}")
         raise HTTPException(status_code=400, detail="Недопустимая подпапка")
 
     try:
+        print(f"🔄 Сохраняем файл в подпапку: {subfolder}")
         file_path = await FileUploadService.save_image(file, subfolder)
-        # ИСПРАВЛЕНО: убираем лишние параметры
+        print(f"✅ Файл сохранен: {file_path}")
+
+        # ИСПРАВЛЕНО: используем правильный метод с одним параметром
         file_url = FileUploadService.get_file_url(file_path)
+        print(f"✅ URL файла: {file_url}")
 
         return {
             "success": True,
@@ -37,6 +45,7 @@ async def upload_image(
         }
 
     except Exception as e:
+        print(f"❌ Ошибка загрузки файла: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Ошибка загрузки файла: {str(e)}")
 
 
@@ -55,7 +64,7 @@ async def admin_upload_image(
 
     try:
         file_path = await FileUploadService.save_image(file, subfolder)
-        # ИСПРАВЛЕНО: убираем лишние параметры
+        # ИСПРАВЛЕНО: используем правильный метод с одним параметром
         file_url = FileUploadService.get_file_url(file_path)
 
         return {
@@ -79,9 +88,34 @@ async def delete_file(
 
     success = FileUploadService.delete_file(file_path)
     if not success:
-        raise HTTPException(status_code=404, detail="Файл не найден")
+        raise HTTPException(status_code=404, detail="Файл не найден или не может быть удален")
 
     return {"success": True, "message": "Файл успешно удален"}
+
+
+@router.get("/test")
+async def test_upload_system(current_user: User = Depends(get_current_user)):
+    """Тестирование системы загрузки файлов"""
+
+    from app.services.file_upload import UPLOAD_DIR
+
+    test_results = {
+        "upload_dir": UPLOAD_DIR,
+        "upload_dir_exists": os.path.exists(UPLOAD_DIR),
+        "upload_dir_writable": os.access(UPLOAD_DIR, os.W_OK) if os.path.exists(UPLOAD_DIR) else False,
+        "subfolders": {}
+    }
+
+    subfolders = ["images", "blog", "games", "products", "avatars"]
+    for subfolder in subfolders:
+        subfolder_path = os.path.join(UPLOAD_DIR, subfolder)
+        test_results["subfolders"][subfolder] = {
+            "path": subfolder_path,
+            "exists": os.path.exists(subfolder_path),
+            "writable": os.access(subfolder_path, os.W_OK) if os.path.exists(subfolder_path) else False
+        }
+
+    return test_results
 
 
 @router.get("/file/{file_path:path}")
@@ -89,40 +123,7 @@ async def get_file(file_path: str):
     """Получение файла по пути"""
 
     full_path = os.path.join("uploads", file_path)
-
     if not os.path.exists(full_path):
         raise HTTPException(status_code=404, detail="Файл не найден")
 
     return FileResponse(full_path)
-
-
-@router.get("/files/list")
-async def list_files(
-        subfolder: str = "images",
-        admin: User = Depends(admin_required)
-):
-    """Получить список файлов в папке (только для администраторов)"""
-
-    upload_path = os.path.join("uploads", subfolder)
-
-    if not os.path.exists(upload_path):
-        return {"files": []}
-
-    files = []
-    for filename in os.listdir(upload_path):
-        file_path = os.path.join(upload_path, filename)
-        if os.path.isfile(file_path):
-            file_url = FileUploadService.get_file_url(
-                os.path.join(subfolder, filename)
-            )
-            file_size = os.path.getsize(file_path)
-
-            files.append({
-                "filename": filename,
-                "file_path": os.path.join(subfolder, filename).replace('\\', '/'),
-                "file_url": file_url,
-                "size": file_size,
-                "size_mb": round(file_size / (1024 * 1024), 2)
-            })
-
-    return {"files": files}

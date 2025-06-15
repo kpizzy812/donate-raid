@@ -170,13 +170,12 @@ class FileUploadService:
             return False
 
     @staticmethod
-    def get_file_url(file_path: str, base_url: str = "") -> str:
+    def get_file_url(file_path: str) -> str:
         """
         Генерирует URL для доступа к файлу
 
         Args:
             file_path: Путь к файлу относительно UPLOAD_DIR
-            base_url: Базовый URL (необязательно)
 
         Returns:
             Полный URL к файлу
@@ -187,9 +186,5 @@ class FileUploadService:
         # Убираем слеши в начале и нормализуем путь
         normalized_path = file_path.lstrip('/').replace('\\', '/')
 
-        # ИСПРАВЛЕНО: Если base_url не задан, возвращаем просто путь от корня
-        if base_url and base_url.strip():
-            base_url = base_url.rstrip('/')
-            return f"{base_url}/uploads/{normalized_path}"
-
+        # ИСПРАВЛЕНО: Возвращаем путь от корня с uploads
         return f"/uploads/{normalized_path}"

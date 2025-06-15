@@ -35,100 +35,138 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db), admin:
                 article_data['featured_image'],
                 subfolder="blog"
             )
-            featured_image_url = FileUploadService.get_file_url(file_path, "")
+            # ИСПРАВЛЕНО: используем правильный метод с одним параметром
+            featured_image_url = FileUploadService.get_file_url(file_path)
             print(f"Изображение сохранено: {featured_image_url}")
         except Exception as e:
-            print(f"Ошибка сохранения base64 изображения: {e}")
+            print(f"Ошибка сохранения изображения: {e}")
             featured_image_url = None
-    elif article_data.get('featured_image'):
-        # Если это обычный URL
-        featured_image_url = article_data['featured_image']
 
-    # Устанавливаем правильное поле
-    article_data['featured_image_url'] = featured_image_url
+    # Подготавливаем данные для создания статьи
+    new_article_data = {
+        "title": article_data["title"],
+        "slug": article_data["slug"],
+        "content": article_data["content"],
+        "excerpt": article_data.get("excerpt"),
+        "category": article_data.get("category"),
+        "game_id": article_data.get("game_id"),
+        "author_name": article_data.get("author_name", "Администратор"),
+        "featured_image_url": featured_image_url,
+        "featured_image_alt": article_data.get("featured_image_alt"),
+        "published": article_data.get("published", False)
+    }
 
-    # Удаляем поля, которых нет в модели
-    article_data.pop('featured_image', None)
-    tags_list = article_data.pop('tags', None)
-    categories_list = article_data.pop('categories', None)
-
-    # ИСПРАВЛЕНО: Правильная обработка категорий
-    if categories_list and len(categories_list) > 0:
-        # Берем первую выбранную категорию
-        article_data['category'] = categories_list[0]
-        print(f"Установлена категория: {categories_list[0]}")
-    elif not article_data.get('category'):
-        # Если категория не указана, ставим по умолчанию
-        article_data['category'] = 'Новости'
-        print("Установлена категория по умолчанию: Новости")
-
-    print(f"Финальные данные для создания: {article_data}")
+    # Убираем None значения
+    new_article_data = {k: v for k, v in new_article_data.items() if v is not None}
 
     # Создаем статью
-    new_article = Article(**article_data)
+    new_article = Article(**new_article_data)
+
+    # Устанавливаем published_at если статья публикуется
+    if new_article.published:
+        new_article.published_at = datetime.utcnow()
+
     db.add(new_article)
     db.commit()
     db.refresh(new_article)
 
-    print(f"Статья создана с ID: {new_article.id}, категория: {new_article.category}")
-
-    # Обрабатываем теги (если нужно)
-    if tags_list:
-        for tag_name in tags_list:
-            # Находим или создаем тег
-            tag = db.query(ArticleTag).filter(ArticleTag.name == tag_name).first()
+    # Обрабатываем теги
+    if article_data.get("tags"):
+        for tag_name in article_data["tags"]:
+            tag = db.query(ArticleTag).filter_by(name=tag_name).first()
             if not tag:
-                tag_slug = tag_name.lower().replace(' ', '-').replace('_', '-')
+                # Создаем новый тег
+                tag_slug = tag_name.lower().replace(" ", "-")
                 tag = ArticleTag(name=tag_name, slug=tag_slug)
                 db.add(tag)
                 db.commit()
-                print(f"Создан тег: {tag_name}")
+                db.refresh(tag)
 
-            # Добавляем тег к статье
-            if tag not in new_article.tags:
-                new_article.tags.append(tag)
-                print(f"Добавлен тег '{tag_name}' к статье")
+            new_article.tags.append(tag)
 
-    db.commit()
-    db.refresh(new_article)
+        db.commit()
+        db.refresh(new_article)
 
     return new_article
+
+
+@router.put("/{article_id}", response_model=ArticleRead)
+def update_article(article_id: int, article: ArticleUpdate, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
+    from app.services.file_upload import FileUploadService
+
+    db_article = db.query(Article).filter(Article.id == article_id).first()
+    if not db_article:
+        raise HTTPException(status_code=404, detail="Article not found")
+
+    # Конвертируем данные для обновления
+    article_data = article.dict(exclude_unset=True)
+
+    # Обрабатываем base64 изображение
+    if article_data.get('featured_image') and article_data['featured_image'].startswith('data:image/'):
+        try:
+            # Конвертируем base64 в файл
+            file_path = FileUploadService.save_base64_image(
+                article_data['featured_image'],
+                subfolder="blog"
+            )
+            # ИСПРАВЛЕНО: используем правильный метод с одним параметром
+            article_data['featured_image_url'] = FileUploadService.get_file_url(file_path)
+        except Exception as e:
+            print(f"Ошибка сохранения изображения: {e}")
+
+    # Удаляем поле featured_image, так как оно не нужно в модели
+    article_data.pop('featured_image', None)
+
+    # Обрабатываем теги
+    if 'tags' in article_data:
+        # Очищаем существующие теги
+        db_article.tags.clear()
+
+        # Добавляем новые теги
+        for tag_name in article_data["tags"]:
+            tag = db.query(ArticleTag).filter_by(name=tag_name).first()
+            if not tag:
+                # Создаем новый тег
+                tag_slug = tag_name.lower().replace(" ", "-")
+                tag = ArticleTag(name=tag_name, slug=tag_slug)
+                db.add(tag)
+                db.commit()
+                db.refresh(tag)
+
+            db_article.tags.append(tag)
+
+        # Удаляем теги из данных для обновления
+        del article_data["tags"]
+
+    # Обновляем поля статьи
+    for field, value in article_data.items():
+        setattr(db_article, field, value)
+
+    # Устанавливаем/обновляем published_at
+    if article_data.get("published") and not db_article.published_at:
+        db_article.published_at = datetime.utcnow()
+    elif not article_data.get("published", True):
+        db_article.published_at = None
+
+    db.commit()
+    db.refresh(db_article)
+    return db_article
+
+
+@router.delete("/{article_id}")
+def delete_article(article_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
+    db_article = db.query(Article).filter(Article.id == article_id).first()
+    if not db_article:
+        raise HTTPException(status_code=404, detail="Article not found")
+
+    db.delete(db_article)
+    db.commit()
+    return {"detail": "Article deleted"}
 
 
 @router.get("/{article_id}", response_model=ArticleRead)
 def get_article(article_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     article = db.query(Article).filter(Article.id == article_id).first()
     if not article:
-        raise HTTPException(status_code=404, detail="Статья не найдена")
+        raise HTTPException(status_code=404, detail="Article not found")
     return article
-
-
-@router.put("/{article_id}", response_model=ArticleRead)
-def update_article(
-    article_id: int,
-    article_update: ArticleUpdate,
-    db: Session = Depends(get_db),
-    admin: User = Depends(admin_required)
-):
-    article = db.query(Article).filter(Article.id == article_id).first()
-    if not article:
-        raise HTTPException(status_code=404, detail="Статья не найдена")
-
-    # Обновляем данные
-    for field, value in article_update.dict(exclude_unset=True).items():
-        setattr(article, field, value)
-
-    db.commit()
-    db.refresh(article)
-    return article
-
-
-@router.delete("/{article_id}")
-def delete_article(article_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
-    article = db.query(Article).filter(Article.id == article_id).first()
-    if not article:
-        raise HTTPException(status_code=404, detail="Статья не найдена")
-
-    db.delete(article)
-    db.commit()
-    return {"message": "Статья удалена"}
