@@ -1,4 +1,4 @@
-// frontend/src/lib/imageUtils.ts
+// frontend/src/lib/imageUtils.ts - ИСПРАВЛЕННАЯ ВЕРСИЯ
 /**
  * Утилиты для работы с изображениями
  */
@@ -17,24 +17,19 @@ export function getImageUrl(imagePath?: string): string | null {
     return imagePath
   }
 
+  // ИСПРАВЛЕНО: получаем базовый URL без /api для статических файлов
+  // Используем STATIC_FILES_BASE_URL как в backend
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api'
+  const baseUrl = apiUrl.replace('/api', '') // Убираем /api для статических файлов
+
   // Если путь начинается с /uploads, добавляем только base URL
   if (imagePath.startsWith('/uploads/')) {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL
-    if (!baseUrl) {
-      console.error('NEXT_PUBLIC_API_URL не установлен!')
-      return null
-    }
     const fullUrl = `${baseUrl}${imagePath}`
     console.log('Полный URL с /uploads:', fullUrl)
     return fullUrl
   }
 
   // Если путь относительный, добавляем /uploads/ и base URL
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL
-  if (!baseUrl) {
-    console.error('NEXT_PUBLIC_API_URL не установлен!')
-    return null
-  }
   const cleanPath = imagePath.replace(/^\/+/, '') // Убираем ведущие слеши
   const fullUrl = `${baseUrl}/uploads/${cleanPath}`
   console.log('Полный URL относительный:', fullUrl)

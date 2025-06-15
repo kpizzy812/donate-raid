@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Search, Calendar, User, Tag, Eye } from 'lucide-react'
 import { api } from '@/lib/api'
+import { getImageUrl } from '@/lib/imageUtils' // ИСПРАВЛЕНО: добавлен импорт getImageUrl
 
 interface ArticleTag {
   id: number
@@ -76,6 +77,14 @@ export default function BlogPage() {
     return imgMatch ? imgMatch[1] : null
   }
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
   // ИСПРАВЛЕНО: функция для получения изображения статьи
   const getArticleImage = (article: Article) => {
     // Проверяем все возможные источники изображения
@@ -85,7 +94,7 @@ export default function BlogPage() {
 
     if (!imagePath) return null
 
-    return getImageUrl(imagePath)
+    return getImageUrl(imagePath) // Теперь функция доступна благодаря импорту
   }
 
   // Функция для обработки ошибок загрузки изображений
@@ -150,24 +159,9 @@ export default function BlogPage() {
               ))}
             </div>
           </div>
-
-          {/* Popular tags */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Популярные теги</h3>
-            <div className="flex flex-wrap gap-2">
-              {['genshin-impact', 'valorant', 'mobile-games', 'free-to-play', 'updates'].map(tag => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full text-sm hover:bg-zinc-200 dark:hover:bg-zinc-700 cursor-pointer transition"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          </div>
         </aside>
 
-        {/* Main Content */}
+        {/* Main content */}
         <main className="flex-1">
           {loading ? (
             <div className="text-center py-12">
@@ -215,50 +209,50 @@ export default function BlogPage() {
                           <div className="text-center">
                             <div className="text-4xl text-zinc-400 mb-2">📰</div>
                             <div className="text-xs text-zinc-500">
-                              {hasImageError ? 'Ошибка загрузки' : 'Без изображения'}
+                              {hasImageError ? 'Ошибка загрузки' : 'Нет изображения'}
                             </div>
                           </div>
                         </div>
                       )}
-
-                      {/* Category Badge */}
-                      <div className="absolute top-3 left-3">
-                        <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded-md font-medium">
-                          {article.category}
-                        </span>
-                      </div>
                     </div>
 
                     {/* Content */}
                     <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition line-clamp-2">
+                      {/* Category */}
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
+                          {article.category}
+                        </span>
+                        {article.views && (
+                          <div className="flex items-center gap-1 text-xs text-zinc-500">
+                            <Eye size={12} />
+                            <span>{article.views}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
                         {article.title}
                       </h3>
 
-                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 line-clamp-3">
-                        {truncateText(article.content, 150)}
+                      {/* Excerpt */}
+                      <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 line-clamp-2">
+                        {truncateText(article.content, 120)}
                       </p>
 
-                      {/* Meta information */}
-                      <div className="flex items-center justify-between text-xs text-zinc-500">
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1">
-                            <Calendar size={12} />
-                            <span>{formatDate(article.created_at)}</span>
-                          </div>
-
-                          {article.author_name && (
-                            <div className="flex items-center gap-1">
-                              <User size={12} />
-                              <span>{article.author_name}</span>
-                            </div>
-                          )}
+                      {/* Meta */}
+                      <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+                        <div className="flex items-center gap-1">
+                          <Calendar size={12} />
+                          <span>
+                            {new Date(article.created_at).toLocaleDateString('ru-RU')}
+                          </span>
                         </div>
-
-                        {article.views && (
+                        {article.author_name && (
                           <div className="flex items-center gap-1">
-                            <Eye size={12} />
-                            <span>{article.views}</span>
+                            <User size={12} />
+                            <span>{article.author_name}</span>
                           </div>
                         )}
                       </div>
@@ -266,18 +260,16 @@ export default function BlogPage() {
                       {/* Tags */}
                       {article.tags && article.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-3">
-                          {article.tags.slice(0, 3).map((tag) => (
+                          {article.tags.slice(0, 3).map(tag => (
                             <span
                               key={tag.id}
-                              className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-full"
-                              style={{ color: tag.color || '#3B82F6' }}
+                              className="text-xs px-2 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                             >
-                              <Tag size={10} />
                               {tag.name}
                             </span>
                           ))}
                           {article.tags.length > 3 && (
-                            <span className="text-xs text-zinc-400">
+                            <span className="text-xs text-zinc-500">
                               +{article.tags.length - 3}
                             </span>
                           )}

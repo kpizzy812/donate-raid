@@ -1,8 +1,12 @@
-// frontend/src/app/blog/[slug]/page.tsx - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
-import { notFound } from 'next/navigation'
+// frontend/src/app/blog/[slug]/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ С КЛИЕНТСКИМ РЕНДЕРИНГОМ
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import { Calendar, User, Tag, Share2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { Metadata } from 'next'
+import { api } from '@/lib/api'
+import { getImageUrl } from '@/lib/imageUtils'
 
 interface Article {
   id: number
@@ -12,94 +16,79 @@ interface Article {
   category: string
   created_at: string
   author_name?: string
-  featured_image_url?: string  // ИСПРАВЛЕНО: правильное название поля
+  featured_image_url?: string
+  featured_image?: string
   tags?: Array<{id: number, name: string, slug: string}>
 }
 
-interface ArticlePageProps {
-  params: {
-    slug: string
-  }
-}
+export default function ArticlePage() {
+  const params = useParams()
+  const router = useRouter()
+  const slug = params?.slug as string
 
-// Вынесем функцию за пределы компонента, чтобы она была доступна в generateMetadata
-function getImageFromContent(content: string) {
-  const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i)
-  return imgMatch ? imgMatch[1] : null
-}
+  const [article, setArticle] = useState<Article | null>(null)
+  const [relatedArticles, setRelatedArticles] = useState<Article[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-async function getArticle(slug: string): Promise<Article | null> {
-  try {
-    // ИСПРАВЛЕНО: правильный путь к API
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${slug}`, {
-      next: { revalidate: 300 } // Кешируем на 5 минут
-    })
+  useEffect(() => {
+    if (!slug) return
 
-    if (!res.ok) return null
-    return res.json()
-  } catch (error) {
-    console.error('Error fetching article:', error)
-    return null
-  }
-}
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
 
-async function getRelatedArticles(category: string, currentSlug: string): Promise<Article[]> {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles?category=${category}`, {
-      next: { revalidate: 300 }
-    })
+        console.log('Загружаем статью с slug:', slug)
 
-    if (!res.ok) return []
-    const articles = await res.json()
+        // Загружаем статью
+        const response = await api.get(`/articles/${slug}`)
+        const articleData = response.data
 
-    // Исключаем текущую статью и берем только 3
-    return articles.filter((article: Article) => article.slug !== currentSlug).slice(0, 3)
-  } catch (error) {
-    return []
-  }
-}
+        console.log('Получена статья:', articleData)
+        setArticle(articleData)
 
-// Генерация метаданных для SEO
-export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
-  const article = await getArticle(params.slug)
+        // Загружаем похожие статьи
+        if (articleData.category) {
+          try {
+            const relatedResponse = await api.get(`/articles?category=${articleData.category}`)
+            const related = relatedResponse.data
+              .filter((a: Article) => a.slug !== slug)
+              .slice(0, 3)
+            setRelatedArticles(related)
+          } catch (relError) {
+            console.warn('Ошибка загрузки похожих статей:', relError)
+          }
+        }
 
-  if (!article) {
-    return {
-      title: 'Статья не найдена',
-      description: 'Запрашиваемая статья не найдена'
+      } catch (err: any) {
+        console.error('Ошибка загрузки статьи:', err)
+
+        if (err.response?.status === 404) {
+          setError('Статья не найдена')
+        } else {
+          setError('Ошибка загрузки статьи')
+        }
+      } finally {
+        setLoading(false)
+      }
     }
+
+    fetchData()
+  }, [slug])
+
+  const getImageFromContent = (content: string) => {
+    const imgMatch = content.match(/<img[^>]+src="([^">]+)"/i)
+    return imgMatch ? imgMatch[1] : null
   }
 
-  const featuredImage = article.featured_image_url || getImageFromContent(article.content)
+  const getArticleImage = (article: Article) => {
+    const imagePath = article.featured_image_url ||
+                     article.featured_image ||
+                     getImageFromContent(article.content)
 
-  return {
-    title: article.title,
-    description: article.content.replace(/<[^>]*>/g, '').substring(0, 160),
-    openGraph: {
-      title: article.title,
-      description: article.content.replace(/<[^>]*>/g, '').substring(0, 160),
-      images: featuredImage ? [featuredImage] : [],
-      type: 'article',
-      publishedTime: article.created_at,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: article.title,
-      description: article.content.replace(/<[^>]*>/g, '').substring(0, 160),
-      images: featuredImage ? [featuredImage] : [],
-    }
+    return imagePath ? getImageUrl(imagePath) : null
   }
-}
-
-export default async function ArticlePage({ params }: ArticlePageProps) {
-  const article = await getArticle(params.slug)
-
-  if (!article) {
-    return notFound()
-  }
-
-  const relatedArticles = await getRelatedArticles(article.category, article.slug)
-  const featuredImage = article.featured_image_url || getImageFromContent(article.content)
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
@@ -108,6 +97,54 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       day: 'numeric'
     })
   }
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: article?.title || 'Статья',
+        text: `Читайте статью: ${article?.title}`,
+        url: window.location.href,
+      })
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      alert('Ссылка скопирована в буфер обмена!')
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-zinc-500">Загружаем статью...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !article) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">
+            {error || 'Статья не найдена'}
+          </h1>
+          <p className="text-zinc-600 mb-6">
+            Запрашиваемая статья не существует или была удалена
+          </p>
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            <ArrowLeft size={16} />
+            Вернуться к блогу
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  const featuredImage = getArticleImage(article)
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -124,18 +161,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <header className="mb-8">
         {/* Category badge */}
         <div className="mb-4">
-          <span className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+          <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-2.5 py-0.5 rounded-full">
             {article.category}
           </span>
         </div>
 
         {/* Title */}
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
           {article.title}
         </h1>
 
         {/* Meta information */}
-        <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mb-6">
+        <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 dark:text-gray-400 mb-6">
           <div className="flex items-center gap-1">
             <Calendar size={16} />
             <time dateTime={article.created_at}>
@@ -151,18 +188,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           )}
 
           <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: article.title,
-                  text: `Читайте статью: ${article.title}`,
-                  url: window.location.href,
-                })
-              } else {
-                navigator.clipboard.writeText(window.location.href)
-                alert('Ссылка скопирована в буфер обмена!')
-              }
-            }}
+            onClick={handleShare}
             className="flex items-center gap-1 text-blue-600 hover:text-blue-700 transition"
           >
             <Share2 size={16} />
@@ -177,6 +203,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               src={featuredImage}
               alt={article.title}
               className="w-full h-64 md:h-80 object-cover rounded-lg shadow-lg"
+              onError={(e) => {
+                console.error('Ошибка загрузки изображения статьи:', featuredImage)
+                e.currentTarget.style.display = 'none'
+              }}
             />
           </div>
         )}
@@ -187,7 +217,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             {article.tags.map((tag) => (
               <span
                 key={tag.id}
-                className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full"
+                className="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded-full"
               >
                 <Tag size={12} />
                 {tag.name}
@@ -200,41 +230,48 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       {/* Article content */}
       <main className="mb-12">
         <div
-          className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900"
+          className="prose prose-lg max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-blue-600 prose-strong:text-gray-900 dark:prose-strong:text-gray-100"
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
       </main>
 
       {/* Related articles */}
       {relatedArticles.length > 0 && (
-        <section className="border-t pt-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Похожие статьи</h2>
+        <section className="border-t border-gray-200 dark:border-gray-700 pt-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Похожие статьи</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            {relatedArticles.map((relatedArticle) => (
-              <Link
-                key={relatedArticle.id}
-                href={`/blog/${relatedArticle.slug}`}
-                className="group block"
-              >
-                <article className="bg-white rounded-lg shadow-md overflow-hidden transition-transform group-hover:scale-105">
-                  {relatedArticle.featured_image_url && (
-                    <img
-                      src={relatedArticle.featured_image_url}
-                      alt={relatedArticle.title}
-                      className="w-full h-40 object-cover"
-                    />
-                  )}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition">
-                      {relatedArticle.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {formatDate(relatedArticle.created_at)}
-                    </p>
-                  </div>
-                </article>
-              </Link>
-            ))}
+            {relatedArticles.map((relatedArticle) => {
+              const relatedImage = getArticleImage(relatedArticle)
+
+              return (
+                <Link
+                  key={relatedArticle.id}
+                  href={`/blog/${relatedArticle.slug}`}
+                  className="group block"
+                >
+                  <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-transform group-hover:scale-105">
+                    {relatedImage && (
+                      <img
+                        src={relatedImage}
+                        alt={relatedArticle.title}
+                        className="w-full h-40 object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
+                    )}
+                    <div className="p-4">
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 transition">
+                        {relatedArticle.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {formatDate(relatedArticle.created_at)}
+                      </p>
+                    </div>
+                  </article>
+                </Link>
+              )
+            })}
           </div>
         </section>
       )}
