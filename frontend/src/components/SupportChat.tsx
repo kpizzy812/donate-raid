@@ -76,6 +76,56 @@ export default function SupportChat({ className = '' }: SupportChatProps) {
     }
   }, [])
 
+  // Автообновление сообщений каждые 3 секунды
+  useEffect(() => {
+    if (!chatInitialized || !guestId) return
+
+    const interval = setInterval(() => {
+      // Тихая загрузка без показа лоадера
+      loadMessagesQuietly()
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [chatInitialized, guestId])
+
+  // Тихая загрузка сообщений для автообновления
+  const loadMessagesQuietly = async () => {
+    if (!guestId) return
+
+    try {
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/support/my?guest_id=${guestId}`
+      const headers: Record<string, string> = {}
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const response = await fetch(url, { headers })
+
+      if (response.ok) {
+        const data = await response.json()
+
+        const newMessages = Array.isArray(data) ? data : []
+
+        // Обновляем сообщения только если они изменились
+        setMessages(prevMessages => {
+          if (JSON.stringify(prevMessages) !== JSON.stringify(newMessages)) {
+            console.log('Обновлены сообщения:', newMessages.length)
+            return newMessages
+          }
+          return prevMessages
+        })
+
+        if (newMessages.length > 0) {
+          setShowPresets(false)
+        }
+      }
+    } catch (error) {
+      // Тихо игнорируем ошибки при автообновлении
+      console.debug('Ошибка автообновления сообщений:', error)
+    }
+  }
+
   const loadMessages = async () => {
     if (!guestId) return
 

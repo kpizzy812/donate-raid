@@ -49,10 +49,10 @@ def support_keyboard(user_id: Optional[int], guest_id: Optional[str] = None):
     return markup
 
 
-# ✅ Команда от FastAPI для вызова из notify
+# ✅ Уведомление о новом сообщении
 async def notify_new_support_message(user_id: Optional[int], text: str, guest_id: Optional[str] = None):
-    # Печатаем входные параметры
-    print(f">>> notify_new_support_message вызван с: user_id={user_id}, guest_id={guest_id}, text='{text}'", file=sys.stderr, flush=True)
+    print(f">>> notify_new_support_message вызван с: user_id={user_id}, guest_id={guest_id}, text='{text}'",
+          file=sys.stderr, flush=True)
     logger.info(f"[notify] incoming: user_id={user_id} | guest_id={guest_id} | message='{text}'")
 
     db = get_db()
@@ -60,7 +60,7 @@ async def notify_new_support_message(user_id: Optional[int], text: str, guest_id
 
     if user_id:
         user = db.query(User).filter_by(id=user_id).first()
-        username = user.username or str(user_id)
+        username = user.username or user.email or str(user_id)
 
     kb = support_keyboard(user_id, guest_id)
     print(f">>> notify_new_support_message: support_keyboard вернул: {kb}", file=sys.stderr, flush=True)
@@ -73,6 +73,10 @@ async def notify_new_support_message(user_id: Optional[int], text: str, guest_id
             if x.strip().isdigit()
         ]
         print(f">>> notify_new_support_message: рассчитанные admin_ids = {admin_ids}", file=sys.stderr, flush=True)
+
+        success_count = 0
+        error_count = 0
+
         for admin_id in admin_ids:
             try:
                 await bot.send_message(
@@ -82,12 +86,49 @@ async def notify_new_support_message(user_id: Optional[int], text: str, guest_id
                     reply_markup=kb if kb else None
                 )
                 print(f">>> notify_new_support_message: отправил админу {admin_id}", file=sys.stderr, flush=True)
+                success_count += 1
             except Exception as e:
-                print(f">>> notify_new_support_message: не смог отправить админу {admin_id}: {e}", file=sys.stderr, flush=True)
-                logger.error(f"[notify] не удалось отправить админу {admin_id}: {e}")
+                print(f">>> notify_new_support_message: не смог отправить админу {admin_id}: {e}", file=sys.stderr,
+                      flush=True)
+                logger.warning(f"[notify] не удалось отправить админу {admin_id}: {e}")
+                error_count += 1
+
+        logger.info(f"[notify] уведомления отправлены: успешно={success_count}, ошибок={error_count}")
     else:
         print(">>> notify_new_support_message: TG_ADMIN_CHAT_IDS пустой или не задан", file=sys.stderr, flush=True)
         logger.warning("[notify] TG_ADMIN_CHAT_IDS пустой, никто не получит сообщение")
+
+
+# ✍️ Ответ админа - ИСПРАВЛЕННАЯ ВЕРСИЯ
+@router.message(SupportReplyState.waiting_for_reply)
+async def send_reply_support(msg: Message, state: FSMContext):
+    data = await state.get_data()
+    user_id = data.get("user_id")
+    guest_id = data.get("guest_id")
+
+    db = get_db()
+
+    # Создаем сообщение от админа
+    reply = SupportMessage(
+        user_id=user_id,
+        guest_id=guest_id,
+        message=msg.text,
+        is_from_user=False,  # Это ответ от админа
+        created_at=datetime.utcnow()
+    )
+    db.add(reply)
+    db.commit()
+
+    # Просто сообщаем админу что ответ сохранен
+    # Пользователь увидит ответ в веб-интерфейсе поддержки
+    if user_id:
+        await msg.answer(f"✅ Ответ отправлен пользователю ID: {user_id}")
+    elif guest_id:
+        await msg.answer(f"✅ Ответ отправлен гостю: {guest_id}")
+    else:
+        await msg.answer("✅ Ответ сохранен")
+
+    await state.clear()
 
 # 💬 Клик "Ответить"
 @router.callback_query(F.data.startswith("support_reply_"))
@@ -108,6 +149,7 @@ async def start_reply_support(call: CallbackQuery, state: FSMContext):
 
 
 # ✍️ Ответ админа
+# ✍️ Ответ админа - ИСПРАВЛЕННАЯ ВЕРСИЯ
 @router.message(SupportReplyState.waiting_for_reply)
 async def send_reply_support(msg: Message, state: FSMContext):
     data = await state.get_data()
@@ -116,22 +158,25 @@ async def send_reply_support(msg: Message, state: FSMContext):
 
     db = get_db()
 
+    # Создаем сообщение от админа
     reply = SupportMessage(
         user_id=user_id,
         guest_id=guest_id,
         message=msg.text,
-        is_from_user=False,
+        is_from_user=False,  # Это ответ от админа
         created_at=datetime.utcnow()
     )
     db.add(reply)
     db.commit()
 
-    try:
-        if user_id:
-            await bot.send_message(user_id, f"👨‍💼 Ответ поддержки:\n\n{msg.text}")
-        await msg.answer("✅ Ответ отправлен")
-    except Exception as e:
-        await msg.answer(f"⚠️ Не удалось отправить сообщение: {e}")
+    # Просто сообщаем админу что ответ сохранен
+    # Пользователь увидит ответ в веб-интерфейсе поддержки
+    if user_id:
+        await msg.answer(f"✅ Ответ отправлен пользователю ID: {user_id}")
+    elif guest_id:
+        await msg.answer(f"✅ Ответ отправлен гостю: {guest_id}")
+    else:
+        await msg.answer("✅ Ответ сохранен")
 
     await state.clear()
 
