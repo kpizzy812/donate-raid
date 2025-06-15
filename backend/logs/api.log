@@ -14876,3 +14876,15 @@ RuntimeError: no running event loop
 2025-06-15 at 20:49:48 | INFO | main:38 - 📤 422 http://localhost:8001/api/orders/my
 2025-06-15 at 20:50:11 | INFO | main:32 - 📥 GET http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
 2025-06-15 at 20:50:11 | INFO | main:38 - 📤 200 http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:50:42 | INFO | main:32 - 📥 GET http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:50:42 | INFO | main:38 - 📤 200 http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:51:12 | INFO | main:32 - 📥 GET http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:51:12 | INFO | main:38 - 📤 200 http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:52:01 | INFO | main:32 - 📥 GET http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:52:01 | INFO | main:38 - 📤 200 http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:53:01 | INFO | main:32 - 📥 GET http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:53:01 | INFO | main:38 - 📤 200 http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:54:01 | INFO | main:32 - 📥 GET http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:54:01 | INFO | main:38 - 📤 200 http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:55:01 | INFO | main:32 - 📥 GET http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
+2025-06-15 at 20:55:01 | INFO | main:38 - 📤 200 http://localhost:8001/api/notifications/count?guest_id=dd80f37d-181a-414e-aeae-65b157b06d18
