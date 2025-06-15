@@ -1,4 +1,4 @@
-# backend/app/services/telegram.py - НОВЫЙ ФАЙЛ
+# backend/app/services/telegram.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 import asyncio
 import aiohttp
 from typing import Optional
@@ -20,7 +20,7 @@ class TelegramNotifier:
             return []
         return [chat_id.strip() for chat_id in settings.TG_ADMIN_CHAT_IDS.split(',')]
 
-    async def send_message(self, text: str, chat_id: Optional[str] = None):
+    async def send_message(self, text: str, chat_id: Optional[str] = None, reply_markup=None):
         """Отправляет сообщение в Telegram"""
         if not self.enabled:
             logger.warning("Telegram уведомления отключены (не настроен токен или chat_id)")
@@ -38,6 +38,10 @@ class TelegramNotifier:
                     "disable_web_page_preview": True
                 }
 
+                # Добавляем клавиатуру если есть
+                if reply_markup:
+                    payload["reply_markup"] = reply_markup
+
                 async with aiohttp.ClientSession() as session:
                     async with session.post(url, json=payload) as response:
                         if response.status == 200:
@@ -50,16 +54,16 @@ class TelegramNotifier:
 
         return True
 
-    def send_message_sync(self, text: str, chat_id: Optional[str] = None):
+    def send_message_sync(self, text: str, chat_id: Optional[str] = None, reply_markup=None):
         """Синхронная версия отправки сообщения"""
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
                 # Если цикл уже запущен, создаем задачу
-                asyncio.create_task(self.send_message(text, chat_id))
+                asyncio.create_task(self.send_message(text, chat_id, reply_markup))
             else:
                 # Запускаем в новом цикле
-                loop.run_until_complete(self.send_message(text, chat_id))
+                loop.run_until_complete(self.send_message(text, chat_id, reply_markup))
         except Exception as e:
             logger.error(f"Ошибка синхронной отправки: {e}")
 
@@ -74,9 +78,18 @@ def notify_order_sync(message: str):
     telegram_notifier.send_message_sync(message)
 
 
-def notify_manual_order_sync(message: str):
-    """Уведомление о ручном заказе"""
-    telegram_notifier.send_message_sync(message)
+def notify_manual_order_sync(message: str, order_id: int = None):
+    """Уведомление о ручном заказе с клавиатурой"""
+    # Импортируем здесь чтобы избежать циклических импортов
+    from bot.handlers.manual_orders import manual_order_keyboard
+
+    keyboard = None
+    if order_id:
+        kb = manual_order_keyboard(order_id)
+        # Конвертируем aiogram клавиатуру в JSON для API
+        keyboard = kb.model_dump() if hasattr(kb, 'model_dump') else None
+
+    telegram_notifier.send_message_sync(message, reply_markup=keyboard)
 
 
 def notify_payment_sync(message: str):
