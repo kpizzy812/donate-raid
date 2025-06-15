@@ -42,8 +42,8 @@ class PaymentMethod(str, Enum):
 
 class OrderCreate(BaseModel):
     user_id: Optional[int] = None
-    game_id: int
-    product_id: int
+    game_id: Optional[int] = None  # 🆕 Сделали опциональным
+    product_id: Optional[int] = None  # 🆕 Сделали опциональным
     amount: Decimal
     currency: str
     payment_method: PaymentMethod

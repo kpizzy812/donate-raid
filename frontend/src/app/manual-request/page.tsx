@@ -1,4 +1,4 @@
-// frontend/src/app/manual-request/page.tsx - ПОЛНАЯ ЗАМЕНА ФАЙЛА!
+// frontend/src/app/manual-request/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useState } from 'react'
@@ -20,41 +20,62 @@ export default function ManualRequestPage() {
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!formData.manual_game_name.trim()) {
-      setError('Укажите название игры')
-      return
-    }
-    
-    if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      setError('Укажите корректную сумму')
-      return
-    }
+  e.preventDefault()
 
-    setLoading(true)
-    setError('')
-
-    try {
-      const response = await api.post('/orders/manual', {
-        manual_game_name: formData.manual_game_name.trim(),
-        amount: parseFloat(formData.amount),
-        currency: formData.currency,
-        comment: formData.comment.trim() || null,
-        // Обязательные поля для Order модели, но не используются для manual
-        game_id: 1, // dummy value
-        product_id: 1 // dummy value
-      })
-
-      setOrderData(response.data)
-      setSubmitted(true)
-    } catch (err: any) {
-      console.error('Ошибка при создании заявки:', err)
-      setError(err.response?.data?.detail || 'Ошибка при отправке заявки')
-    } finally {
-      setLoading(false)
-    }
+  if (!formData.manual_game_name.trim()) {
+    setError('Укажите название игры')
+    return
   }
+
+  if (!formData.amount || parseFloat(formData.amount) <= 0) {
+    setError('Укажите корректную сумму')
+    return
+  }
+
+  setLoading(true)
+  setError('')
+
+  try {
+    const response = await api.post('/orders/manual', {
+      manual_game_name: formData.manual_game_name.trim(),
+      amount: parseFloat(formData.amount),
+      currency: formData.currency,
+      comment: formData.comment.trim() || null,
+      payment_method: 'manual'
+      // 🆕 УБРАЛИ game_id и product_id - backend автоматически их создаст
+    })
+
+    setOrderData(response.data)
+    setSubmitted(true)
+  } catch (err: any) {
+    console.error('Ошибка при создании заявки:', err)
+
+    // Улучшенная обработка ошибок
+    let errorMessage = 'Ошибка при отправке заявки'
+
+    if (err.response?.data) {
+      if (typeof err.response.data === 'string') {
+        errorMessage = err.response.data
+      } else if (err.response.data.detail) {
+        if (typeof err.response.data.detail === 'string') {
+          errorMessage = err.response.data.detail
+        } else if (Array.isArray(err.response.data.detail)) {
+          // Обработка ошибок валидации Pydantic
+          const validationErrors = err.response.data.detail
+            .map((error: any) => `${error.loc?.join('.') || 'поле'}: ${error.msg}`)
+            .join(', ')
+          errorMessage = `Ошибки валидации: ${validationErrors}`
+        }
+      } else if (err.response.data.message) {
+        errorMessage = err.response.data.message
+      }
+    }
+
+    setError(errorMessage)
+  } finally {
+    setLoading(false)
+  }
+}
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -96,7 +117,7 @@ export default function ManualRequestPage() {
                 {formData.comment && (
                   <p><span className="font-medium">Комментарий:</span> {formData.comment}</p>
                 )}
-                <p><span className="font-medium">Статус:</span> 
+                <p><span className="font-medium">Статус:</span>
                   <span className="inline-flex items-center gap-1 ml-1">
                     <Clock className="w-3 h-3" />
                     Ожидает обработки
@@ -158,7 +179,7 @@ export default function ManualRequestPage() {
       <div>
         <h1 className="text-2xl font-bold mb-2">Заявка на донат в свою игру</h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Если вашей игры нет в списке — вы можете оформить заявку вручную. 
+          Если вашей игры нет в списке — вы можете оформить заявку вручную.
           Укажите, что именно вы хотите купить, и оператор свяжется с вами.
         </p>
       </div>

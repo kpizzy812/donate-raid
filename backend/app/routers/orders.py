@@ -156,32 +156,79 @@ def cancel_order(
 # ------------------------------------------------------------
 @router.post("/manual", response_model=OrderRead)
 def create_manual_order(
-    data: OrderCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+        data: OrderCreate,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
 ):
     print(f"▶▶▶ Вызван create_manual_order для user_id={current_user.id} c данными: {data.dict()}")
     if not data.manual_game_name:
         print("    → manual_game_name не передан, верну 400")
         raise HTTPException(status_code=400, detail="manual_game_name is required for manual orders")
 
-    new_order = Order(**data.dict())
+    # 🆕 Автоматически получаем или создаем фиктивные записи для manual заказов
+    from app.models.game import Game
+    from app.models.product import Product, ProductType
+
+    # Ищем или создаем системную игру для manual заказов
+    dummy_game = db.query(Game).filter_by(name="Manual Orders").first()
+    if not dummy_game:
+        dummy_game = Game(
+            name="Manual Orders",
+            banner_url="",
+            auto_support=False,
+            sort_order=999999,  # В самый конец
+            enabled=False  # Скрываем от пользователей
+        )
+        db.add(dummy_game)
+        db.flush()  # Получаем ID
+        print(f"    → Создана системная игра для manual заказов с ID: {dummy_game.id}")
+
+    # Ищем или создаем системный продукт
+    dummy_product = db.query(Product).filter_by(
+        game_id=dummy_game.id,
+        name="Manual Order Service"
+    ).first()
+    if not dummy_product:
+        from decimal import Decimal
+        dummy_product = Product(
+            game_id=dummy_game.id,
+            name="Manual Order Service",
+            price_rub=Decimal("0.00"),
+            type=ProductType.service,
+            description="Системный продукт для ручных заказов",
+            enabled=False,  # Скрываем от пользователей
+            delivery="manual",
+            sort_order=999999
+        )
+        db.add(dummy_product)
+        db.flush()
+        print(f"    → Создан системный продукт для manual заказов с ID: {dummy_product.id}")
+
+    # 🆕 Создаем заказ с автоматически подставленными ID
+    order_data_dict = data.dict()
+    if not order_data_dict.get('game_id'):
+        order_data_dict['game_id'] = dummy_game.id
+    if not order_data_dict.get('product_id'):
+        order_data_dict['product_id'] = dummy_product.id
+
+    new_order = Order(**order_data_dict)
     new_order.user_id = current_user.id
     new_order.payment_method = PaymentMethod.manual
+
     db.add(new_order)
     db.commit()
     db.refresh(new_order)
 
     print(f"    → Новый ручной заказ создан, id={new_order.id}, игра={data.manual_game_name}")
 
-    # 🔔 Telegram уведомление С ORDER_ID - ИСПРАВЛЕНО!
+    # 🔔 Telegram уведомление с order_id
     notify_manual_order_sync(
         f"📥 <b>Новая ручная заявка #{new_order.id}</b>\n"
         f"👤 <b>{current_user.username or 'No username'}</b> (ID: {current_user.id})\n"
         f"🎮 Игра: <code>{data.manual_game_name}</code>\n"
         f"💵 Сумма: {data.amount} {data.currency}\n"
         f"📝 Комментарий: {data.comment or '-'}",
-        order_id=new_order.id  # 🆕 ДОБАВЬТЕ ЭТУ СТРОКУ!
+        order_id=new_order.id
     )
     print(f"    → Отправлено Telegram-уведомление о новом ручном заказе #{new_order.id}")
 
