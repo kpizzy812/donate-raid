@@ -8,14 +8,14 @@ services:
     volumes:
       - pgdata_prod:/var/lib/postgresql/data
     ports:
-      - "127.0.0.1:5435:5432"  # Только localhost
+      - "127.0.0.1:5435:5432"  # Только localhost - БД не должна быть доступна извне
     restart: unless-stopped
 
   backend:
     build: ./backend
     env_file: .env
     ports:
-      - "127.0.0.1:8001:8000"  # Только localhost
+      - "8001:8000"  # Убираем 127.0.0.1, чтобы было доступно извне
     depends_on:
       - postgres
     environment:
@@ -37,9 +37,11 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.prod  # Используем продакшн сборку
+      dockerfile: Dockerfile.prod
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}  # Передаем из .env
     ports:
-      - "127.0.0.1:3001:3000"  # Только localhost
+      - "3001:3000"  # Убираем 127.0.0.1, чтобы было доступно извне
     depends_on:
       - backend
     environment:

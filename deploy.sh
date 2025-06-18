@@ -35,12 +35,20 @@ ssh "${REMOTE_USER}@${REMOTE_HOST}" bash <<EOF
     exit 1
   fi
 
-  # Создаем .env если его нет
+  # Проверяем наличие .env файла (не перезаписываем если есть)
   if [ ! -f .env ]; then
     echo "⚠️  Создание .env из примера..."
     cp .env.example .env
     echo "🔑 ВАЖНО: Отредактируйте .env файл перед продакшн запуском!"
+  else
+    echo "✅ Используем существующий .env файл"
   fi
+
+  # Автоматически обновляем URL в .env для сервера
+  echo "🔧 Обновляем URL для сервера ${REMOTE_HOST}..."
+  sed -i "s|NEXT_PUBLIC_API_URL=http://localhost:8001/api|NEXT_PUBLIC_API_URL=http://${REMOTE_HOST}:8001/api|g" .env
+  sed -i "s|FRONTEND_URL=http://localhost:3001|FRONTEND_URL=http://${REMOTE_HOST}:3001|g" .env
+  sed -i "s|STATIC_FILES_BASE_URL=http://localhost:8001|STATIC_FILES_BASE_URL=http://${REMOTE_HOST}:8001|g" .env
 
   # Заменяем docker-compose.yml на продакшен версию если есть
   if [ -f docker-compose.prod.yml ]; then
@@ -59,10 +67,13 @@ ssh "${REMOTE_USER}@${REMOTE_HOST}" bash <<EOF
   sleep 10
 
   # Применяем миграции
+  echo "🗄️  Проверка текущего состояния миграций..."
+  docker-compose exec -T backend alembic current || true
+
   echo "🗄️  Применение миграций базы данных..."
   docker-compose exec -T backend alembic upgrade head || {
-    echo "⚠️  Миграции не применились, возможно БД пустая"
-    docker-compose exec -T backend alembic revision --autogenerate -m "initial migration" || true
+    echo "⚠️  Миграции не применились, создаем новую..."
+    docker-compose exec -T backend alembic revision --autogenerate -m "fix missing columns" || true
     docker-compose exec -T backend alembic upgrade head || true
   }
 
@@ -73,9 +84,9 @@ ssh "${REMOTE_USER}@${REMOTE_HOST}" bash <<EOF
   docker-compose logs --tail=20
 
   echo "✅ Деплой завершён!"
-  echo "🌐 Фронтенд: http://${REMOTE_HOST}:3000"
-  echo "🔌 API: http://${REMOTE_HOST}:8000"
-  echo "📚 API Docs: http://${REMOTE_HOST}:8000/docs"
+  echo "🌐 Фронтенд: http://${REMOTE_HOST}:3001"
+  echo "🔌 API: http://${REMOTE_HOST}:8001"
+  echo "📚 API Docs: http://${REMOTE_HOST}:8001/docs"
 
 EOF
 

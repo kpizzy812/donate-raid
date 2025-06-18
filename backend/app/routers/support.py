@@ -1,120 +1,232 @@
-# backend/app/routers/support.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
-from fastapi import APIRouter, Depends, Request, Query
+# backend/bot/handlers/support.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+import sys
+from aiogram import Router, F
+from aiogram.types import CallbackQuery, Message
+from aiogram.fsm.context import FSMContext
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.orm import Session
-from app.core.database import get_db
+from sqlalchemy import and_, desc
+from app.core.database import SessionLocal
 from app.models.support import SupportMessage, SupportStatus
-from app.services.auth import get_current_user_from_request_sync
 from app.models.user import User
+from app.core.config import settings
+from bot.states.support import SupportReplyState
+from bot.instance import bot
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel
-from bot.handlers.support import notify_new_support_message
+from loguru import logger
 
-router = APIRouter()
+router = Router()
 
 
-# Pydantic схемы
-class SupportMessageCreate(BaseModel):
-    message: str
+def get_db() -> Session:
+    return SessionLocal()
 
 
-class SupportMessageRead(BaseModel):
-    id: int
-    user_id: Optional[int] = None
-    guest_id: Optional[str] = None
-    message: str
-    is_from_user: bool
-    created_at: datetime
-    status: str
+# 🎛️ Клавиатура для админа с улучшенными опциями
+def support_keyboard(user_id: int = None, guest_id: str = None):
+    kb = InlineKeyboardBuilder()
 
-    class Config:
-        from_attributes = True
+    if user_id:
+        reply_data = f"support_reply_user_{user_id}"
+        close_data = f"support_resolve_user_{user_id}"
+        view_data = f"support_view_user_{user_id}"
+    else:
+        reply_data = f"support_reply_guest_{guest_id}"
+        close_data = f"support_resolve_guest_{guest_id}"
+        view_data = f"support_view_guest_{guest_id}"
+
+    kb.button(text="✍️ Ответить", callback_data=reply_data)
+    kb.button(text="📋 История", callback_data=view_data)
+    kb.button(text="✅ Закрыть диалог", callback_data=close_data)
+    kb.button(text="🔙 К диалогам", callback_data="support_back")
+    kb.adjust(2, 2)
+
+    return kb.as_markup()
 
 
-@router.post("/send", response_model=SupportMessageRead)  # ✅ Изменили endpoint на /send
-async def create_support_message(
-        data: SupportMessageCreate,
-        request: Request,
-        guest_id: Optional[str] = Query(None),
-        db: Session = Depends(get_db),
-):
-    """Создать сообщение в поддержку"""
-    user = None
+# ✅ Уведомление о новом сообщении
+async def notify_new_support_message(user_id: int = None, text: str = None, guest_id: str = None):
+    logger.info(f"[notify] incoming: user_id={user_id} | guest_id={guest_id} | message='{text}'")
 
-    # Пытаемся получить авторизованного пользователя
+    db = get_db()
     try:
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            user = get_current_user_from_request_sync(request, db)
-            print(f"✅ Авторизованный пользователь найден: ID={user.id}, email={user.email}")
-        else:
-            print("ℹ️ Токен авторизации не найден, работаем как гость")
-    except Exception as e:
-        print(f"⚠️ Ошибка получения пользователя: {e}")
-        user = None  # Продолжаем как гость
+        username = "Гость"
+        user_info = ""
 
-    # Создаем сообщение
-    message = SupportMessage(
-        user_id=user.id if user else None,
-        guest_id=guest_id if not user else None,
-        message=data.message,
-        is_from_user=True,
-        status=SupportStatus.new,
-        created_at=datetime.utcnow()
-    )
+        if user_id:
+            user = db.query(User).filter_by(id=user_id).first()
+            if user:
+                username = user.username or user.email or f"ID: {user_id}"
+                user_info = f"📧 {user.email}\n💰 Баланс: {user.balance or 0} ₽\n"
 
-    db.add(message)
-    db.commit()
-    db.refresh(message)
-
-    print(f"📝 Создано сообщение: user_id={message.user_id}, guest_id={message.guest_id}, message='{message.message}'")
-
-    # Уведомляем в Telegram
-    try:
-        await notify_new_support_message(
-            user_id=user.id if user else None,
-            text=data.message,
-            guest_id=guest_id if not user else None
-        )
-    except Exception as e:
-        print(f"⚠️ Ошибка уведомления в Telegram: {e}")
-
-    return message
-
-
-@router.get("/my", response_model=list[SupportMessageRead])
-def get_my_support_history(
-        request: Request,
-        db: Session = Depends(get_db),
-        guest_id: Optional[str] = Query(None),
-):
-    """Получить историю сообщений"""
-
-    # Пытаемся получить авторизованного пользователя
-    try:
-        auth_header = request.headers.get("Authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            current_user = get_current_user_from_request_sync(request, db)
-            print(f"✅ Загружаем сообщения для авторизованного пользователя: ID={current_user.id}")
-            return (
-                db.query(SupportMessage)
-                .filter_by(user_id=current_user.id)
-                .order_by(SupportMessage.created_at.asc())
-                .all()
+        # Считаем количество сообщений в диалоге
+        message_count = db.query(SupportMessage).filter(
+            and_(
+                SupportMessage.user_id == user_id,
+                SupportMessage.guest_id == guest_id
             )
-        else:
-            print(f"ℹ️ Токен не найден, загружаем сообщения для гостя: guest_id={guest_id}")
-    except Exception as e:
-        print(f"⚠️ Ошибка получения пользователя: {e}")
+        ).count()
 
-    # Если авторизация не удалась, пробуем загрузить по guest_id
-    if guest_id:
-        return (
-            db.query(SupportMessage)
-            .filter_by(guest_id=guest_id)
-            .order_by(SupportMessage.created_at.asc())
-            .all()
+        kb = support_keyboard(user_id, guest_id)
+
+        message_text = (
+            f"📨 <b>Новое сообщение от {username}</b>\n\n"
+            f"{user_info}"
+            f"💬 Сообщений в диалоге: {message_count}\n"
+            f"🕒 Время: {datetime.now().strftime('%H:%M')}\n\n"
+            f"<b>Сообщение:</b>\n{text}"
         )
 
-    print("❌ Ни токен, ни guest_id не предоставлены")
-    return []
+        if settings.TG_ADMIN_CHAT_IDS:
+            admin_ids = [
+                int(x.strip())
+                for x in settings.TG_ADMIN_CHAT_IDS.split(",")
+                if x.strip().isdigit()
+            ]
+
+            for admin_id in admin_ids:
+                try:
+                    await bot.send_message(
+                        admin_id,
+                        message_text,
+                        parse_mode="HTML",
+                        reply_markup=kb
+                    )
+                    logger.info(f"[notify] sent to admin {admin_id}")
+                except Exception as e:
+                    logger.warning(f"[notify] failed to send to admin {admin_id}: {e}")
+    finally:
+        db.close()
+
+
+# ✍️ ИСПРАВЛЕННЫЙ ответ админа БЕЗ admin_id
+@router.message(SupportReplyState.waiting_for_reply)
+async def send_reply_support(msg: Message, state: FSMContext):
+    data = await state.get_data()
+    user_id = data.get("user_id")
+    guest_id = data.get("guest_id")
+
+    db = get_db()
+    try:
+        # Создаем сообщение от админа БЕЗ admin_id
+        reply = SupportMessage(
+            user_id=user_id,
+            guest_id=guest_id,
+            message=msg.text,
+            is_from_user=False,
+            status=SupportStatus.in_progress,
+            # admin_id НЕ УКАЗЫВАЕМ - пусть будет NULL
+            created_at=datetime.utcnow()
+        )
+        db.add(reply)
+        db.commit()
+
+        # Отмечаем предыдущие сообщения пользователя как "в обработке"
+        db.query(SupportMessage).filter(
+            and_(
+                SupportMessage.user_id == user_id,
+                SupportMessage.guest_id == guest_id,
+                SupportMessage.is_from_user == True,
+                SupportMessage.status == SupportStatus.new
+            )
+        ).update({"status": SupportStatus.in_progress})
+        db.commit()
+
+        # Сообщаем админу об успешной отправке
+        if user_id:
+            user = db.query(User).get(user_id)
+            username = user.username or user.email or f"ID: {user_id}" if user else f"ID: {user_id}"
+            await msg.answer(f"✅ Ответ отправлен пользователю <b>{username}</b>", parse_mode="HTML")
+        elif guest_id:
+            await msg.answer(f"✅ Ответ отправлен гостю <code>{guest_id[:8]}...</code>", parse_mode="HTML")
+
+    except Exception as e:
+        logger.error(f"Ошибка при отправке ответа: {e}")
+        await msg.answer(f"❌ Ошибка при отправке ответа: {e}")
+    finally:
+        db.close()
+
+    await state.clear()
+
+
+# 💬 Клик "Ответить"
+@router.callback_query(F.data.startswith("support_reply_"))
+async def start_reply_support(call: CallbackQuery, state: FSMContext):
+    data = call.data
+
+    if data.startswith("support_reply_user_"):
+        identifier = data.replace("support_reply_user_", "")
+        await state.update_data(user_id=int(identifier), guest_id=None)
+        await call.message.answer("✍️ Введите ваш ответ пользователю:")
+    else:  # support_reply_guest_
+        identifier = data.replace("support_reply_guest_", "")
+        await state.update_data(user_id=None, guest_id=identifier)
+        await call.message.answer("✍️ Введите ваш ответ гостю:")
+
+    await state.set_state(SupportReplyState.waiting_for_reply)
+    await call.answer()
+
+
+# 📋 Просмотр истории диалога
+@router.callback_query(F.data.startswith("support_view_"))
+async def view_support_dialog(call: CallbackQuery):
+    data = call.data
+    db = get_db()
+
+    try:
+        if data.startswith("support_view_user_"):
+            user_id = int(data.replace("support_view_user_", ""))
+            messages = db.query(SupportMessage).filter_by(user_id=user_id).order_by(
+                SupportMessage.created_at.desc()).limit(10).all()
+
+            user = db.query(User).get(user_id)
+            label = user.username or user.email or f"ID: {user_id}" if user else f"ID: {user_id}"
+            kb = support_keyboard(user_id=user_id)
+        else:
+            guest_id = data.replace("support_view_guest_", "")
+            messages = db.query(SupportMessage).filter_by(guest_id=guest_id).order_by(
+                SupportMessage.created_at.desc()).limit(10).all()
+            label = f"Гость: {guest_id[:8]}..."
+            kb = support_keyboard(guest_id=guest_id)
+
+        if not messages:
+            history = "Диалог пуст."
+        else:
+            history = "\n\n".join([
+                f"{'👤' if msg.is_from_user else '👨‍💼'} {msg.message[:100]}... ({msg.created_at.strftime('%H:%M')})"
+                for msg in reversed(messages)
+            ])
+
+        await call.message.edit_text(
+            f"📋 <b>История диалога: {label}</b>\n\n{history}",
+            reply_markup=kb,
+            parse_mode="HTML"
+        )
+    finally:
+        db.close()
+
+    await call.answer()
+
+
+# ✅ Закрытие диалога
+@router.callback_query(F.data.startswith("support_resolve_"))
+async def resolve_support(call: CallbackQuery):
+    data = call.data
+    db = get_db()
+
+    try:
+        if data.startswith("support_resolve_user_"):
+            user_id = int(data.replace("support_resolve_user_", ""))
+            db.query(SupportMessage).filter_by(user_id=user_id).update({"status": SupportStatus.resolved})
+            label = f"пользователя ID: {user_id}"
+        else:
+            guest_id = data.replace("support_resolve_guest_", "")
+            db.query(SupportMessage).filter_by(guest_id=guest_id).update({"status": SupportStatus.resolved})
+            label = f"гостя {guest_id[:8]}..."
+
+        db.commit()
+        await call.message.edit_text(f"✅ Диалог с {label} закрыт")
+    finally:
+        db.close()
+
+    await call.answer("Диалог закрыт")
