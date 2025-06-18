@@ -1,4 +1,4 @@
-# backend/app/main.py - ОБНОВЛЕННАЯ ВЕРСИЯ
+# backend/app/main.py - ОБНОВЛЕННАЯ ВЕРСИЯ С WEBSOCKET
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from app.routers import router as api_router
@@ -15,6 +15,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 🆕 ДОБАВЛЯЕМ WEBSOCKET РОУТЕР
+try:
+    from app.routers.websocket_support import router as ws_router
+    app.include_router(ws_router, prefix="/api/support")
+    logger.info("✅ WebSocket роутер подключен")
+except ImportError as e:
+    logger.warning(f"⚠️ WebSocket роутер не найден: {e}")
+except Exception as e:
+    logger.error(f"❌ Ошибка подключения WebSocket: {e}")
 
 # 🆕 Создаем папку uploads и подключаем статические файлы
 uploads_dir = "uploads"
@@ -44,3 +54,7 @@ app.include_router(api_router)
 def read_root():
     logger.debug("Root endpoint called")
     return {"message": "Donate Raid API is running"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
