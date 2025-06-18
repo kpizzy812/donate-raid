@@ -59,8 +59,11 @@ ssh "${REMOTE_USER}@${REMOTE_HOST}" bash <<EOF
   echo "🛑 Останавливаю старые контейнеры..."
   docker-compose down --remove-orphans || true
 
-  echo "🔨 Собираю и запускаю новые контейнеры..."
-  docker-compose up --build -d
+  echo "🔨 Собираю новые контейнеры без кэша..."
+  docker-compose build --no-cache backend bot
+
+  echo "🚀 Запускаю контейнеры..."
+  docker-compose up -d --force-recreate
 
   # Ждем запуска базы данных
   echo "⏳ Ждем запуска PostgreSQL..."
