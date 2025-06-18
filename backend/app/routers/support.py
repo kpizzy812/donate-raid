@@ -1,4 +1,4 @@
-# backend/app/routers/support.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/routers/support.py - ПОЛНАЯ ВЕРСИЯ
 from fastapi import APIRouter, Depends, Request, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
@@ -12,11 +12,9 @@ from bot.handlers.support import notify_new_support_message
 
 router = APIRouter()
 
-
 # Pydantic схемы
 class SupportMessageCreate(BaseModel):
     message: str
-
 
 class SupportMessageRead(BaseModel):
     id: int
@@ -30,8 +28,7 @@ class SupportMessageRead(BaseModel):
     class Config:
         from_attributes = True
 
-
-@router.post("/send", response_model=SupportMessageRead)  # ✅ Изменили endpoint на /send
+@router.post("/send", response_model=SupportMessageRead)
 async def create_support_message(
         data: SupportMessageCreate,
         request: Request,
@@ -81,40 +78,36 @@ async def create_support_message(
 
     return message
 
-
 @router.get("/my", response_model=list[SupportMessageRead])
-def get_my_support_history(
+async def get_my_support_messages(
         request: Request,
-        db: Session = Depends(get_db),
         guest_id: Optional[str] = Query(None),
+        db: Session = Depends(get_db)
 ):
-    """Получить историю сообщений"""
+    """Получить мои сообщения поддержки"""
+    user = None
 
     # Пытаемся получить авторизованного пользователя
     try:
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
-            current_user = get_current_user_from_request_sync(request, db)
-            print(f"✅ Загружаем сообщения для авторизованного пользователя: ID={current_user.id}")
-            return (
-                db.query(SupportMessage)
-                .filter_by(user_id=current_user.id)
-                .order_by(SupportMessage.created_at.asc())
-                .all()
-            )
-        else:
-            print(f"ℹ️ Токен не найден, загружаем сообщения для гостя: guest_id={guest_id}")
-    except Exception as e:
-        print(f"⚠️ Ошибка получения пользователя: {e}")
+            user = get_current_user_from_request_sync(request, db)
+    except Exception:
+        user = None
 
-    # Если авторизация не удалась, пробуем загрузить по guest_id
-    if guest_id:
-        return (
-            db.query(SupportMessage)
-            .filter_by(guest_id=guest_id)
-            .order_by(SupportMessage.created_at.asc())
-            .all()
-        )
+    # Определяем фильтр для запроса
+    if user:
+        # Для авторизованных пользователей ищем по user_id
+        messages = db.query(SupportMessage).filter(
+            SupportMessage.user_id == user.id
+        ).order_by(SupportMessage.created_at.asc()).all()
+    elif guest_id:
+        # Для гостей ищем по guest_id
+        messages = db.query(SupportMessage).filter(
+            SupportMessage.guest_id == guest_id
+        ).order_by(SupportMessage.created_at.asc()).all()
+    else:
+        # Если нет ни user_id, ни guest_id - возвращаем пустой список
+        messages = []
 
-    print("❌ Ни токен, ни guest_id не предоставлены")
-    return []
+    return messages
