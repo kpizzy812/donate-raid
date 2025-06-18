@@ -1,4 +1,4 @@
-# backend/app/main.py - ОБНОВЛЕННАЯ ВЕРСИЯ С WEBSOCKET
+# backend/app/main.py - ИСПРАВЛЕННАЯ ВЕРСИЯ БЕЗ КОНФЛИКТА МАРШРУТОВ
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from app.routers import router as api_router
@@ -16,11 +16,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 🆕 ДОБАВЛЯЕМ WEBSOCKET РОУТЕР
+# 🆕 ДОБАВЛЯЕМ WEBSOCKET РОУТЕР ОТДЕЛЬНО (БЕЗ КОНФЛИКТА С API)
 try:
     from app.routers.websocket_support import router as ws_router
-    app.include_router(ws_router, prefix="/api/support")
-    logger.info("✅ WebSocket роутер подключен")
+    # Подключаем WebSocket БЕЗ префикса /api, чтобы избежать конфликта
+    app.include_router(ws_router, prefix="/ws/support")
+    logger.info("✅ WebSocket роутер подключен на /ws/support")
 except ImportError as e:
     logger.warning(f"⚠️ WebSocket роутер не найден: {e}")
 except Exception as e:
@@ -48,6 +49,7 @@ async def log_requests(request: Request, call_next):
     logger.info(f"📤 {response.status_code} {request.url}")
     return response
 
+# Подключаем основной API роутер
 app.include_router(api_router)
 
 @app.get("/")

@@ -73,61 +73,64 @@ export default function SupportChat({ onClose }: SupportChatProps) {
   }, [chatInitialized, roomId])
 
   const connectWebSocket = useCallback(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) return
+  if (wsRef.current?.readyState === WebSocket.OPEN) return
 
-    try {
-      const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8001'}/api/support/ws/${roomId}`
-      wsRef.current = new WebSocket(wsUrl)
+  try {
+    // ИСПРАВЛЕННЫЙ URL: убираем /api, используем /ws/support
+    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8001'}/ws/support/ws/${roomId}`
+    wsRef.current = new WebSocket(wsUrl)
 
-      wsRef.current.onopen = () => {
-        console.log('WebSocket connected')
-        // Очищаем таймер переподключения
-        if (reconnectTimeoutRef.current) {
-          clearTimeout(reconnectTimeoutRef.current)
-          reconnectTimeoutRef.current = null
-        }
+    wsRef.current.onopen = () => {
+      console.log('✅ WebSocket connected')
+      // Очищаем таймер переподключения
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+        reconnectTimeoutRef.current = null
       }
-
-      wsRef.current.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data)
-          if (data.type === 'new_message' && data.data) {
-            // Добавляем новое сообщение
-            setMessages(prev => {
-              // Проверяем, что сообщение ещё не добавлено
-              const exists = prev.find(msg => msg.id === data.data.id)
-              if (exists) return prev
-
-              return [...prev, data.data].sort((a, b) =>
-                new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-              )
-            })
-          }
-        } catch (error) {
-          console.error('Ошибка парсинга WebSocket сообщения:', error)
-        }
-      }
-
-      wsRef.current.onclose = () => {
-        console.log('WebSocket disconnected')
-        wsRef.current = null
-
-        // Переподключение через 3 секунды если нужно
-        if (shouldReconnectRef.current) {
-          reconnectTimeoutRef.current = setTimeout(() => {
-            connectWebSocket()
-          }, 3000)
-        }
-      }
-
-      wsRef.current.onerror = (error) => {
-        console.error('WebSocket error:', error)
-      }
-
-    } catch (error) {
-      console.error('Ошибка подключения WebSocket:', error)
     }
-  }, [roomId])
+
+    wsRef.current.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        console.log('📨 Получено WebSocket сообщение:', data)
+
+        if (data.type === 'new_message' && data.data) {
+          // Добавляем новое сообщение
+          setMessages(prev => {
+            // Проверяем, что сообщение ещё не добавлено
+            const exists = prev.find(msg => msg.id === data.data.id)
+            if (exists) return prev
+
+            return [...prev, data.data].sort((a, b) =>
+              new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            )
+          })
+        }
+      } catch (error) {
+        console.error('Ошибка парсинга WebSocket сообщения:', error)
+      }
+    }
+
+    wsRef.current.onclose = () => {
+      console.log('🔌 WebSocket disconnected')
+      wsRef.current = null
+
+      // Переподключение через 3 секунды если нужно
+      if (shouldReconnectRef.current) {
+        reconnectTimeoutRef.current = setTimeout(() => {
+          connectWebSocket()
+        }, 3000)
+      }
+    }
+
+    wsRef.current.onerror = (error) => {
+      console.error('❌ WebSocket error:', error)
+    }
+
+  } catch (error) {
+    console.error('Ошибка подключения WebSocket:', error)
+  }
+}, [roomId])
 
   const disconnectWebSocket = useCallback(() => {
     if (reconnectTimeoutRef.current) {
