@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Параметры
 REMOTE_USER="root"
-REMOTE_HOST="93.123.84.232"
+REMOTE_HOST="194.169.160.101"
 REMOTE_DIR="/home/donate"
 LOCAL_DIR="$(pwd)"
 
