@@ -1,4 +1,4 @@
-# backend/bot/handlers/support.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/bot/handlers/support.py - ПОЛНАЯ ИСПРАВЛЕННАЯ ВЕРСИЯ
 import sys
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, Message
@@ -99,7 +99,7 @@ async def notify_new_support_message(user_id: int = None, text: str = None, gues
         db.close()
 
 
-# ✍️ ИСПРАВЛЕННЫЙ ответ админа БЕЗ admin_id
+# ✍️ ИСПРАВЛЕННЫЙ ответ админа с уведомлением фронтенда
 @router.message(SupportReplyState.waiting_for_reply)
 async def send_reply_support(msg: Message, state: FSMContext):
     data = await state.get_data()
@@ -108,18 +108,18 @@ async def send_reply_support(msg: Message, state: FSMContext):
 
     db = get_db()
     try:
-        # Создаем сообщение от админа БЕЗ admin_id
+        # Создаем сообщение от админа
         reply = SupportMessage(
             user_id=user_id,
             guest_id=guest_id,
             message=msg.text,
             is_from_user=False,
             status=SupportStatus.in_progress,
-            # admin_id НЕ УКАЗЫВАЕМ - пусть будет NULL
             created_at=datetime.utcnow()
         )
         db.add(reply)
         db.commit()
+        db.refresh(reply)
 
         # Отмечаем предыдущие сообщения пользователя как "в обработке"
         db.query(SupportMessage).filter(
@@ -131,6 +131,30 @@ async def send_reply_support(msg: Message, state: FSMContext):
             )
         ).update({"status": SupportStatus.in_progress})
         db.commit()
+
+        # 🆕 ПОПЫТКА WEBSOCKET УВЕДОМЛЕНИЯ (если доступно)
+        try:
+            # Пытаемся импортировать и использовать WebSocket
+            from app.routers.websocket_support import notify_support_websocket
+
+            message_data = {
+                "id": reply.id,
+                "message": reply.message,
+                "is_from_user": reply.is_from_user,
+                "created_at": reply.created_at.isoformat(),
+                "status": reply.status.value
+            }
+
+            await notify_support_websocket(
+                user_id=user_id,
+                guest_id=guest_id,
+                message_data=message_data
+            )
+            logger.info("✅ WebSocket уведомление отправлено")
+        except ImportError:
+            logger.info("❌ WebSocket модуль недоступен")
+        except Exception as e:
+            logger.error(f"❌ Ошибка WebSocket уведомления: {e}")
 
         # Сообщаем админу об успешной отправке
         if user_id:
@@ -192,16 +216,15 @@ async def view_support_dialog(call: CallbackQuery):
         if not messages:
             history = "Диалог пуст."
         else:
-            history = "\n\n".join([
-                f"{'👤' if msg.is_from_user else '👨‍💼'} {msg.message[:100]}... ({msg.created_at.strftime('%H:%M')})"
-                for msg in reversed(messages)
-            ])
+            history = ""
+            for msg in reversed(messages):  # Показываем в прямом порядке
+                sender = "👤 Пользователь" if msg.is_from_user else "🤖 Поддержка"
+                time_str = msg.created_at.strftime("%d.%m %H:%M")
+                history += f"{sender} ({time_str}):\n{msg.message}\n\n"
 
-        await call.message.edit_text(
-            f"📋 <b>История диалога: {label}</b>\n\n{history}",
-            reply_markup=kb,
-            parse_mode="HTML"
-        )
+        text = f"📋 <b>История диалога с {label}</b>\n\n{history}"
+
+        await call.message.edit_text(text, reply_markup=kb, parse_mode="HTML")
     finally:
         db.close()
 
@@ -210,23 +233,50 @@ async def view_support_dialog(call: CallbackQuery):
 
 # ✅ Закрытие диалога
 @router.callback_query(F.data.startswith("support_resolve_"))
-async def resolve_support(call: CallbackQuery):
+async def resolve_support_dialog(call: CallbackQuery):
     data = call.data
     db = get_db()
 
     try:
         if data.startswith("support_resolve_user_"):
             user_id = int(data.replace("support_resolve_user_", ""))
-            db.query(SupportMessage).filter_by(user_id=user_id).update({"status": SupportStatus.resolved})
-            label = f"пользователя ID: {user_id}"
+
+            # Отмечаем все сообщения пользователя как решенные
+            updated = db.query(SupportMessage).filter_by(user_id=user_id).update(
+                {"status": SupportStatus.resolved}
+            )
+
+            user = db.query(User).get(user_id)
+            label = user.username or user.email or f"ID: {user_id}" if user else f"ID: {user_id}"
         else:
             guest_id = data.replace("support_resolve_guest_", "")
-            db.query(SupportMessage).filter_by(guest_id=guest_id).update({"status": SupportStatus.resolved})
-            label = f"гостя {guest_id[:8]}..."
+
+            # Отмечаем все сообщения гостя как решенные
+            updated = db.query(SupportMessage).filter_by(guest_id=guest_id).update(
+                {"status": SupportStatus.resolved}
+            )
+
+            label = f"Гость: {guest_id[:8]}..."
 
         db.commit()
-        await call.message.edit_text(f"✅ Диалог с {label} закрыт")
+
+        await call.message.edit_text(
+            f"✅ <b>Диалог с {label} закрыт</b>\n\n"
+            f"Обновлено сообщений: {updated}",
+            parse_mode="HTML",
+            reply_markup=InlineKeyboardBuilder().button(
+                text="🔙 К диалогам", callback_data="support_back"
+            ).as_markup()
+        )
     finally:
         db.close()
 
-    await call.answer("Диалог закрыт")
+    await call.answer()
+
+
+# 🔙 Возврат к списку диалогов - ИСПРАВЛЕНО
+@router.callback_query(F.data == "support_back")
+async def support_back(call: CallbackQuery):
+    # ИСПРАВЛЕННЫЙ ИМПОРТ - используем правильное имя функции
+    from bot.handlers.admin import admin_support_menu
+    await admin_support_menu(call)
