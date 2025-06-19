@@ -7,7 +7,7 @@ from app.schemas.admin.users import UserRead, UserUpdate
 
 router = APIRouter()
 
-@router.get("/", response_model=list[UserRead])
+@router.get("", response_model=list[UserRead])
 def list_users(
     q: str = Query(""),
     db: Session = Depends(get_db),

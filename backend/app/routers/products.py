@@ -9,12 +9,12 @@ from typing import List
 router = APIRouter()
 
 
-@router.get("/", response_model=List[ProductRead])
+@router.get("", response_model=List[ProductRead])
 def list_products(db: Session = Depends(get_db)):
     return db.query(Product).all()
 
 
-@router.post("/", response_model=ProductRead)
+@router.post("", response_model=ProductRead)
 def create_product(product_data: ProductCreate, db: Session = Depends(get_db)):
     game = db.query(Game).filter(Game.id == product_data.game_id).first()
     if not game:

@@ -10,11 +10,11 @@ from app.services.auth import admin_required
 router = APIRouter()
 
 
-@router.get("/", response_model=list[GameRead])
+@router.get("", response_model=list[GameRead])
 def list_games(db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     return db.query(Game).order_by(Game.sort_order.asc()).all()
 
-@router.post("/", response_model=GameRead)
+@router.post("", response_model=GameRead)
 def create_game(game: GameCreate, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     if db.query(Game).filter(Game.name == game.name).first():
         raise HTTPException(status_code=400, detail="Game already exists")

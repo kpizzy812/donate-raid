@@ -17,7 +17,7 @@ def list_articles(db: Session = Depends(get_db), admin: User = Depends(admin_req
     return db.query(Article).options(joinedload(Article.tags)).order_by(Article.created_at.desc()).all()
 
 
-@router.post("/", response_model=ArticleRead)
+@router.post("", response_model=ArticleRead)
 def create_article(article: ArticleCreate, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     from app.services.file_upload import FileUploadService
 

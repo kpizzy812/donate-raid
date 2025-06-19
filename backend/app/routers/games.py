@@ -19,7 +19,7 @@ def get_db():
         db.close()
 
 
-@router.get("/", response_model=List[GameRead])
+@router.get("", response_model=List[GameRead])
 def list_games(q: str = Query("", alias="q"), db: Session = Depends(get_db)):
     query = db.query(Game).options(joinedload(Game.products))
     if q:

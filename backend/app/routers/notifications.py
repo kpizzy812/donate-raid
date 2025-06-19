@@ -23,7 +23,7 @@ class NotificationResponse(BaseModel):
     data: Optional[dict] = None
 
 
-@router.get("/", response_model=List[NotificationResponse])
+@router.get("", response_model=List[NotificationResponse])
 def get_notifications(
         guest_id: Optional[str] = Query(None),
         limit: int = Query(10, le=50),

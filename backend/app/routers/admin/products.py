@@ -9,12 +9,12 @@ from app.services.auth import admin_required
 
 router = APIRouter()
 
-@router.get("/", response_model=list[ProductRead])
+@router.get("", response_model=list[ProductRead])
 def list_products(db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     return db.query(Product).order_by(Product.sort_order.asc()).all()
 
 
-@router.post("/", response_model=ProductRead)
+@router.post("", response_model=ProductRead)
 def create_product(product: ProductCreate, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     new_product = Product(**product.dict())
     db.add(new_product)

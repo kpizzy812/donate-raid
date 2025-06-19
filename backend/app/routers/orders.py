@@ -63,7 +63,7 @@ def get_order(
 # ------------------------------------------------------------
 # 3) Endpoint для создания заказа (POST /)
 # ------------------------------------------------------------
-@router.post("/", response_model=OrderRead)
+@router.post("", response_model=OrderRead)
 def create_order(
     order_data: OrderCreate,
     db: Session = Depends(get_db),

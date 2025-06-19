@@ -10,7 +10,7 @@ from app.schemas.blog.article import ArticleRead
 router = APIRouter()
 
 
-@router.get("/", response_model=List[ArticleRead])
+@router.get("", response_model=List[ArticleRead])
 def get_articles(
         db: Session = Depends(get_db),
         q: str = Query("", alias="q"),
