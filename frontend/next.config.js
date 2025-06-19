@@ -3,7 +3,7 @@ const path = require('path');
 
 /** @type {import('next').NextConfig} */
 module.exports = {
-  // output: 'standalone', // Временно отключаем для упрощения
+  output: 'standalone', // Включаем для production Docker
 
   webpack: (config) => {
     config.resolve.alias['@'] = path.resolve(__dirname, 'src');
@@ -28,7 +28,7 @@ module.exports = {
 
   // Добавляем обработку изображений
   images: {
-    domains: ['localhost', 'backend'],
+    domains: ['localhost', 'backend', 'donateraid.ru'], // Добавили donateraid.ru
     unoptimized: true, // Отключаем оптимизацию изображений для простоты
   },
 

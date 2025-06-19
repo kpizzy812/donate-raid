@@ -73,29 +73,9 @@ export default function GlobalChatProvider() {
       {isChatOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
           {/* Контейнер чата */}
-          <div className="relative w-full max-w-2xl h-[600px] max-h-[90vh] bg-white dark:bg-zinc-900 rounded-lg shadow-2xl overflow-hidden">
-            {/* Заголовок с кнопкой закрытия */}
-            <div className="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800">
-              <div className="flex items-center gap-3">
-                <MessageCircle className="w-6 h-6 text-blue-600" />
-                <div>
-                  <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">Поддержка</h3>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">Мы онлайн и готовы помочь</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsChatOpen(false)}
-                className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-lg transition-all"
-                title="Закрыть чат"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Чат - займет оставшуюся высоту */}
-            <div className="h-[calc(100%-73px)]">
-              <SupportChat />
-            </div>
+          <div className="relative w-full max-w-2xl h-[600px] max-h-[90vh]">
+            {/* ИСПРАВЛЕНО: передаем onClose в ваш оригинальный SupportChat */}
+            <SupportChat onClose={() => setIsChatOpen(false)} />
           </div>
         </div>
       )}

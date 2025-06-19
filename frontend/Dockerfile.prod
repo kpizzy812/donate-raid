@@ -1,4 +1,4 @@
-# frontend/Dockerfile.prod - обновленный для production
+# frontend/Dockerfile.prod - ИСПРАВЛЕННАЯ ВЕРСИЯ
 FROM node:18-alpine AS base
 
 # Install dependencies only when needed
@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -16,7 +16,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set production environment variables
+# Set production environment variables для build time
 ARG NEXT_PUBLIC_API_URL=https://donateraid.ru/api
 ARG NEXT_PUBLIC_WS_URL=wss://donateraid.ru
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
@@ -31,6 +31,10 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+
+# Добавляем production переменные для runtime
+ENV NEXT_PUBLIC_API_URL=https://donateraid.ru/api
+ENV NEXT_PUBLIC_WS_URL=wss://donateraid.ru
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs

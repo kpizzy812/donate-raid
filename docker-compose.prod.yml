@@ -54,6 +54,8 @@ services:
       - backend
     environment:
       - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://donateraid.ru/api  # Добавляем runtime переменную
+      - NEXT_PUBLIC_WS_URL=wss://donateraid.ru         # Добавляем runtime переменную
     restart: unless-stopped
     networks:
       - donateraid

@@ -115,34 +115,41 @@ full_deploy() {
         if [ ! -f .env ]; then
             echo "⚠️  Создание .env из примера..."
             cp .env.example .env
-            sed -i "s|NEXT_PUBLIC_API_URL=http://localhost:8001/api|NEXT_PUBLIC_API_URL=http://${REMOTE_HOST}:8001/api|g" .env
-            sed -i "s|FRONTEND_URL=http://localhost:3001|FRONTEND_URL=http://${REMOTE_HOST}:3001|g" .env
+            # ИСПРАВЛЯЕМ: используем правильный домен для продакшена
+            sed -i "s|NEXT_PUBLIC_API_URL=http://localhost:8001/api|NEXT_PUBLIC_API_URL=https://donateraid.ru/api|g" .env
+            sed -i "s|FRONTEND_URL=http://localhost:3001|FRONTEND_URL=https://donateraid.ru|g" .env
+            sed -i "s|STATIC_FILES_BASE_URL=http://localhost:8001|STATIC_FILES_BASE_URL=https://donateraid.ru|g" .env
         fi
 
         echo "🛑 Останавливаю контейнеры..."
-        docker-compose down --remove-orphans || true
+        # ИСПРАВЛЯЕМ: используем docker-compose.prod.yml
+        docker-compose -f docker-compose.prod.yml down --remove-orphans || true
 
         echo "🔨 Собираю контейнеры..."
-        docker-compose build --no-cache
+        # ИСПРАВЛЯЕМ: используем docker-compose.prod.yml
+        docker-compose -f docker-compose.prod.yml build --no-cache
 
         echo "🚀 Запускаю контейнеры..."
-        docker-compose up -d --force-recreate
+        # ИСПРАВЛЯЕМ: используем docker-compose.prod.yml
+        docker-compose -f docker-compose.prod.yml up -d --force-recreate
 
         echo "⏳ Ждем запуска PostgreSQL..."
         sleep 10
 
         echo "🗄️  Применение миграций..."
-        docker-compose exec -T backend alembic upgrade head || true
+        # ИСПРАВЛЯЕМ: используем docker-compose.prod.yml
+        docker-compose -f docker-compose.prod.yml exec -T backend alembic upgrade head || true
 
         echo "📊 Статус контейнеров:"
-        docker-compose ps
+        # ИСПРАВЛЯЕМ: используем docker-compose.prod.yml
+        docker-compose -f docker-compose.prod.yml ps
 
         echo "✅ Деплой завершён!"
 EOF
 
     echo -e "${GREEN}🎉 Полный деплой успешно завершен!${NC}"
-    echo -e "${CYAN}🌐 Фронтенд: http://${REMOTE_HOST}:3001${NC}"
-    echo -e "${CYAN}🔌 API: http://${REMOTE_HOST}:8001${NC}"
+    echo -e "${CYAN}🌐 Фронтенд: https://donateraid.ru${NC}"
+    echo -e "${CYAN}🔌 API: https://donateraid.ru/api${NC}"
 }
 
 # 2. Быстрая синхронизация
@@ -190,7 +197,7 @@ setup_server() {
 start_containers() {
     echo -e "${GREEN}▶️ Запуск всех контейнеров...${NC}"
 
-    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose up -d"
+    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose -f docker-compose.prod.yml up -d"
 
     echo -e "${GREEN}✅ Контейнеры запущены!${NC}"
     show_container_status
@@ -204,7 +211,7 @@ stop_containers() {
         return 1
     fi
 
-    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose down"
+    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose -f docker-compose.prod.yml down"
 
     echo -e "${GREEN}✅ Контейнеры остановлены!${NC}"
 }
@@ -213,7 +220,7 @@ stop_containers() {
 restart_containers() {
     echo -e "${GREEN}🔄 Перезапуск всех контейнеров...${NC}"
 
-    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose restart"
+    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose -f docker-compose.prod.yml restart"
 
     echo -e "${GREEN}✅ Контейнеры перезапущены!${NC}"
     show_container_status
@@ -230,11 +237,11 @@ rebuild_containers() {
     ssh "${REMOTE_USER}@${REMOTE_HOST}" bash <<EOF
         cd ${REMOTE_DIR}
         echo "🛑 Останавливаем контейнеры..."
-        docker-compose down
+        docker-compose -f docker-compose.prod.yml down
         echo "🔨 Пересобираем без кэша..."
-        docker-compose build --no-cache
+        docker-compose -f docker-compose.prod.yml build --no-cache
         echo "🚀 Запускаем..."
-        docker-compose up -d
+        docker-compose -f docker-compose.prod.yml up -d
 EOF
 
     echo -e "${GREEN}✅ Пересборка завершена!${NC}"
@@ -245,7 +252,7 @@ EOF
 show_container_status() {
     echo -e "${GREEN}📋 Статус контейнеров:${NC}"
 
-    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose ps"
+    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose -f docker-compose.prod.yml ps"
 }
 
 # 9. Просмотр логов
@@ -254,7 +261,7 @@ show_logs() {
     echo -e "${YELLOW}(последние 50 строк для каждого контейнера)${NC}"
     echo ""
 
-    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose logs --tail=50"
+    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose -f docker-compose.prod.yml logs --tail=50"
 }
 
 # 10. Живые логи
@@ -262,7 +269,7 @@ follow_logs() {
     echo -e "${GREEN}📈 Живые логи (Ctrl+C для выхода):${NC}"
     echo ""
 
-    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose logs -f"
+    ssh "${REMOTE_USER}@${REMOTE_HOST}" "cd ${REMOTE_DIR} && docker-compose -f docker-compose.prod.yml logs -f"
 }
 
 # 11. Применить миграции
