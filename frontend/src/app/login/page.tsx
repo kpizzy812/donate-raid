@@ -1,4 +1,4 @@
-// frontend/src/app/login/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/login/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ С ПРАВИЛЬНЫМИ ССЫЛКАМИ
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -32,7 +32,7 @@ export default function LoginPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    
+
     if (!email.includes('@')) {
       setError('Введите корректный email')
       return
@@ -42,10 +42,10 @@ export default function LoginPage() {
 
     try {
       setLoading(true)
-      
+
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 сек таймаут
-      
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/request-link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,7 +62,7 @@ export default function LoginPage() {
 
       setSent(true)
       setCountdown(60) // 60 секунд до повторной отправки
-      
+
       // Автоматическая проверка входящих токенов каждые 3 секунды
       const checkInterval = setInterval(async () => {
         const token = localStorage.getItem('access_token')
@@ -79,7 +79,7 @@ export default function LoginPage() {
       if (err.name === 'AbortError') {
         setError('Превышено время ожидания. Попробуйте снова.')
       } else {
-        setError(err.message || 'Произошла ошибка')
+        setError(err.message || 'Произошла ошибка при отправке письма')
       }
     } finally {
       setLoading(false)
@@ -88,47 +88,52 @@ export default function LoginPage() {
 
   const resendEmail = () => {
     setSent(false)
+    setError('')
     setCountdown(0)
-    submit({ preventDefault: () => {} } as React.FormEvent)
   }
 
+  // Если загружается информация о пользователе
   if (userLoading) {
     return (
-      <div className="py-10 max-w-md mx-auto text-center">
+      <div className="py-20 text-center">
         <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-        <p className="mt-4 text-zinc-500">Проверяем авторизацию...</p>
       </div>
     )
   }
 
+  // Если пользователь уже авторизован, не показываем форму
+  if (user) {
+    return null
+  }
+
   return (
-    <div className="py-10 max-w-md mx-auto space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold">Вход в DonateRaid</h1>
-        <p className="text-zinc-500 mt-2">Быстрый вход через email без пароля</p>
+    <div className="py-10 max-w-md mx-auto px-4">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Вход в аккаунт</h1>
+        <p className="text-zinc-500 dark:text-zinc-400">
+          Мы отправим вам ссылку для входа на email
+        </p>
       </div>
 
       {sent ? (
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
-          
+
           <div>
-            <h3 className="text-lg font-semibold text-green-600 mb-2">Письмо отправлено!</h3>
+            <h2 className="text-xl font-semibold mb-2">Письмо отправлено!</h2>
             <p className="text-zinc-600 dark:text-zinc-400 mb-4">
-              Проверьте почту <strong>{email}</strong> и перейдите по ссылке для входа
+              Проверьте почту <strong>{email}</strong> и нажмите на ссылку для входа.
             </p>
-            <div className="text-sm text-zinc-500 space-y-2">
-              <p>• Ссылка действительна 30 минут</p>
-              <p>• Проверьте папку "Спам", если письма нет</p>
-              <p>• Страница автоматически обновится при входе</p>
-            </div>
+            <p className="text-sm text-zinc-500 mb-6">
+              Письмо может попасть в папку "Спам" или "Промоакции"
+            </p>
           </div>
 
-          <div className="pt-4 border-t border-zinc-200 dark:border-zinc-700">
+          <div className="text-center">
             {countdown > 0 ? (
               <p className="text-sm text-zinc-500">
                 Отправить повторно через {countdown} сек.
@@ -186,9 +191,9 @@ export default function LoginPage() {
           <div className="text-xs text-zinc-500 text-center space-y-1">
             <p>Нажимая кнопку, вы соглашаетесь с</p>
             <div className="space-x-2">
-              <a href="/privacy" className="text-blue-600 hover:underline">Политикой конфиденциальности</a>
+              <a href="/legal/privacy" className="text-blue-600 hover:underline">Политикой конфиденциальности</a>
               <span>и</span>
-              <a href="/terms" className="text-blue-600 hover:underline">Условиями использования</a>
+              <a href="/legal/terms" className="text-blue-600 hover:underline">Условиями использования</a>
             </div>
           </div>
         </form>
