@@ -12,7 +12,7 @@ from datetime import datetime
 router = APIRouter()
 
 
-@router.get("/", response_model=list[ArticleRead])
+@router.get("", response_model=list[ArticleRead])
 def list_articles(db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     return db.query(Article).options(joinedload(Article.tags)).order_by(Article.created_at.desc()).all()
 

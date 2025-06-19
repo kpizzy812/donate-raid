@@ -35,7 +35,7 @@ class PaymentTermRead(PaymentTermBase):
         from_attributes = True
 
 
-@router.get("/", response_model=List[PaymentTermRead])
+@router.get("", response_model=List[PaymentTermRead])
 def get_payment_terms(db: Session = Depends(get_db)):
     """Получить активные пользовательские соглашения для отображения при оплате"""
     terms = db.query(PaymentTerm).filter_by(is_active=True).order_by(PaymentTerm.sort_order.asc()).all()
