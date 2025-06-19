@@ -35,8 +35,8 @@ export default function SupportChat({ onClose }: SupportChatProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const lastMessageCountRef = useRef(0)
 
-  // Инициализация при загрузке компонента
-  useEffect(() => {
+    // Инициализация при загрузке компонента
+    useEffect(() => {
     const storedToken = localStorage.getItem('access_token')
     const storedGuestId = localStorage.getItem('guest_id') || generateGuestId()
 
@@ -48,17 +48,22 @@ export default function SupportChat({ onClose }: SupportChatProps) {
       // Нужно получить user_id из токена
       try {
         const payload = JSON.parse(atob(storedToken.split('.')[1]))
+        console.log('🔑 Token payload:', payload)
         setRoomId(`user_${payload.sub}`)
+        console.log('🏠 Room ID установлен:', `user_${payload.sub}`)
       } catch (e) {
+        console.error('❌ Ошибка парсинга токена:', e)
         setRoomId(`guest_${storedGuestId}`)
+        console.log('🏠 Room ID установлен (fallback):', `guest_${storedGuestId}`)
       }
     } else {
       setRoomId(`guest_${storedGuestId}`)
+      console.log('🏠 Room ID установлен (guest):', `guest_${storedGuestId}`)
     }
 
     loadMessages()
     setChatInitialized(true)
-  }, [])
+    }, [])
 
   // WebSocket connection
   useEffect(() => {
@@ -76,12 +81,14 @@ export default function SupportChat({ onClose }: SupportChatProps) {
   if (wsRef.current?.readyState === WebSocket.OPEN) return
 
   try {
-    // ИСПРАВЛЕННЫЙ URL: убираем /api, используем /ws/support
+    // ИСПРАВЛЕННЫЙ URL: правильный путь к WebSocket
     const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8001'}/ws/support/ws/${roomId}`
+    console.log('🔌 Подключаемся к WebSocket:', wsUrl)
+
     wsRef.current = new WebSocket(wsUrl)
 
     wsRef.current.onopen = () => {
-      console.log('✅ WebSocket connected')
+      console.log('✅ WebSocket connected to:', wsUrl)
       // Очищаем таймер переподключения
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current)
@@ -111,12 +118,13 @@ export default function SupportChat({ onClose }: SupportChatProps) {
       }
     }
 
-    wsRef.current.onclose = () => {
-      console.log('🔌 WebSocket disconnected')
+    wsRef.current.onclose = (event) => {
+      console.log('🔌 WebSocket disconnected. Code:', event.code, 'Reason:', event.reason)
       wsRef.current = null
 
       // Переподключение через 3 секунды если нужно
       if (shouldReconnectRef.current) {
+        console.log('🔄 Переподключение через 3 секунды...')
         reconnectTimeoutRef.current = setTimeout(() => {
           connectWebSocket()
         }, 3000)
@@ -125,10 +133,11 @@ export default function SupportChat({ onClose }: SupportChatProps) {
 
     wsRef.current.onerror = (error) => {
       console.error('❌ WebSocket error:', error)
+      console.error('❌ Проблема с подключением к:', wsUrl)
     }
 
   } catch (error) {
-    console.error('Ошибка подключения WebSocket:', error)
+    console.error('Ошибка создания WebSocket:', error)
   }
 }, [roomId])
 
@@ -258,53 +267,67 @@ export default function SupportChat({ onClose }: SupportChatProps) {
   }
 
   const sendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return
+    if (!inputMessage.trim() || !guestId) return
 
-    const messageText = inputMessage.trim()
-    setInputMessage('')
-
-    // Добавляем оптимистичное сообщение
+    const tempId = Date.now()
     const optimisticMessage: SupportMessage = {
-      id: Date.now(),
-      message: messageText,
+      id: tempId,
+      message: inputMessage.trim(),
       is_from_user: true,
       created_at: new Date().toISOString(),
       status: 'sending'
     }
 
+    // Добавляем сообщение оптимистично
     setMessages(prev => [...prev, optimisticMessage])
+    setInputMessage('')
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/support/send`, {
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/support/send`
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      }
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const body = {
+        message: optimisticMessage.message,
+        guest_id: guestId
+      }
+
+      console.log('📤 Отправляем сообщение:', body)
+
+      const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({
-          message: messageText,
-          guest_id: token ? undefined : guestId
-        })
+        headers,
+        body: JSON.stringify(body)
       })
 
       if (response.ok) {
-        const sentMessage = await response.json()
+        const data = await response.json()
+        console.log('✅ Сообщение отправлено:', data)
 
-        // Заменяем оптимистичное сообщение на реальное
+        // Обновляем статус сообщения
         setMessages(prev => prev.map(msg =>
-          msg.id === optimisticMessage.id ? sentMessage : msg
+          msg.id === tempId ? { ...data, status: 'sent' } : msg
         ))
       } else {
-        throw new Error('Ошибка отправки')
+        const errorData = await response.json()
+        console.error('❌ Ошибка отправки:', errorData)
+
+        // Помечаем сообщение как неотправленное
+        setMessages(prev => prev.map(msg =>
+          msg.id === tempId ? { ...msg, status: 'error' } : msg
+        ))
       }
     } catch (error) {
-      console.error('Ошибка отправки сообщения:', error)
+      console.error('❌ Ошибка отправки сообщения:', error)
 
-      // Помечаем сообщение как ошибку
+      // Помечаем сообщение как неотправленное
       setMessages(prev => prev.map(msg =>
-        msg.id === optimisticMessage.id
-          ? { ...msg, status: 'error' }
-          : msg
+        msg.id === tempId ? { ...msg, status: 'error' } : msg
       ))
     }
   }

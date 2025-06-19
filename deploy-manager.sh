@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Настройки
 REMOTE_USER="root"
-REMOTE_HOST="194.169.160.101"
+REMOTE_HOST="donateraid.ru"
 REMOTE_DIR="/home/donate"
 LOCAL_DIR="$(pwd)"
 

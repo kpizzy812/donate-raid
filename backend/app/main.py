@@ -1,4 +1,4 @@
-# backend/app/main.py - ИСПРАВЛЕННАЯ ВЕРСИЯ БЕЗ КОНФЛИКТА МАРШРУТОВ
+# backend/app/main.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from app.routers import router as api_router
@@ -10,7 +10,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],  # В продакшне указать конкретные домены
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -59,4 +59,5 @@ def read_root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    # Порт 8000 внутри контейнера, но маппится на 8001 снаружи
+    uvicorn.run(app, host="0.0.0.0", port=8000)

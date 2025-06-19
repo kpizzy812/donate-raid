@@ -274,6 +274,82 @@ async def resolve_support_dialog(call: CallbackQuery):
     await call.answer()
 
 
+@router.message(SupportReplyState.waiting_for_reply)
+async def reply_to_support_user(msg: Message, state: FSMContext):
+    data = await state.get_data()
+    user_id = data.get("user_id")
+    guest_id = data.get("guest_id")
+
+    db = get_db()
+
+    try:
+        # Создаем ответ от поддержки
+        reply = SupportMessage(
+            user_id=user_id,
+            guest_id=guest_id,
+            message=msg.text,
+            is_from_user=False,
+            status=SupportStatus.in_progress,
+            created_at=datetime.utcnow()
+        )
+        db.add(reply)
+        db.commit()
+        db.refresh(reply)
+
+        # Отмечаем предыдущие сообщения пользователя как "в обработке"
+        db.query(SupportMessage).filter(
+            and_(
+                SupportMessage.user_id == user_id if user_id else SupportMessage.guest_id == guest_id,
+                SupportMessage.is_from_user == True,
+                SupportMessage.status == SupportStatus.new
+            )
+        ).update({"status": SupportStatus.in_progress})
+        db.commit()
+
+        logger.info(f"💬 Создан ответ поддержки: ID={reply.id}, user_id={user_id}, guest_id={guest_id}")
+
+        # 🆕 ПОПЫТКА WEBSOCKET УВЕДОМЛЕНИЯ (если доступно)
+        try:
+            # Пытаемся импортировать и использовать WebSocket
+            from app.routers.websocket_support import notify_support_websocket
+
+            message_data = {
+                "id": reply.id,
+                "message": reply.message,
+                "is_from_user": reply.is_from_user,
+                "created_at": reply.created_at.isoformat(),
+                "status": reply.status.value
+            }
+
+            logger.info(f"📡 Отправляем WebSocket уведомление: user_id={user_id}, guest_id={guest_id}")
+
+            await notify_support_websocket(
+                user_id=user_id,
+                guest_id=guest_id,
+                message_data=message_data
+            )
+            logger.info("✅ WebSocket уведомление отправлено успешно")
+        except ImportError:
+            logger.warning("❌ WebSocket модуль недоступен")
+        except Exception as e:
+            logger.error(f"❌ Ошибка WebSocket уведомления: {e}")
+
+        # Сообщаем админу об успешной отправке
+        if user_id:
+            user = db.query(User).get(user_id)
+            username = user.username or user.email or f"ID: {user_id}" if user else f"ID: {user_id}"
+            await msg.answer(f"✅ Ответ отправлен пользователю <b>{username}</b>", parse_mode="HTML")
+        elif guest_id:
+            await msg.answer(f"✅ Ответ отправлен гостю <code>{guest_id[:8]}...</code>", parse_mode="HTML")
+
+    except Exception as e:
+        logger.error(f"❌ Ошибка при отправке ответа: {e}")
+        await msg.answer(f"❌ Ошибка при отправке ответа: {e}")
+    finally:
+        db.close()
+
+    await state.clear()
+
 # 🔙 Возврат к списку диалогов - ИСПРАВЛЕНО
 @router.callback_query(F.data == "support_back")
 async def support_back(call: CallbackQuery):

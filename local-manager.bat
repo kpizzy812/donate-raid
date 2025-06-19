@@ -2,15 +2,10 @@
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-:: deploy-manager.bat - Управление удаленным сервером (Windows)
-title Deploy Manager - DonateRaid Project
+:: local-manager.bat - Локальная разработка (Windows)
+title Local Manager - DonateRaid Project
 
-:: Настройки (можно изменить)
-set REMOTE_USER=root
-set REMOTE_HOST=194.169.160.101
-set REMOTE_DIR=/home/donate
-
-:: Цвета для Windows
+:: Цвета
 set RED=[91m
 set GREEN=[92m
 set YELLOW=[93m
@@ -23,8 +18,8 @@ set NC=[0m
 :show_header
 cls
 echo %PURPLE%╔══════════════════════════════════════════════════════════════╗%NC%
-echo %PURPLE%║%WHITE%                    🚀 DEPLOY MANAGER 🚀                      %PURPLE%║%NC%
-echo %PURPLE%║%CYAN%                     DonateRaid Project                       %PURPLE%║%NC%
+echo %PURPLE%║%WHITE%                    💻 LOCAL MANAGER 💻                       %PURPLE%║%NC%
+echo %PURPLE%║%CYAN%                  Локальная разработка                        %PURPLE%║%NC%
 echo %PURPLE%║%YELLOW%                        Windows                              %PURPLE%║%NC%
 echo %PURPLE%╚══════════════════════════════════════════════════════════════╝%NC%
 echo.
@@ -33,220 +28,326 @@ goto :show_menu
 :show_menu
 echo %WHITE%Выберите действие:%NC%
 echo.
-echo %CYAN%📦 ДЕПЛОЙ И СИНХРОНИЗАЦИЯ:%NC%
-echo   %GREEN%1%NC% - 🚀 Полный деплой (rsync + build + migrate + restart)
-echo   %GREEN%2%NC% - 📁 Быстрая синхронизация кода (только rsync)
-echo   %GREEN%3%NC% - 🔧 Настройка сервера (server-setup.sh)
+echo %CYAN%🐳 DOCKER ЛОКАЛЬНО:%NC%
+echo   %GREEN%1%NC% - 🚀 Запуск в Docker (docker-compose up)
+echo   %GREEN%2%NC% - ⏹️  Остановка Docker контейнеров
+echo   %GREEN%3%NC% - 🔄 Перезапуск Docker контейнеров
+echo   %GREEN%4%NC% - 🏗️  Пересборка Docker контейнеров
+echo   %GREEN%5%NC% - 📋 Статус Docker контейнеров
+echo   %GREEN%6%NC% - 📜 Логи Docker контейнеров
 echo.
-echo %CYAN%🐳 УПРАВЛЕНИЕ КОНТЕЙНЕРАМИ:%NC%
-echo   %GREEN%4%NC% - ▶️  Запуск всех контейнеров
-echo   %GREEN%5%NC% - ⏹️  Остановка всех контейнеров
-echo   %GREEN%6%NC% - 🔄 Перезапуск всех контейнеров
-echo   %GREEN%7%NC% - 🏗️  Пересборка контейнеров
+echo %CYAN%⚡ РАЗРАБОТКА (без Docker):%NC%
+echo   %GREEN%7%NC% - 🐍 Запуск Backend (FastAPI)
+echo   %GREEN%8%NC% - 🤖 Запуск Telegram Bot
+echo   %GREEN%9%NC% - ⚛️  Запуск Frontend (Next.js)
+echo   %GREEN%10%NC% - 📊 Запуск PostgreSQL (Docker)
 echo.
-echo %CYAN%📊 МОНИТОРИНГ:%NC%
-echo   %GREEN%8%NC% - 📋 Статус контейнеров
-echo   %GREEN%9%NC% - 📜 Просмотр логов всех контейнеров
-echo   %GREEN%10%NC% - 📈 Живые логи (follow)
+echo %CYAN%🗄️  БАЗА ДАННЫХ:%NC%
+echo   %GREEN%11%NC% - 🔄 Применить миграции
+echo   %GREEN%12%NC% - 📝 Создать миграцию
+echo   %GREEN%13%NC% - 💾 Бэкап локальной БД
+echo   %GREEN%14%NC% - 🗃️  Подключиться к БД (psql)
 echo.
-echo %CYAN%🛠️ РАЗРАБОТКА:%NC%
-echo   %GREEN%11%NC% - 🐍 Применить миграции БД
-echo   %GREEN%12%NC% - 💾 Бэкап базы данных
-echo   %GREEN%13%NC% - 🔍 SSH подключение к серверу
+echo %CYAN%🛠️  УТИЛИТЫ:%NC%
+echo   %GREEN%15%NC% - 📦 Установка зависимостей
+echo   %GREEN%16%NC% - 🧹 Очистка (node_modules, __pycache__, .next)
+echo   %GREEN%17%NC% - 🔍 Проверка портов
 echo.
 echo   %RED%0%NC% - ❌ Выход
 echo.
-set /p choice=%YELLOW%Ваш выбор [0-13]: %NC%
+set /p choice=%YELLOW%Ваш выбор [0-17]: %NC%
 
-if "%choice%"=="1" goto :full_deploy
-if "%choice%"=="2" goto :quick_sync
-if "%choice%"=="3" goto :setup_server
-if "%choice%"=="4" goto :start_containers
-if "%choice%"=="5" goto :stop_containers
-if "%choice%"=="6" goto :restart_containers
-if "%choice%"=="7" goto :rebuild_containers
-if "%choice%"=="8" goto :show_container_status
-if "%choice%"=="9" goto :show_logs
-if "%choice%"=="10" goto :follow_logs
-if "%choice%"=="11" goto :apply_migrations
-if "%choice%"=="12" goto :backup_database
-if "%choice%"=="13" goto :ssh_connect
+if "%choice%"=="1" goto :docker_up
+if "%choice%"=="2" goto :docker_down
+if "%choice%"=="3" goto :docker_restart
+if "%choice%"=="4" goto :docker_rebuild
+if "%choice%"=="5" goto :docker_status
+if "%choice%"=="6" goto :docker_logs
+if "%choice%"=="7" goto :dev_backend
+if "%choice%"=="8" goto :dev_bot
+if "%choice%"=="9" goto :dev_frontend
+if "%choice%"=="10" goto :dev_database
+if "%choice%"=="11" goto :db_migrate
+if "%choice%"=="12" goto :db_create_migration
+if "%choice%"=="13" goto :db_backup
+if "%choice%"=="14" goto :db_connect
+if "%choice%"=="15" goto :install_deps
+if "%choice%"=="16" goto :cleanup
+if "%choice%"=="17" goto :check_ports
 if "%choice%"=="0" goto :exit
 goto :invalid_choice
 
-:check_requirements
-:: Проверяем наличие необходимых инструментов
-where ssh >nul 2>&1
+:check_docker
+where docker >nul 2>&1
 if errorlevel 1 (
-    echo %RED%❌ SSH не найден! Установите OpenSSH или Git Bash%NC%
-    echo %YELLOW%💡 Или используйте WSL/PowerShell%NC%
-    pause
-    goto :show_header
-)
-
-where scp >nul 2>&1
-if errorlevel 1 (
-    echo %RED%❌ SCP не найден! Установите OpenSSH%NC%
+    echo %RED%❌ Docker не найден! Установите Docker Desktop%NC%
+    echo %CYAN%💡 Скачайте с: https://www.docker.com/products/docker-desktop%NC%
     pause
     goto :show_header
 )
 goto :eof
 
-:confirm_action
-echo %YELLOW%⚠️  %~1%NC%
-set /p response=%YELLOW%Продолжить? [y/N]: %NC%
-if /i "%response%"=="y" goto :eof
-if /i "%response%"=="yes" goto :eof
-echo %RED%❌ Отменено%NC%
-pause
-goto :show_header
-
-:full_deploy
-call :check_requirements
-echo %GREEN%🚀 Начинаем полный деплой...%NC%
-call :confirm_action "Будет выполнен полный деплой на %REMOTE_HOST%"
-
-echo %BLUE%📂 Синхронизация файлов...%NC%
-
-:: Для Windows используем scp вместо rsync (или rsync из WSL)
-if exist "%ProgramFiles%\Git\usr\bin\rsync.exe" (
-    "%ProgramFiles%\Git\usr\bin\rsync.exe" -az --delete --exclude=".git/" --exclude="node_modules/" --exclude="*.pyc" --exclude="__pycache__/" --exclude=".next/" --exclude="backend/logs/" --exclude="backend/.venv/" ./ %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_DIR%/
-) else (
-    echo %YELLOW%⚠️ Rsync не найден, используем scp...%NC%
-    scp -r . %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_DIR%/
-)
-
-echo %BLUE%🔧 Выполняем деплой на сервере...%NC%
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && bash -c 'set -euo pipefail; echo \"🔧 Проверка окружения...\"; if ! command -v docker >/dev/null; then echo \"❌ Docker не установлен!\"; exit 1; fi; if [ ! -f .env ]; then echo \"⚠️ Создание .env...\"; cp .env.example .env; sed -i \"s|localhost:8001|%REMOTE_HOST%:8001|g\" .env; fi; echo \"🛑 Останавливаю контейнеры...\"; docker-compose down --remove-orphans || true; echo \"🔨 Собираю контейнеры...\"; docker-compose build --no-cache; echo \"🚀 Запускаю контейнеры...\"; docker-compose up -d --force-recreate; echo \"⏳ Ждем PostgreSQL...\"; sleep 10; echo \"🗄️ Применение миграций...\"; docker-compose exec -T backend alembic upgrade head || true; echo \"📊 Статус:\"; docker-compose ps; echo \"✅ Деплой завершён!\"'"
-
-echo %GREEN%🎉 Полный деплой успешно завершен!%NC%
-echo %CYAN%🌐 Фронтенд: http://%REMOTE_HOST%:3001%NC%
-echo %CYAN%🔌 API: http://%REMOTE_HOST%:8001%NC%
-pause
-goto :show_header
-
-:quick_sync
-call :check_requirements
-echo %GREEN%📁 Быстрая синхронизация кода...%NC%
-
-if exist "%ProgramFiles%\Git\usr\bin\rsync.exe" (
-    "%ProgramFiles%\Git\usr\bin\rsync.exe" -az --exclude=".git/" --exclude="node_modules/" --exclude="*.pyc" --exclude="__pycache__/" --exclude=".next/" --exclude="backend/logs/" --exclude="backend/.venv/" ./ %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_DIR%/
-) else (
-    scp -r . %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_DIR%/
-)
-
-echo %GREEN%✅ Синхронизация завершена!%NC%
-echo %YELLOW%💡 Для применения изменений может потребоваться перезапуск контейнеров%NC%
-pause
-goto :show_header
-
-:setup_server
-call :check_requirements
-echo %GREEN%🔧 Настройка сервера...%NC%
-call :confirm_action "Будет выполнена настройка сервера %REMOTE_HOST%"
-
-if not exist "server-setup.sh" (
-    echo %RED%❌ Файл server-setup.sh не найден!%NC%
+:check_node
+where node >nul 2>&1
+if errorlevel 1 (
+    echo %RED%❌ Node.js не найден! Установите Node.js%NC%
+    echo %CYAN%💡 Скачайте с: https://nodejs.org/%NC%
     pause
     goto :show_header
 )
+goto :eof
 
-echo %BLUE%📤 Копируем скрипт настройки...%NC%
-scp server-setup.sh %REMOTE_USER%@%REMOTE_HOST%:/tmp/
+:check_python
+where python >nul 2>&1
+if errorlevel 1 (
+    echo %RED%❌ Python не найден! Установите Python%NC%
+    echo %CYAN%💡 Скачайте с: https://www.python.org/%NC%
+    pause
+    goto :show_header
+)
+goto :eof
 
-echo %BLUE%🔧 Запускаем настройку сервера...%NC%
-ssh %REMOTE_USER%@%REMOTE_HOST% "chmod +x /tmp/server-setup.sh && /tmp/server-setup.sh"
-
-echo %GREEN%✅ Настройка сервера завершена!%NC%
-pause
-goto :show_header
-
-:start_containers
-call :check_requirements
-echo %GREEN%▶️ Запуск всех контейнеров...%NC%
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && docker-compose up -d"
+:docker_up
+call :check_docker
+echo %GREEN%🚀 Запуск в Docker...%NC%
+docker-compose up -d
 echo %GREEN%✅ Контейнеры запущены!%NC%
-call :show_container_status_inline
+echo %CYAN%🌐 Frontend: http://localhost:3001%NC%
+echo %CYAN%🔌 API: http://localhost:8001%NC%
+echo %CYAN%📚 API Docs: http://localhost:8001/docs%NC%
 pause
 goto :show_header
 
-:stop_containers
-call :check_requirements
-echo %GREEN%⏹️ Остановка всех контейнеров...%NC%
-call :confirm_action "Все контейнеры будут остановлены"
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && docker-compose down"
+:docker_down
+call :check_docker
+echo %GREEN%⏹️ Остановка контейнеров...%NC%
+docker-compose down
 echo %GREEN%✅ Контейнеры остановлены!%NC%
 pause
 goto :show_header
 
-:restart_containers
-call :check_requirements
-echo %GREEN%🔄 Перезапуск всех контейнеров...%NC%
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && docker-compose restart"
+:docker_restart
+call :check_docker
+echo %GREEN%🔄 Перезапуск контейнеров...%NC%
+docker-compose restart
 echo %GREEN%✅ Контейнеры перезапущены!%NC%
-call :show_container_status_inline
 pause
 goto :show_header
 
-:rebuild_containers
-call :check_requirements
+:docker_rebuild
+call :check_docker
 echo %GREEN%🏗️ Пересборка контейнеров...%NC%
-call :confirm_action "Контейнеры будут пересобраны (может занять время)"
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && echo '🛑 Останавливаем...' && docker-compose down && echo '🔨 Пересобираем...' && docker-compose build --no-cache && echo '🚀 Запускаем...' && docker-compose up -d"
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
 echo %GREEN%✅ Пересборка завершена!%NC%
-call :show_container_status_inline
 pause
 goto :show_header
 
-:show_container_status
+:docker_status
+call :check_docker
 echo %GREEN%📋 Статус контейнеров:%NC%
-call :show_container_status_inline
+docker-compose ps
 pause
 goto :show_header
 
-:show_container_status_inline
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && docker-compose ps"
-goto :eof
-
-:show_logs
-call :check_requirements
-echo %GREEN%📜 Логи всех контейнеров:%NC%
-echo %YELLOW%(последние 50 строк для каждого контейнера)%NC%
-echo.
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && docker-compose logs --tail=50"
+:docker_logs
+call :check_docker
+echo %GREEN%📜 Логи контейнеров:%NC%
+docker-compose logs --tail=50
 pause
 goto :show_header
 
-:follow_logs
-call :check_requirements
-echo %GREEN%📈 Живые логи (Ctrl+C для выхода):%NC%
-echo.
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && docker-compose logs -f"
+:dev_backend
+call :check_python
+echo %GREEN%🐍 Запуск Backend (FastAPI)...%NC%
+echo %YELLOW%Порт: 8001%NC%
+cd /d backend
+
+if not exist ".venv" (
+    echo %YELLOW%⚠️ Виртуальное окружение не найдено. Создаём...%NC%
+    python -m venv .venv
+    call .venv\Scripts\activate.bat
+    pip install -r requirements.txt
+) else (
+    call .venv\Scripts\activate.bat
+)
+
+echo %BLUE%🚀 Запускаем FastAPI...%NC%
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+cd /d ..
 goto :show_header
 
-:apply_migrations
-call :check_requirements
-echo %GREEN%🐍 Применение миграций БД...%NC%
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && echo '🗄️ Текущее состояние:' && docker-compose exec -T backend alembic current && echo '' && echo '🔄 Применяем миграции...' && docker-compose exec -T backend alembic upgrade head && echo '✅ Миграции применены!'"
+:dev_bot
+call :check_python
+echo %GREEN%🤖 Запуск Telegram Bot...%NC%
+cd /d backend
+
+if not exist ".venv" (
+    echo %RED%❌ Виртуальное окружение не найдено! Сначала запустите Backend.%NC%
+    pause
+    cd /d ..
+    goto :show_header
+)
+
+call .venv\Scripts\activate.bat
+echo %BLUE%🚀 Запускаем бота...%NC%
+python bot\main.py
+cd /d ..
+goto :show_header
+
+:dev_frontend
+call :check_node
+echo %GREEN%⚛️ Запуск Frontend (Next.js)...%NC%
+echo %YELLOW%Порт: 3001%NC%
+cd /d frontend
+
+if not exist "node_modules" (
+    echo %YELLOW%⚠️ node_modules не найден. Устанавливаем зависимости...%NC%
+    npm install
+)
+
+echo %BLUE%🚀 Запускаем Next.js...%NC%
+npm run dev
+cd /d ..
+goto :show_header
+
+:dev_database
+call :check_docker
+echo %GREEN%📊 Запуск PostgreSQL в Docker...%NC%
+docker-compose up -d postgres
+echo %GREEN%✅ PostgreSQL запущен!%NC%
+echo %CYAN%📡 Подключение: localhost:5432%NC%
 pause
 goto :show_header
 
-:backup_database
-call :check_requirements
-echo %GREEN%💾 Создание бэкапа базы данных...%NC%
+:db_migrate
+echo %GREEN%🔄 Применение миграций...%NC%
+cd /d backend
+
+if exist ".venv" (
+    call .venv\Scripts\activate.bat
+    alembic upgrade head
+) else (
+    echo %YELLOW%Используем Docker...%NC%
+    docker-compose exec backend alembic upgrade head
+)
+
+echo %GREEN%✅ Миграции применены!%NC%
+cd /d ..
+pause
+goto :show_header
+
+:db_create_migration
+echo %GREEN%📝 Создание новой миграции...%NC%
+set /p description=%YELLOW%Введите описание миграции: %NC%
+cd /d backend
+
+if exist ".venv" (
+    call .venv\Scripts\activate.bat
+    alembic revision --autogenerate -m "%description%"
+) else (
+    echo %YELLOW%Используем Docker...%NC%
+    docker-compose exec backend alembic revision --autogenerate -m "%description%"
+)
+
+echo %GREEN%✅ Миграция создана!%NC%
+cd /d ..
+pause
+goto :show_header
+
+:db_backup
+call :check_docker
+echo %GREEN%💾 Бэкап локальной БД...%NC%
 for /f "tokens=2 delims==" %%I in ('wmic OS Get localdatetime /value') do set "dt=%%I"
-set "backup_name=backup_%dt:~0,8%_%dt:~8,6%.sql"
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && echo '💾 Создаём бэкап: %backup_name%' && mkdir -p backups && docker-compose exec -T postgres pg_dump -U postgres donateraid > 'backups/%backup_name%' && echo '✅ Бэкап создан: backups/%backup_name%' && echo '📁 Список бэкапов:' && ls -la backups/"
+set "backup_name=local_backup_%dt:~0,8%_%dt:~8,6%.sql"
+
+if not exist "backups" mkdir backups
+docker-compose exec -T postgres pg_dump -U postgres donateraid > "backups\%backup_name%"
+echo %GREEN%✅ Бэкап создан: backups\%backup_name%%NC%
 pause
 goto :show_header
 
-:ssh_connect
-call :check_requirements
-echo %GREEN%🔍 Подключение к серверу...%NC%
-echo %YELLOW%Вы будете подключены к %REMOTE_HOST%%NC%
-echo %YELLOW%Для выхода используйте команду 'exit'%NC%
+:db_connect
+call :check_docker
+echo %GREEN%🗃️ Подключение к БД...%NC%
+docker-compose exec postgres psql -U postgres -d donateraid
+goto :show_header
+
+:install_deps
+echo %GREEN%📦 Установка зависимостей...%NC%
+
+echo %BLUE%🐍 Backend зависимости...%NC%
+cd /d backend
+if not exist ".venv" (
+    python -m venv .venv
+)
+call .venv\Scripts\activate.bat
+pip install -r requirements.txt
+cd /d ..
+
+echo %BLUE%⚛️ Frontend зависимости...%NC%
+cd /d frontend
+call npm install
+cd /d ..
+
+echo %GREEN%✅ Все зависимости установлены!%NC%
+pause
+goto :show_header
+
+:cleanup
+echo %GREEN%🧹 Очистка проекта...%NC%
+
+echo %BLUE%🗑️ Удаляем node_modules...%NC%
+for /d /r . %%d in (node_modules) do @if exist "%%d" rd /s /q "%%d" 2>nul
+
+echo %BLUE%🗑️ Удаляем __pycache__...%NC%
+for /d /r . %%d in (__pycache__) do @if exist "%%d" rd /s /q "%%d" 2>nul
+
+echo %BLUE%🗑️ Удаляем .next...%NC%
+if exist "frontend\.next" rd /s /q "frontend\.next" 2>nul
+
+echo %BLUE%🗑️ Удаляем .pyc файлы...%NC%
+del /s /q *.pyc 2>nul
+
+echo %GREEN%✅ Очистка завершена!%NC%
+pause
+goto :show_header
+
+:check_ports
+echo %GREEN%🔍 Проверка портов...%NC%
 echo.
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && bash"
+
+echo %CYAN%Порт 3001 (Frontend):%NC%
+netstat -an | findstr :3001 >nul
+if errorlevel 1 (
+    echo %GREEN%✅ Порт 3001 свободен%NC%
+) else (
+    echo %RED%❌ Порт 3001 занят%NC%
+    netstat -ano | findstr :3001
+)
+
+echo.
+echo %CYAN%Порт 8001 (Backend):%NC%
+netstat -an | findstr :8001 >nul
+if errorlevel 1 (
+    echo %GREEN%✅ Порт 8001 свободен%NC%
+) else (
+    echo %RED%❌ Порт 8001 занят%NC%
+    netstat -ano | findstr :8001
+)
+
+echo.
+echo %CYAN%Порт 5432 (PostgreSQL):%NC%
+netstat -an | findstr :5432 >nul
+if errorlevel 1 (
+    echo %GREEN%✅ Порт 5432 свободен%NC%
+) else (
+    echo %RED%❌ Порт 5432 занят%NC%
+    netstat -ano | findstr :5432
+)
+
+pause
 goto :show_header
 
 :invalid_choice
