@@ -216,6 +216,7 @@ export default function PrivacyPage() {
           <p>Субъект персональных данных обладает следующими правами:</p>
 
           <div className="space-y-4">
+            {/* Блок с адресом скрыт
             <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded-lg">
               <h3 className="font-semibold mb-2">Право получения информации</h3>
               <p className="text-sm">
@@ -224,6 +225,7 @@ export default function PrivacyPage() {
                 в порядке, установленном ст.14 Закона.
               </p>
             </div>
+            */}
 
             <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded-lg">
               <h3 className="font-semibold mb-2">Право на уточнение, блокировку или уничтожение данных</h3>
@@ -297,3 +299,7 @@ export default function PrivacyPage() {
             </li>
           </ul>
         </section>
+      </div>
+    </div>
+  )
+}
