@@ -235,7 +235,7 @@ export default function CheckoutPage() {
                         <div className="text-xs text-zinc-500 font-medium mb-1">Данные заказа:</div>
                         {Object.entries(item.inputs).map(([key, value]) => (
                           <div key={key} className="text-xs text-zinc-600 dark:text-zinc-400">
-                            <span className="font-medium">{getFieldLabel(key)}:</span> {value}
+                            <span className="font-medium">{key}:</span> {value}
                           </div>
                         ))}
                       </div>

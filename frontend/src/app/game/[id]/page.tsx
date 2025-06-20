@@ -225,13 +225,13 @@ export default function GamePage() {
           <div className="flex items-start gap-4">
             {/* Логотип игры */}
             <div className="w-16 h-16 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
-              {game.logo_url ? (
-                <img
-                  src={getImageUrl(game.logo_url)}
-                  alt={game.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
+              {game.logo_url && getImageUrl(game.logo_url) ? (
+              <img
+                src={getImageUrl(game.logo_url)!}
+                alt={game.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
                 <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                   <span className="text-white text-lg">💎</span>
                 </div>
