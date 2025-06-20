@@ -24,6 +24,7 @@ interface InputField {
   validation_regex?: string
   min_length?: number
   max_length?: number
+  subcategory_id?: number | null  // ДОБАВЛЕНО: привязка к подкатегории
 }
 
 export default function CreateGamePage() {
@@ -68,10 +69,10 @@ export default function CreateGamePage() {
   }
 
   const updateInputField = (index: number, field: keyof InputField, value: any) => {
-    const updated = [...inputFields]
-    updated[index] = { ...updated[index], [field]: value }
-    setInputFields(updated)
-  }
+  const updated = [...inputFields]
+  updated[index] = { ...updated[index], [field]: value }
+  setInputFields(updated)
+}
 
   // Функции управления подкатегориями (без изменений)
   const addSubcategory = () => {
@@ -359,202 +360,148 @@ export default function CreateGamePage() {
           </div>
         </div>
 
-        {/* ДОБАВЛЕНО: Поля для ввода пользователем */}
-        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Поля для ввода пользователем</h2>
-            <button
-              type="button"
-              onClick={addInputField}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Добавить поле
-            </button>
-          </div>
+        {/* Поля для ввода пользователем */}
+<div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
+  <div className="flex justify-between items-center mb-4">
+    <h2 className="text-lg font-semibold">Поля для ввода пользователем</h2>
+    <button
+      type="button"
+      onClick={addInputField}
+      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+    >
+      <Plus className="w-4 h-4" />
+      Добавить поле
+    </button>
+  </div>
 
-          {inputFields.length === 0 && (
-            <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">
-              Поля, которые пользователь должен заполнить при покупке любого товара этой игры
-              (например: Player ID, Server ID, Email и т.д.)
-            </p>
-          )}
+  {inputFields.length === 0 && (
+    <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">
+      Поля, которые пользователь должен заполнить при покупке товаров этой игры.
+      Можно привязать поля к конкретным подкатегориям или оставить общими для всей игры.
+    </p>
+  )}
 
-          {inputFields.map((field, index) => (
-            <div key={index} className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4">
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-medium">Поле #{index + 1}</h4>
-                <button
-                  onClick={() => removeInputField(index)}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+  {inputFields.map((field, index) => (
+    <div key={index} className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4">
+      <div className="flex justify-between items-center mb-3">
+        <h4 className="font-medium">Поле #{index + 1}</h4>
+        <button
+          onClick={() => removeInputField(index)}
+          className="text-red-600 hover:text-red-700"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Название поля</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
-                    value={field.name}
-                    onChange={e => updateInputField(index, 'name', e.target.value)}
-                    placeholder="player_id"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Отображаемое название</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
-                    value={field.label}
-                    onChange={e => updateInputField(index, 'label', e.target.value)}
-                    placeholder="Player ID"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Тип поля</label>
-                  <select
-                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
-                    value={field.type}
-                    onChange={e => updateInputField(index, 'type', e.target.value)}
-                  >
-                    <option value="text">Текст</option>
-                    <option value="email">Email</option>
-                    <option value="password">Пароль</option>
-                    <option value="number">Число</option>
-                    <option value="select">Выпадающий список</option>
-                    <option value="textarea">Многострочный текст</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Placeholder</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
-                    value={field.placeholder || ''}
-                    onChange={e => updateInputField(index, 'placeholder', e.target.value)}
-                    placeholder="1121321412"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={field.required}
-                    onChange={e => updateInputField(index, 'required', e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  <label className="text-sm">Обязательное</label>
-                </div>
-              </div>
-
-              <div className="mb-3">
-                <label className="block text-sm font-medium mb-1">Подсказка</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
-                  value={field.help_text || ''}
-                  onChange={e => updateInputField(index, 'help_text', e.target.value)}
-                  placeholder="Подсказка для пользователя"
-                />
-              </div>
-
-              {field.type === 'select' && (
-                <div>
-                  <label className="block text-sm font-medium mb-1">Варианты (по одному в строке)</label>
-                  <textarea
-                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
-                    rows={3}
-                    value={field.options?.join('\n') || ''}
-                    onChange={e => updateInputField(index, 'options', e.target.value.split('\n').filter(opt => opt.trim()))}
-                    placeholder="Россия&#10;Глобал&#10;Индонезия"
-                  />
-                </div>
-              )}
-            </div>
-          ))}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+        <div>
+          <label className="block text-sm font-medium mb-1">Название поля *</label>
+          <input
+            type="text"
+            className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+            value={field.name}
+            onChange={e => updateInputField(index, 'name', e.target.value)}
+            placeholder="player_id"
+          />
         </div>
-
-        {/* Подкатегории (без изменений) */}
-        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Подкатегории (регионы)</h2>
-            <button
-              onClick={addSubcategory}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Добавить подкатегорию
-            </button>
-          </div>
-
-          {subcategories.length === 0 && (
-            <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">
-              Подкатегории позволят разделить товары по регионам (например: Россия, Глобал, Индонезия)
-            </p>
-          )}
-
-          {subcategories.map((subcategory, index) => (
-            <div key={index} className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4">
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-medium">Подкатегория #{index + 1}</h4>
-                <button
-                  onClick={() => removeSubcategory(index)}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Название *</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
-                    value={subcategory.name}
-                    onChange={e => updateSubcategory(index, 'name', e.target.value)}
-                    placeholder="Россия, Глобал, Индонезия..."
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Порядок сортировки</label>
-                  <input
-                    type="number"
-                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
-                    value={subcategory.sort_order}
-                    onChange={e => updateSubcategory(index, 'sort_order', Number(e.target.value))}
-                  />
-                </div>
-              </div>
-
-              <div className="mb-3">
-                <label className="block text-sm font-medium mb-1">Описание</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
-                  value={subcategory.description}
-                  onChange={e => updateSubcategory(index, 'description', e.target.value)}
-                  placeholder="Дополнительная информация о подкатегории..."
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={subcategory.enabled}
-                  onChange={e => updateSubcategory(index, 'enabled', e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <label className="text-sm">Включена</label>
-              </div>
-            </div>
-          ))}
+        <div>
+          <label className="block text-sm font-medium mb-1">Отображаемое название *</label>
+          <input
+            type="text"
+            className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+            value={field.label}
+            onChange={e => updateInputField(index, 'label', e.target.value)}
+            placeholder="Player ID"
+          />
         </div>
+        {/* ДОБАВЛЕНО: Выбор подкатегории */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Подкатегория</label>
+          <select
+            className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+            value={field.subcategory_id || ''}
+            onChange={e => updateInputField(index, 'subcategory_id', e.target.value ? Number(e.target.value) : null)}
+          >
+            <option value="">Для всех подкатегорий</option>
+            {subcategories.map((sub, subIndex) => (
+              <option key={subIndex} value={subIndex + 1}>
+                {sub.name || `Подкатегория ${subIndex + 1}`}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-zinc-500 mt-1">
+            Если не выбрано - поле будет показываться для всех подкатегорий
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div>
+          <label className="block text-sm font-medium mb-1">Тип поля</label>
+          <select
+            className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+            value={field.type}
+            onChange={e => updateInputField(index, 'type', e.target.value)}
+          >
+            <option value="text">Текст</option>
+            <option value="email">Email</option>
+            <option value="password">Пароль</option>
+            <option value="number">Число</option>
+            <option value="select">Выпадающий список</option>
+            <option value="textarea">Многострочный текст</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Placeholder</label>
+          <input
+            type="text"
+            className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+            value={field.placeholder || ''}
+            onChange={e => updateInputField(index, 'placeholder', e.target.value)}
+            placeholder="Введите ваш Player ID"
+          />
+        </div>
+      </div>
+
+      {field.type === 'select' && (
+        <div className="mb-3">
+          <label className="block text-sm font-medium mb-1">Варианты выбора</label>
+          <textarea
+            className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+            rows={3}
+            value={field.options?.join('\n') || ''}
+            onChange={e => updateInputField(index, 'options', e.target.value.split('\n').filter(opt => opt.trim()))}
+            placeholder="Россия&#10;Глобал&#10;Индонезия"
+          />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium mb-1">Подсказка</label>
+          <input
+            type="text"
+            className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+            value={field.help_text || ''}
+            onChange={e => updateInputField(index, 'help_text', e.target.value)}
+            placeholder="Найдите Player ID в настройках игры"
+          />
+        </div>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={field.required}
+              onChange={e => updateInputField(index, 'required', e.target.checked)}
+              className="rounded"
+            />
+            <span className="text-sm">Обязательное</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
 
         {/* Логотип и баннер (без изменений) */}
         <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">

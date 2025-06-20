@@ -84,7 +84,6 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [noteType, setNoteType] = useState('warning')
   const [subcategoryId, setSubcategoryId] = useState<number | null>(null)
   const [imageUrl, setImageUrl] = useState('')
-  const [inputFields, setInputFields] = useState<InputField[]>([])
 
   useEffect(() => {
     loadGames()
@@ -163,7 +162,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       setNoteType(productData.note_type || 'warning')
       setSubcategoryId(productData.subcategory_id || null)
       setImageUrl(productData.image_url || '')
-      setInputFields(productData.input_fields || [])
+
     } catch (error) {
       console.error('Ошибка загрузки товара:', error)
       alert('Ошибка загрузки товара')
@@ -196,7 +195,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         enabled,
         delivery,
         sort_order: sortOrder,
-        input_fields: inputFields,
+
         special_note: specialNote.trim() || null,
         note_type: noteType,
         subcategory_id: subcategoryId,  // Используем subcategory_id вместо subcategory
@@ -263,29 +262,6 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     }
   }
 
-  const addInputField = () => {
-    setInputFields([
-      ...inputFields,
-      {
-        name: '',
-        label: '',
-        type: 'text',
-        required: true,
-        placeholder: '',
-        help_text: ''
-      }
-    ])
-  }
-
-  const removeInputField = (index: number) => {
-    setInputFields(inputFields.filter((_, i) => i !== index))
-  }
-
-  const updateInputField = (index: number, field: Partial<InputField>) => {
-    const updated = [...inputFields]
-    updated[index] = { ...updated[index], ...field }
-    setInputFields(updated)
-  }
 
   if (loading) {
     return (
@@ -531,137 +507,6 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                 <option value="error">Ошибка (красный)</option>
               </select>
             </div>
-          </div>
-        </div>
-
-        {/* Настраиваемые поля ввода */}
-        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Поля для ввода пользователем</h2>
-            <button
-              onClick={addInputField}
-              className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Добавить поле
-            </button>
-          </div>
-
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-            Настройте поля, которые должен заполнить покупатель (Player ID, Email, регион и т.д.)
-          </p>
-
-          <div className="space-y-4">
-            {inputFields.map((field, index) => (
-              <div key={index} className="border border-zinc-200 dark:border-zinc-600 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium">Поле #{index + 1}</h3>
-                  <button
-                    onClick={() => removeInputField(index)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Название поля *</label>
-                    <input
-                      type="text"
-                      value={field.name}
-                      onChange={e => updateInputField(index, { name: e.target.value })}
-                      className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700"
-                      placeholder="player_id"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Отображаемое название *</label>
-                    <input
-                      type="text"
-                      value={field.label}
-                      onChange={e => updateInputField(index, { label: e.target.value })}
-                      className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700"
-                      placeholder="Player ID"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Тип поля</label>
-                    <select
-                      value={field.type}
-                      onChange={e => updateInputField(index, { type: e.target.value as any })}
-                      className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700"
-                    >
-                      <option value="text">Текст</option>
-                      <option value="email">Email</option>
-                      <option value="password">Пароль</option>
-                      <option value="number">Число</option>
-                      <option value="select">Выпадающий список</option>
-                      <option value="textarea">Многострочный текст</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Placeholder</label>
-                    <input
-                      type="text"
-                      value={field.placeholder || ''}
-                      onChange={e => updateInputField(index, { placeholder: e.target.value })}
-                      className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700"
-                      placeholder="Введите ваш Player ID"
-                    />
-                  </div>
-                </div>
-
-                {field.type === 'select' && (
-                  <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1">Варианты (по одному на строку)</label>
-                    <textarea
-                      value={field.options?.join('\n') || ''}
-                      onChange={e => updateInputField(index, {
-                        options: e.target.value.split('\n').filter(o => o.trim())
-                      })}
-                      className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700"
-                      rows={3}
-                      placeholder="Вариант 1&#10;Вариант 2&#10;Вариант 3"
-                    />
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Подсказка</label>
-                    <input
-                      type="text"
-                      value={field.help_text || ''}
-                      onChange={e => updateInputField(index, { help_text: e.target.value })}
-                      className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-700"
-                      placeholder="Найдите Player ID в настройках игры"
-                    />
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={field.required}
-                        onChange={e => updateInputField(index, { required: e.target.checked })}
-                        className="rounded"
-                      />
-                      <span className="text-sm">Обязательное</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {inputFields.length === 0 && (
-              <div className="text-center py-8 text-zinc-500">
-                Поля не добавлены. Если товар не требует дополнительных данных от пользователя,
-                оставьте этот раздел пустым.
-              </div>
-            )}
           </div>
         </div>
 
