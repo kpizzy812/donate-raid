@@ -82,7 +82,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   const loadGames = async () => {
     try {
-      const response = await api.get('/admin/games/')
+      const response = await api.get('/admin/games')
       setGames(response.data)
     } catch (error) {
       console.error('Ошибка загрузки игр:', error)

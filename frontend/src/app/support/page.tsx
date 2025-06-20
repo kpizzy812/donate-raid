@@ -41,7 +41,7 @@ export default function SupportPage() {
             Самый быстрый способ получить помощь
           </p>
           <a
-            href="https://t.me/donateraid_support"
+            href="https://t.me/donateraid"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
@@ -133,7 +133,7 @@ export default function SupportPage() {
             </button>
 
             <a
-              href="https://t.me/donateraid_support"
+              href="https://t.me/donateraid"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-all hover:scale-105"

@@ -143,7 +143,7 @@ export default function FAQPage() {
             Открыть чат
           </a>
           <a
-            href="https://t.me/donateraid_support"
+            href="https://t.me/donateraid"
             target="_blank"
             className="inline-block border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-2 rounded-md transition"
           >

@@ -96,7 +96,7 @@ export default function CreateGamePage() {
 
       console.log('Отправляем данные игры:', gameData) // Отладка
 
-      await adminApi.post('/admin/games/', gameData)
+      await adminApi.post('/admin/games', gameData)
       alert('Игра успешно создана!')
       router.push('/admin/games')
     } catch (error: any) {
