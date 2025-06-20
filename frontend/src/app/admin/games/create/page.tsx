@@ -1,9 +1,16 @@
-// frontend/src/app/admin/games/create/page.tsx - ИСПРАВЛЕННЫЕ ПУТИ ЗАГРУЗКИ
+// frontend/src/app/admin/games/create/page.tsx - С УПРАВЛЕНИЕМ ПОДКАТЕГОРИЯМИ
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Upload, Image as ImageIcon } from 'lucide-react'
+import { X, Upload, Image as ImageIcon, Plus, Trash2 } from 'lucide-react'
+
+interface Subcategory {
+  name: string
+  description: string
+  sort_order: number
+  enabled: boolean
+}
 
 export default function CreateGamePage() {
   const router = useRouter()
@@ -20,11 +27,14 @@ export default function CreateGamePage() {
   const [enabled, setEnabled] = useState(true)
   const [sortOrder, setSortOrder] = useState(0)
 
+  // ДОБАВЛЕНО: Управление подкатегориями
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([])
+
   // Состояния загрузки
   const [bannerUploading, setBannerUploading] = useState(false)
   const [logoUploading, setLogoUploading] = useState(false)
 
-  // ИСПРАВЛЕНО: Правильный путь для загрузки баннера
+  // Функции загрузки изображений (исправленные пути)
   const uploadBanner = async (file: File) => {
     setBannerUploading(true)
     const formData = new FormData()
@@ -39,9 +49,7 @@ export default function CreateGamePage() {
         body: formData,
       })
 
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки')
-      }
+      if (!response.ok) throw new Error('Ошибка загрузки')
 
       const data = await response.json()
       if (data.success) {
@@ -57,7 +65,6 @@ export default function CreateGamePage() {
     }
   }
 
-  // ИСПРАВЛЕНО: Правильный путь для загрузки лого
   const uploadLogo = async (file: File) => {
     setLogoUploading(true)
     const formData = new FormData()
@@ -72,9 +79,7 @@ export default function CreateGamePage() {
         body: formData,
       })
 
-      if (!response.ok) {
-        throw new Error('Ошибка загрузки')
-      }
+      if (!response.ok) throw new Error('Ошибка загрузки')
 
       const data = await response.json()
       if (data.success) {
@@ -112,8 +117,25 @@ export default function CreateGamePage() {
     input.click()
   }
 
-  const removeBanner = () => setBannerUrl('')
-  const removeLogo = () => setLogoUrl('')
+  // ДОБАВЛЕНО: Функции управления подкатегориями
+  const addSubcategory = () => {
+    setSubcategories([...subcategories, {
+      name: '',
+      description: '',
+      sort_order: subcategories.length,
+      enabled: true
+    }])
+  }
+
+  const updateSubcategory = (index: number, field: keyof Subcategory, value: any) => {
+    const updated = [...subcategories]
+    updated[index] = { ...updated[index], [field]: value }
+    setSubcategories(updated)
+  }
+
+  const removeSubcategory = (index: number) => {
+    setSubcategories(subcategories.filter((_, i) => i !== index))
+  }
 
   const getImageUrl = (url: string) => {
     if (url.startsWith('http')) return url
@@ -129,6 +151,7 @@ export default function CreateGamePage() {
     }
 
     try {
+      // Сначала создаем игру
       const gameData = {
         name: name.trim(),
         description: description.trim() || null,
@@ -145,7 +168,7 @@ export default function CreateGamePage() {
       console.log('Отправляем данные игры:', gameData)
 
       const token = localStorage.getItem('access_token')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/games`, {
+      const gameResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/games`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,12 +177,37 @@ export default function CreateGamePage() {
         body: JSON.stringify(gameData)
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
+      if (!gameResponse.ok) {
+        const errorData = await gameResponse.json()
         throw new Error(errorData.detail || 'Ошибка создания игры')
       }
 
-      alert('Игра успешно создана!')
+      const createdGame = await gameResponse.json()
+      const gameId = createdGame.id
+
+      // Затем создаем подкатегории
+      for (const subcategory of subcategories) {
+        if (subcategory.name.trim()) {
+          const subcategoryData = {
+            game_id: gameId,
+            name: subcategory.name.trim(),
+            description: subcategory.description.trim() || null,
+            sort_order: subcategory.sort_order,
+            enabled: subcategory.enabled
+          }
+
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/subcategories/game/${gameId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(subcategoryData)
+          })
+        }
+      }
+
+      alert('Игра и подкатегории успешно созданы!')
       router.push('/admin/games')
     } catch (error: any) {
       console.error('Ошибка создания игры:', error)
@@ -248,7 +296,84 @@ export default function CreateGamePage() {
           </div>
         </div>
 
-        {/* Логотип игры (квадратная картинка) */}
+        {/* ДОБАВЛЕНО: Управление подкатегориями */}
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Подкатегории (регионы)</h2>
+            <button
+              onClick={addSubcategory}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Добавить подкатегорию
+            </button>
+          </div>
+
+          {subcategories.length === 0 && (
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">
+              Подкатегории позволят разделить товары по регионам (например: Россия, Глобал, Индонезия)
+            </p>
+          )}
+
+          {subcategories.map((subcategory, index) => (
+            <div key={index} className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="font-medium">Подкатегория #{index + 1}</h4>
+                <button
+                  onClick={() => removeSubcategory(index)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Название *</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                    value={subcategory.name}
+                    onChange={e => updateSubcategory(index, 'name', e.target.value)}
+                    placeholder="Россия, Глобал, Индонезия..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Порядок сортировки</label>
+                  <input
+                    type="number"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                    value={subcategory.sort_order}
+                    onChange={e => updateSubcategory(index, 'sort_order', Number(e.target.value))}
+                  />
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">Описание</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                  value={subcategory.description}
+                  onChange={e => updateSubcategory(index, 'description', e.target.value)}
+                  placeholder="Дополнительная информация о подкатегории..."
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={subcategory.enabled}
+                  onChange={e => updateSubcategory(index, 'enabled', e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <label className="text-sm">Включена</label>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Логотип игры */}
         <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <h2 className="text-lg font-semibold mb-4">Логотип игры (квадратная картинка)</h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
@@ -261,13 +386,10 @@ export default function CreateGamePage() {
                 src={getImageUrl(logoUrl)}
                 alt="Логотип игры"
                 className="w-32 h-32 object-cover rounded-lg border border-zinc-300 dark:border-zinc-600"
-                onError={(e) => {
-                  console.error('❌ Ошибка загрузки лого:', logoUrl)
-                  e.currentTarget.style.display = 'none'
-                }}
+                onError={(e) => e.currentTarget.style.display = 'none'}
               />
               <button
-                onClick={removeLogo}
+                onClick={() => setLogoUrl('')}
                 className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm"
               >
                 <X className="w-4 h-4" />
@@ -287,9 +409,6 @@ export default function CreateGamePage() {
               <span className="text-zinc-600 dark:text-zinc-400 text-sm">
                 {logoUploading ? 'Загрузка...' : 'Нажмите для загрузки лого'}
               </span>
-              <span className="text-xs text-zinc-500 mt-1">
-                Квадратное изображение<br />JPG, PNG, GIF. Макс. 5MB
-              </span>
             </button>
           )}
         </div>
@@ -307,13 +426,10 @@ export default function CreateGamePage() {
                 src={getImageUrl(bannerUrl)}
                 alt="Баннер игры"
                 className="w-full max-w-md h-32 object-cover rounded border border-zinc-300 dark:border-zinc-600"
-                onError={(e) => {
-                  console.error('❌ Ошибка загрузки баннера:', bannerUrl)
-                  e.currentTarget.style.display = 'none'
-                }}
+                onError={(e) => e.currentTarget.style.display = 'none'}
               />
               <button
-                onClick={removeBanner}
+                onClick={() => setBannerUrl('')}
                 className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm"
               >
                 <X className="w-4 h-4" />
@@ -334,7 +450,6 @@ export default function CreateGamePage() {
                 <span className="text-zinc-600 dark:text-zinc-400">
                   {bannerUploading ? 'Загрузка...' : 'Нажмите для загрузки баннера'}
                 </span>
-                <span className="text-xs text-zinc-500">JPG, PNG, GIF. Макс. 5MB</span>
               </div>
             </button>
           )}
