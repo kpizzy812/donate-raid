@@ -93,20 +93,41 @@ export default function CreateProductPage() {
 
   // ДОБАВЛЕНО: Загрузка подкатегорий игры
   const loadGameSubcategories = async (gameId: number) => {
+    console.log(`🔍 Загружаем подкатегории для игры ${gameId}`)
+
     try {
       const token = localStorage.getItem('access_token')
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/subcategories/game/${gameId}`,
-        {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }
-      )
+      console.log('🔑 Токен:', token ? 'найден' : 'НЕ НАЙДЕН')
+
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/admin/subcategories/game/${gameId}`
+      console.log('🌐 URL запроса:', url)
+
+      const response = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+
+      console.log('📡 Ответ статус:', response.status)
+      console.log('📡 Ответ заголовки:', response.headers)
+
       if (response.ok) {
         const data = await response.json()
+        console.log('✅ Полученные подкатегории:', data)
+        console.log('📊 Количество подкатегорий:', data.length)
         setGameSubcategories(data)
+
+        if (data.length === 0) {
+          console.log('⚠️ ВНИМАНИЕ: API вернул пустой массив подкатегорий')
+          alert('❌ У этой игры нет подкатегорий или они не загрузились. Проверьте:\n1. Созданы ли подкатегории для этой игры\n2. Работает ли бэкенд\n3. Подключен ли роутер subcategories')
+        }
+      } else {
+        const errorText = await response.text()
+        console.error('❌ Ошибка HTTP:', response.status, errorText)
+        alert(`❌ Ошибка ${response.status}: ${errorText}`)
+        setGameSubcategories([])
       }
     } catch (error) {
-      console.error('Ошибка загрузки подкатегорий:', error)
+      console.error('❌ Ошибка сети при загрузке подкатегорий:', error)
+      alert(`❌ Сетевая ошибка: ${error}`)
       setGameSubcategories([])
     }
   }

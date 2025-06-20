@@ -1,4 +1,4 @@
-# backend/app/routers/__init__.py - С ЛОГИРОВАНИЕМ
+# backend/app/routers/__init__.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter
 from loguru import logger
 
@@ -13,6 +13,7 @@ from .admin import (
     orders as admin_orders,
     articles as admin_articles,
     users as admin_users,
+    subcategories as admin_subcategories,  # ДОБАВЛЕНО
 )
 
 router = APIRouter()
@@ -38,5 +39,9 @@ router.include_router(admin_products.router, prefix="/api/admin/products", tags=
 router.include_router(admin_orders.router, prefix="/api/admin/orders", tags=["Admin Orders"])
 router.include_router(admin_articles.router, prefix="/api/admin/articles", tags=["Admin Articles"])
 router.include_router(admin_users.router, prefix="/api/admin/users", tags=["Admin Users"])
+
+# ДОБАВЛЕНО: Роутер для подкатегорий
+router.include_router(admin_subcategories.router, prefix="/api/admin/subcategories", tags=["Admin Subcategories"])
+logger.info("✅ Admin subcategories роутер зарегистрирован: /api/admin/subcategories")
 
 logger.info("✅ Все admin роутеры зарегистрированы")

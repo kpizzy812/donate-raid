@@ -151,6 +151,9 @@ export default function CreateGamePage() {
     }
 
     try {
+      console.log('🎮 Начинаем создание игры...')
+      console.log('📋 Подкатегории для создания:', subcategories)
+
       // Сначала создаем игру
       const gameData = {
         name: name.trim(),
@@ -165,7 +168,7 @@ export default function CreateGamePage() {
         sort_order: sortOrder
       }
 
-      console.log('Отправляем данные игры:', gameData)
+      console.log('📤 Отправляем данные игры:', gameData)
 
       const token = localStorage.getItem('access_token')
       const gameResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/games`, {
@@ -184,9 +187,17 @@ export default function CreateGamePage() {
 
       const createdGame = await gameResponse.json()
       const gameId = createdGame.id
+      console.log('✅ Игра создана с ID:', gameId)
 
       // Затем создаем подкатегории
-      for (const subcategory of subcategories) {
+      console.log('🏷️ Начинаем создание подкатегорий...')
+      let createdSubcategories = 0
+      let errorCount = 0
+
+      for (let i = 0; i < subcategories.length; i++) {
+        const subcategory = subcategories[i]
+        console.log(`🏷️ Обрабатываем подкатегорию ${i + 1}/${subcategories.length}:`, subcategory)
+
         if (subcategory.name.trim()) {
           const subcategoryData = {
             game_id: gameId,
@@ -196,22 +207,51 @@ export default function CreateGamePage() {
             enabled: subcategory.enabled
           }
 
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/subcategories/game/${gameId}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(subcategoryData)
-          })
+          console.log('📤 Отправляем данные подкатегории:', subcategoryData)
+
+          try {
+            const subcategoryResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/subcategories/game/${gameId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(subcategoryData)
+            })
+
+            console.log('📡 Ответ API для подкатегории:', subcategoryResponse.status)
+
+            if (subcategoryResponse.ok) {
+              const createdSubcategory = await subcategoryResponse.json()
+              console.log('✅ Подкатегория создана:', createdSubcategory)
+              createdSubcategories++
+            } else {
+              const errorData = await subcategoryResponse.json()
+              console.error('❌ Ошибка создания подкатегории:', errorData)
+              errorCount++
+            }
+          } catch (subcategoryError) {
+            console.error('❌ Сетевая ошибка при создании подкатегории:', subcategoryError)
+            errorCount++
+          }
+        } else {
+          console.log('⏭️ Пропускаем пустую подкатегорию')
         }
       }
 
-      alert('Игра и подкатегории успешно созданы!')
+      console.log(`📊 Итоги создания подкатегорий: создано ${createdSubcategories}, ошибок ${errorCount}`)
+
+      if (errorCount > 0) {
+        alert(`⚠️ Игра создана, но при создании подкатегорий произошли ошибки.\nСоздано: ${createdSubcategories}\nОшибок: ${errorCount}\n\nПроверьте консоль для подробностей.`)
+      } else {
+        alert(`✅ Игра и ${createdSubcategories} подкатегорий успешно созданы!`)
+      }
+
+      // Переходим к списку игр
       router.push('/admin/games')
     } catch (error: any) {
-      console.error('Ошибка создания игры:', error)
-      alert(`Ошибка создания игры: ${error.message}`)
+      console.error('❌ Общая ошибка создания игры:', error)
+      alert(`❌ Ошибка создания игры: ${error.message}`)
     }
   }
 
