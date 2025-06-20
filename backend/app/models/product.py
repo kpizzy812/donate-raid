@@ -1,4 +1,4 @@
-# backend/app/models/product.py - ОБНОВЛЕННАЯ ВЕРСИЯ
+# backend/app/models/product.py - ОБНОВЛЕННАЯ ВЕРСИЯ С FOREIGN KEY К ПОДКАТЕГОРИЯМ
 from sqlalchemy import Column, Integer, String, ForeignKey, Numeric, Boolean, Text, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSON
@@ -40,9 +40,21 @@ class Product(Base):
     special_note = Column(String(255), nullable=True)  # Текст пометки
     note_type = Column(String(20), default="warning")  # warning, info, danger
 
-    # Подкатегория
+    # ОБНОВЛЕНО: Подкатегория теперь foreign key
+    subcategory_id = Column(Integer, ForeignKey("game_subcategories.id", ondelete="SET NULL"), nullable=True)
+
+    # ОСТАВЛЯЕМ для обратной совместимости на время миграции
     subcategory = Column(String(100), nullable=True)
 
     image_url = Column(String(255), nullable=True)
 
+    # Relationships
     game = relationship("Game", back_populates="products")
+    subcategory_obj = relationship("GameSubcategory", back_populates="products")
+
+    @property
+    def subcategory_name(self):
+        """Возвращает название подкатегории для совместимости"""
+        if self.subcategory_obj:
+            return self.subcategory_obj.name
+        return self.subcategory  # Fallback на старое поле

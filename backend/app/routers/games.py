@@ -1,3 +1,4 @@
+# backend/app/routers/games.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОДКАТЕГОРИЯМИ
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
@@ -21,14 +22,37 @@ def get_db():
 
 @router.get("", response_model=List[GameRead])
 def list_games(q: str = Query("", alias="q"), db: Session = Depends(get_db)):
-    query = db.query(Game).options(joinedload(Game.products))
+    """Получить список всех игр с продуктами и подкатегориями"""
+    query = db.query(Game).options(
+        joinedload(Game.products),
+        joinedload(Game.subcategories)
+    ).filter(Game.enabled == True)
+
     if q:
         query = query.filter(Game.name.ilike(f"%{q}%"))
-    return query.all()
+
+    games = query.order_by(Game.sort_order.asc()).all()
+
+    logger.info(f"🎮 Возвращаем {len(games)} игр")
+    return games
+
 
 @router.get("/{game_id}", response_model=GameRead)
 def get_game(game_id: int, db: Session = Depends(get_db)):
-    game = db.query(Game).options(joinedload(Game.products)).filter(Game.id == game_id).first()
+    """Получить конкретную игру с продуктами и подкатегориями"""
+    game = db.query(Game).options(
+        joinedload(Game.products),
+        joinedload(Game.subcategories)
+    ).filter(
+        Game.id == game_id,
+        Game.enabled == True
+    ).first()
+
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
+
+    logger.info(f"🎮 Возвращаем игру: {game.name}")
+    logger.info(f"🎮 Товаров: {len(game.products)}, Подкатегорий: {len(game.subcategories)}")
+    logger.info(f"🎮 FAQ: {bool(game.faq_content)}, Инструкции: {bool(game.instructions)}")
+
     return game

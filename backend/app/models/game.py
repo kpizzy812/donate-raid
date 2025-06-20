@@ -1,4 +1,4 @@
-# backend/app/models/game.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/models/game.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОДКАТЕГОРИЯМИ
 from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -14,15 +14,16 @@ class Game(Base):
     instructions = Column(Text, nullable=True)
     sort_order = Column(Integer, default=0, nullable=False)
 
-    # Новые поля из миграции
+    # Поля для расширенного отображения
     description = Column(Text, nullable=True)
-    subcategory_description = Column(Text, nullable=True)
+    subcategory_description = Column(Text, nullable=True)  # Описание системы подкатегорий
     logo_url = Column(String(255), nullable=True)
     faq_content = Column(Text, nullable=True)
     enabled = Column(Boolean, default=True)
 
-    # Relationships - ИСПРАВЛЕНО: добавлено каскадное удаление
+    # Relationships
     products = relationship("Product", back_populates="game", cascade="all, delete-orphan")
+    subcategories = relationship("GameSubcategory", back_populates="game", cascade="all, delete-orphan", order_by="GameSubcategory.sort_order")
     faqs = relationship("GameFAQ", back_populates="game", cascade="all, delete-orphan")
     instructions_list = relationship("GameInstruction", back_populates="game", cascade="all, delete-orphan")
     articles = relationship("Article", back_populates="game")
@@ -34,13 +35,15 @@ class Game(Base):
 
         try:
             import json
-            # Если FAQ хранится как JSON
             return json.loads(self.faq_content)
         except:
-            # Если FAQ хранится как обычный текст, возвращаем как есть
             return [{"question": "FAQ", "answer": self.faq_content}]
 
     def set_faq_list(self, faq_list):
         """Сохраняет список FAQ в формате JSON"""
         import json
         self.faq_content = json.dumps(faq_list, ensure_ascii=False)
+
+    def get_enabled_subcategories(self):
+        """Возвращает только активные подкатегории"""
+        return [sub for sub in self.subcategories if sub.enabled]

@@ -1,5 +1,6 @@
-# backend/app/models/__init__.py
+# backend/app/models/__init__.py - ОБНОВЛЕННАЯ ВЕРСИЯ
 from app.models.game import Game
+from app.models.game_subcategory import GameSubcategory
 from app.models.product import Product
 from app.models.user import User
 from app.models.order import Order
@@ -13,6 +14,7 @@ from app.models.game_instruction import GameInstruction
 
 __all__ = [
     "Game",
+    "GameSubcategory",  # НОВОЕ
     "Product",
     "User",
     "Order",

@@ -1,4 +1,4 @@
-# backend/app/schemas/admin/products.py - ОБНОВЛЕННАЯ ВЕРСИЯ
+# backend/app/schemas/admin/products.py - ОБНОВЛЕННАЯ ВЕРСИЯ С SUBCATEGORY_ID
 from pydantic import BaseModel
 from typing import Optional, List
 from decimal import Decimal
@@ -49,8 +49,14 @@ class ProductBase(BaseModel):
     input_fields: Optional[List[InputField]] = []  # Настраиваемые поля ввода
     special_note: Optional[str] = None  # Особая пометка (например "Не подходит для РУ аккаунта")
     note_type: Optional[str] = "warning"  # warning, info, danger
-    subcategory: Optional[str] = None  # Подкатегория товара
-    image_url: Optional[str] = None  # 🆕 URL картинки товара
+
+    # ОБНОВЛЕНО: используем subcategory_id вместо строкового поля
+    subcategory_id: Optional[int] = None  # ID подкатегории
+
+    # Оставляем для обратной совместимости на время миграции
+    subcategory: Optional[str] = None  # DEPRECATED: будет удалено после миграции
+
+    image_url: Optional[str] = None  # URL картинки товара
 
 
 class ProductCreate(ProductBase):
@@ -64,5 +70,14 @@ class ProductUpdate(ProductBase):
 class ProductRead(ProductBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    # Добавляем вычисляемое поле для названия подкатегории
+    subcategory_name: Optional[str] = None
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+# Схема для отображения продукта с полной информацией о подкатегории
+class ProductReadDetailed(ProductRead):
+    subcategory_obj: Optional[dict] = None  # Полная информация о подкатегории

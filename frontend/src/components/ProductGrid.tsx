@@ -1,4 +1,4 @@
-// frontend/src/components/ProductGrid.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// frontend/src/components/ProductGrid.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useState } from 'react'
@@ -6,6 +6,7 @@ import { ShoppingCart, X, AlertTriangle, Info, CheckCircle, XCircle, Minus, Plus
 import { useCart } from '@/context/CartContext'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { getImageUrl } from '@/lib/imageUtils'
 
 interface InputField {
   name: string
@@ -68,10 +69,45 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
   }
 
   const handleProductClick = (product: Product) => {
-    setShowUserDataModal(product)
-    setUserData({})
-    setQuantity(product.min_amount || 1)
-    setErrors({})
+    // Если у товара есть настраиваемые поля ввода, показываем модалку
+    if (product.input_fields && product.input_fields.length > 0) {
+      setShowUserDataModal(product)
+      setUserData({})
+      setQuantity(product.min_amount || 1)
+      setErrors({})
+    } else {
+      // Если нет полей ввода, сразу добавляем в корзину
+      handleQuickAddToCart(product)
+    }
+  }
+
+  const handleQuickAddToCart = (product: Product) => {
+    // Создаем элемент корзины без дополнительных полей
+    const cartItem = {
+      product: {
+        id: product.id,
+        game_id: product.game_id,
+        name: product.name,
+        price_rub: product.price_rub
+      },
+      inputs: {}
+    }
+
+    // Добавляем в корзину
+    addItems([cartItem])
+
+    // Показываем тоаст с кнопкой перехода в корзину
+    toast.success(`${product.name} добавлен в корзину!`, {
+      description: `Цена: ₽${product.price_rub}`,
+      action: {
+        label: 'В корзину',
+        onClick: () => router.push('/order/cart'),
+      },
+      duration: 3000,
+    })
+
+    // Вызываем колбэк
+    onAddToCart(product, {})
   }
 
   const validateForm = (product: Product, data: Record<string, any>) => {
@@ -123,14 +159,14 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
       // Добавляем в корзину
       addItems(cartItems)
 
-      // Показываем красивый тоаст с кнопкой
+      // Показываем тоаст с кнопкой
       toast.success(`${showUserDataModal.name} добавлен в корзину!`, {
         description: `Количество: ${quantity} × ₽${showUserDataModal.price_rub} = ₽${(quantity * showUserDataModal.price_rub).toFixed(2)}`,
         action: {
-          label: 'Оформить заказ',
+          label: 'В корзину',
           onClick: () => router.push('/order/cart'),
         },
-        duration: 5000,
+        duration: 3000,
       })
 
       // Вызываем колбэк
@@ -147,177 +183,192 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
 
     const baseInputClass = `w-full p-3 bg-zinc-700 text-white rounded border ${
       error ? 'border-red-500' : 'border-zinc-600'
-    } focus:border-blue-500 focus:outline-none`
+    } focus:ring-2 focus:ring-blue-500`
 
     switch (field.type) {
-      case 'textarea':
-        return (
-          <textarea
-            className={baseInputClass}
-            value={value}
-            onChange={e => setUserData({ ...userData, [field.name]: e.target.value })}
-            placeholder={field.placeholder}
-            rows={3}
-          />
-        )
       case 'select':
         return (
-          <select
-            className={baseInputClass}
-            value={value}
-            onChange={e => setUserData({ ...userData, [field.name]: e.target.value })}
-          >
-            <option value="">Выберите...</option>
-            {field.options?.map(option => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
+          <div key={field.name}>
+            <label className="block text-sm font-medium mb-2">
+              {field.label} {field.required && <span className="text-red-400">*</span>}
+            </label>
+            <select
+              className={baseInputClass}
+              value={value}
+              onChange={e => setUserData(prev => ({ ...prev, [field.name]: e.target.value }))}
+            >
+              <option value="">Выберите...</option>
+              {field.options?.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+            {field.help_text && (
+              <p className="text-xs text-zinc-400 mt-1">{field.help_text}</p>
+            )}
+            {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+          </div>
         )
-      case 'number':
+
+      case 'textarea':
         return (
-          <input
-            type="number"
-            className={baseInputClass}
-            value={value}
-            onChange={e => setUserData({ ...userData, [field.name]: e.target.value })}
-            placeholder={field.placeholder}
-          />
+          <div key={field.name}>
+            <label className="block text-sm font-medium mb-2">
+              {field.label} {field.required && <span className="text-red-400">*</span>}
+            </label>
+            <textarea
+              className={baseInputClass}
+              placeholder={field.placeholder}
+              value={value}
+              onChange={e => setUserData(prev => ({ ...prev, [field.name]: e.target.value }))}
+              rows={3}
+            />
+            {field.help_text && (
+              <p className="text-xs text-zinc-400 mt-1">{field.help_text}</p>
+            )}
+            {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+          </div>
         )
-      case 'email':
-        return (
-          <input
-            type="email"
-            className={baseInputClass}
-            value={value}
-            onChange={e => setUserData({ ...userData, [field.name]: e.target.value })}
-            placeholder={field.placeholder}
-          />
-        )
-      case 'password':
-        return (
-          <input
-            type="password"
-            className={baseInputClass}
-            value={value}
-            onChange={e => setUserData({ ...userData, [field.name]: e.target.value })}
-            placeholder={field.placeholder}
-          />
-        )
+
       default:
         return (
-          <input
-            type="text"
-            className={baseInputClass}
-            value={value}
-            onChange={e => setUserData({ ...userData, [field.name]: e.target.value })}
-            placeholder={field.placeholder}
-          />
+          <div key={field.name}>
+            <label className="block text-sm font-medium mb-2">
+              {field.label} {field.required && <span className="text-red-400">*</span>}
+            </label>
+            <input
+              type={field.type}
+              className={baseInputClass}
+              placeholder={field.placeholder}
+              value={value}
+              onChange={e => setUserData(prev => ({ ...prev, [field.name]: e.target.value }))}
+            />
+            {field.help_text && (
+              <p className="text-xs text-zinc-400 mt-1">{field.help_text}</p>
+            )}
+            {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+          </div>
         )
     }
   }
 
+  // Группируем товары по подкатегориям (используем новые поля)
+  const groupedProducts = products.reduce((acc, product) => {
+    // Используем subcategory_name, если есть, иначе fallback на subcategory, иначе "Общие товары"
+    const category = product.subcategory_name || product.subcategory || 'Общие товары'
+    if (!acc[category]) {
+      acc[category] = []
+    }
+    acc[category].push(product)
+    return acc
+  }, {} as Record<string, Product[]>)
+
   return (
-    <div className="space-y-6">
-      {/* Единый бокс со всеми товарами */}
-      <div className="bg-zinc-800 rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">Доступные товары</h2>
+    <div className="space-y-8">
+      {Object.entries(groupedProducts).map(([category, categoryProducts]) => (
+        <div key={category} className="space-y-4">
+          {/* Заголовок подкатегории */}
+          <div className="border-b border-zinc-200 dark:border-zinc-700 pb-2">
+            <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+              {category}
+            </h3>
+          </div>
 
-        <div className="grid gap-4">
-          {products.map((product) => (
-            <div key={product.id} className="bg-zinc-700/50 rounded-lg p-4 hover:bg-zinc-700 transition-colors">
-              <div className="flex gap-4">
-                {/* Картинка товара */}
-                {product.image_url && (
-                  <div className="w-20 h-20 bg-zinc-600 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none'
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* Информация о товаре */}
-                <div className="flex-1 min-w-0">
-                  {/* Подкатегория */}
-                  {product.subcategory && (
-                    <div className="text-xs text-blue-400 mb-1 font-medium">
-                      {product.subcategory}
+          {/* Сетка товаров (2 столбца) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {categoryProducts.map((product) => (
+              <div key={product.id} className="bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:shadow-lg transition-shadow">
+                <div className="p-4">
+                  <div className="flex gap-4">
+                    {/* Картинка товара */}
+                    <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-700 rounded-lg overflow-hidden flex-shrink-0">
+                      {product.image_url ? (
+                        <img
+                          src={getImageUrl(product.image_url) || ''}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none'
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-2xl">
+                          🎮
+                        </div>
+                      )}
                     </div>
-                  )}
 
-                  {/* Название */}
-                  <h3 className="font-semibold mb-1 text-white">{product.name}</h3>
+                    {/* Информация о товаре */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">
+                        {product.name}
+                      </h4>
 
-                  {/* Описание */}
-                  {product.description && (
-                    <p className="text-zinc-400 text-sm mb-2 line-clamp-2">{product.description}</p>
-                  )}
+                      {product.description && (
+                        <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2 line-clamp-2">
+                          {product.description}
+                        </p>
+                      )}
 
-                  {/* Особая пометка */}
-                  {product.special_note && (
-                    <div className={`flex items-center gap-2 p-2 rounded border text-xs mb-2 ${getNoteColor(product.note_type)}`}>
-                      {getNoteIcon(product.note_type)}
-                      <span>{product.special_note}</span>
-                    </div>
-                  )}
+                      {/* Особая пометка */}
+                      {product.special_note && (
+                        <div className={`flex items-center gap-2 p-2 rounded border text-xs mb-2 ${getNoteColor(product.note_type)}`}>
+                          {getNoteIcon(product.note_type)}
+                          <span>{product.special_note}</span>
+                        </div>
+                      )}
 
-                  {/* Диапазон количества */}
-                  <div className="text-xs text-zinc-500 mb-2">
-                    Количество: от {product.min_amount} до {product.max_amount}
-                  </div>
-                </div>
+                      {/* Цена и кнопка */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          {product.old_price_rub && (
+                            <div className="text-sm text-zinc-500 line-through">
+                              ₽{product.old_price_rub}
+                            </div>
+                          )}
+                          <div className="text-lg font-bold text-green-600">
+                            ₽{product.price_rub}
+                          </div>
+                        </div>
 
-                {/* Цена и кнопка */}
-                <div className="text-right flex-shrink-0">
-                  <div className="mb-3">
-                    {product.old_price_rub && (
-                      <div className="text-zinc-500 line-through text-sm">
-                        ₽{product.old_price_rub}
+                        <button
+                          onClick={() => handleProductClick(product)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded flex items-center gap-2 transition-colors text-sm font-medium"
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                          Купить
+                        </button>
                       </div>
-                    )}
-                    <div className="text-xl font-bold text-green-400">
-                      ₽{product.price_rub}
                     </div>
                   </div>
-
-                  <button
-                    onClick={() => handleProductClick(product)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded flex items-center gap-2 transition-colors text-sm"
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    Купить
-                  </button>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      ))}
 
-      {/* Модалка для ввода данных пользователя */}
+      {/* Модалка для ввода данных пользователя (только если есть поля ввода) */}
       {showUserDataModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-zinc-800 rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+          <div className="bg-white dark:bg-zinc-800 rounded-lg p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Оформление покупки</h3>
               <button
                 onClick={() => setShowUserDataModal(null)}
-                className="text-zinc-400 hover:text-white"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Информация о товаре */}
-            <div className="mb-6 p-4 bg-zinc-700 rounded">
+            <div className="mb-6 p-4 bg-zinc-50 dark:bg-zinc-700 rounded">
               <div className="font-medium">{showUserDataModal.name}</div>
-              <div className="text-green-400 font-bold">₽{showUserDataModal.price_rub}</div>
+              <div className="text-green-600 font-bold">₽{showUserDataModal.price_rub}</div>
               {showUserDataModal.description && (
-                <div className="text-sm text-zinc-400 mt-1">{showUserDataModal.description}</div>
+                <div className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+                  {showUserDataModal.description}
+                </div>
               )}
             </div>
 
@@ -325,100 +376,52 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
               {/* Количество */}
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Количество <span className="text-red-400">*</span>
+                  Количество
                 </label>
                 <div className="flex items-center gap-3">
                   <button
-                    type="button"
                     onClick={() => setQuantity(Math.max(showUserDataModal.min_amount, quantity - 1))}
+                    className="p-2 bg-zinc-200 dark:bg-zinc-600 rounded"
                     disabled={quantity <= showUserDataModal.min_amount}
-                    className="w-10 h-10 bg-zinc-600 hover:bg-zinc-500 disabled:bg-zinc-700 disabled:cursor-not-allowed rounded flex items-center justify-center transition-colors"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-
-                  <input
-                    type="number"
-                    value={quantity}
-                    onChange={e => setQuantity(Math.max(showUserDataModal.min_amount, Math.min(showUserDataModal.max_amount, parseInt(e.target.value) || showUserDataModal.min_amount)))}
-                    min={showUserDataModal.min_amount}
-                    max={showUserDataModal.max_amount}
-                    className="flex-1 text-center p-2 bg-zinc-700 text-white rounded border border-zinc-600 focus:border-blue-500 focus:outline-none"
-                  />
-
+                  <span className="text-lg font-medium px-4">{quantity}</span>
                   <button
-                    type="button"
                     onClick={() => setQuantity(Math.min(showUserDataModal.max_amount, quantity + 1))}
+                    className="p-2 bg-zinc-200 dark:bg-zinc-600 rounded"
                     disabled={quantity >= showUserDataModal.max_amount}
-                    className="w-10 h-10 bg-zinc-600 hover:bg-zinc-500 disabled:bg-zinc-700 disabled:cursor-not-allowed rounded flex items-center justify-center transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
-
-                <div className="text-xs text-zinc-400 mt-1">
+                <div className="text-xs text-zinc-500 mt-1">
                   От {showUserDataModal.min_amount} до {showUserDataModal.max_amount}
                 </div>
-
                 {errors.quantity && (
-                  <p className="text-xs text-red-400 mt-1">{errors.quantity}</p>
+                  <p className="text-red-400 text-xs mt-1">{errors.quantity}</p>
                 )}
               </div>
 
-              {/* ИСПРАВЛЕНО: Дополнительные поля от админа */}
-              {showUserDataModal.input_fields && showUserDataModal.input_fields.length > 0 && (
-                <>
-                  <div className="border-t border-zinc-600 pt-4">
-                    <h4 className="text-sm font-medium mb-3 text-zinc-300">
-                      Дополнительная информация для заказа:
-                    </h4>
-                  </div>
+              {/* Поля ввода */}
+              {showUserDataModal.input_fields?.map(field => renderInputField(field))}
 
-                  {showUserDataModal.input_fields.map((field) => (
-                    <div key={field.name}>
-                      <label className="block text-sm font-medium mb-1">
-                        {field.label}
-                        {field.required && <span className="text-red-400 ml-1">*</span>}
-                      </label>
-
-                      {renderInputField(field)}
-
-                      {field.help_text && (
-                        <p className="text-xs text-zinc-400 mt-1">{field.help_text}</p>
-                      )}
-
-                      {errors[field.name] && (
-                        <p className="text-xs text-red-400 mt-1">{errors[field.name]}</p>
-                      )}
-                    </div>
-                  ))}
-                </>
-              )}
-            </div>
-
-            {/* Итоговая сумма */}
-            <div className="mt-6 p-4 bg-zinc-700 rounded">
-              <div className="flex justify-between items-center">
-                <span>Итого:</span>
-                <span className="text-xl font-bold text-green-400">
-                  ₽{(showUserDataModal.price_rub * quantity).toFixed(2)}
-                </span>
+              {/* Итоговая цена */}
+              <div className="border-t pt-4 mt-6">
+                <div className="flex justify-between items-center text-lg font-bold">
+                  <span>Итого:</span>
+                  <span className="text-green-600">
+                    ₽{(quantity * showUserDataModal.price_rub).toFixed(2)}
+                  </span>
+                </div>
               </div>
-            </div>
 
-            {/* Кнопки */}
-            <div className="flex gap-3 mt-6">
+              {/* Кнопка оформления */}
               <button
                 onClick={handleSubmitUserData}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded transition-colors font-medium"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors"
               >
                 Добавить в корзину
-              </button>
-              <button
-                onClick={() => setShowUserDataModal(null)}
-                className="px-6 bg-zinc-600 hover:bg-zinc-700 text-white py-3 rounded transition-colors"
-              >
-                Отмена
               </button>
             </div>
           </div>
