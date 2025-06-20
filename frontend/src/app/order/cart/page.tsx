@@ -1,4 +1,4 @@
-// frontend/src/app/order/cart/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/order/cart/page.tsx - ПОЛНАЯ ВЕРСИЯ
 'use client'
 
 import { useCart } from '@/context/CartContext'
@@ -11,6 +11,25 @@ export default function CartPage() {
   const router = useRouter()
 
   const total = items.reduce((sum, item) => sum + Number(item.product.price_rub), 0)
+
+  // Функция для получения понятного названия поля
+  const getFieldLabel = (fieldName: string): string => {
+    const fieldLabels: Record<string, string> = {
+      'player_id': 'Player ID',
+      'server_id': 'Server ID',
+      'user_id': 'User ID',
+      'email': 'Email',
+      'nickname': 'Никнейм',
+      'region': 'Регион',
+      'account_id': 'ID аккаунта',
+      'character_name': 'Имя персонажа',
+      'guild_name': 'Название гильдии',
+      'phone': 'Телефон',
+      'comment': 'Комментарий'
+    }
+
+    return fieldLabels[fieldName] || fieldName.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+  }
 
   const handleProceedToCheckout = () => {
     if (items.length === 0) return
@@ -75,7 +94,9 @@ export default function CartPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           {Object.entries(item.inputs).map(([key, value]) => (
                             <div key={key} className="bg-zinc-50 dark:bg-zinc-800 px-3 py-2 rounded-lg">
-                              <div className="text-xs text-zinc-500 mb-1">{key}:</div>
+                              <div className="text-xs text-zinc-500 mb-1">
+                                {getFieldLabel(key)}:
+                              </div>
                               <div className="font-medium text-sm">{value}</div>
                             </div>
                           ))}
@@ -123,41 +144,17 @@ export default function CartPage() {
                   </span>
                 </div>
                 <div className="text-sm text-zinc-500 mt-1">
-                  {items.length} {items.length === 1 ? 'товар' : 'товара'}
+                  {items.length} {items.length === 1 ? 'товар' :
+                    items.length < 5 ? 'товара' : 'товаров'}
                 </div>
               </div>
 
-              {/* Кнопка оформления заказа */}
               <button
                 onClick={handleProceedToCheckout}
-                className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center gap-2 mb-4"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
               >
                 Оформить заказ
-                <ArrowRight className="w-5 h-5" />
-              </button>
-
-              {/* Дополнительная информация */}
-              <div className="text-xs text-zinc-500 space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Быстрая обработка заказов</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>Безопасная оплата</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Поддержка 24/7</span>
-                </div>
-              </div>
-
-              {/* Кнопка продолжить покупки */}
-              <button
-                onClick={() => router.push('/')}
-                className="w-full mt-4 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 px-6 py-3 rounded-lg transition-colors"
-              >
-                Продолжить покупки
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
