@@ -1,7 +1,43 @@
-# backend/app/schemas/game.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОДКАТЕГОРИЯМИ
+# backend/app/schemas/game.py - ИСПРАВЛЕННАЯ ВЕРСИЯ С ПРАВИЛЬНОЙ ТИПИЗАЦИЕЙ
 from pydantic import BaseModel
-from typing import Optional, List
-from app.schemas.game_subcategory import GameSubcategoryRead
+from typing import Optional, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.schemas.product import ProductRead
+    from app.schemas.game_subcategory import GameSubcategoryRead
+
+# Схемы для избежания циклического импорта
+class ProductReadForGame(BaseModel):
+    id: int
+    name: str
+    price_rub: float
+    old_price_rub: Optional[float] = None
+    description: Optional[str] = None
+    instructions: Optional[str] = None
+    type: str
+    subcategory_id: Optional[int] = None
+    subcategory_name: Optional[str] = None
+    special_note: Optional[str] = None
+    note_type: str = "warning"
+    image_url: Optional[str] = None
+    min_amount: float = 1
+    max_amount: float = 1
+
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class GameSubcategoryReadForGame(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+    sort_order: int
+    enabled: bool
+
+    model_config = {
+        "from_attributes": True
+    }
 
 
 class FAQItem(BaseModel):
@@ -31,8 +67,9 @@ class GameRead(GameBase):
     enabled: Optional[bool] = True
     faq_content: Optional[str] = None
     subcategory_description: Optional[str] = None
-    products: Optional[List] = []  # Будет заполнено при загрузке
-    subcategories: Optional[List[GameSubcategoryRead]] = []  # Подкатегории игры
+    # ИСПРАВЛЕНО: Правильная типизация списков
+    products: List[ProductReadForGame] = []
+    subcategories: List[GameSubcategoryReadForGame] = []
 
     model_config = {
         "from_attributes": True

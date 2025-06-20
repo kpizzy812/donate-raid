@@ -1,4 +1,4 @@
-# backend/app/models/product.py - ОБНОВЛЕННАЯ ВЕРСИЯ С FOREIGN KEY К ПОДКАТЕГОРИЯМ
+# backend/app/models/product.py - ИСПРАВЛЕННАЯ ВЕРСИЯ С ПРАВИЛЬНЫМИ СВОЙСТВАМИ
 from sqlalchemy import Column, Integer, String, ForeignKey, Numeric, Boolean, Text, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSON
@@ -58,3 +58,6 @@ class Product(Base):
         if self.subcategory_obj:
             return self.subcategory_obj.name
         return self.subcategory  # Fallback на старое поле
+
+    def __str__(self):
+        return f"{self.game.name} - {self.name}"

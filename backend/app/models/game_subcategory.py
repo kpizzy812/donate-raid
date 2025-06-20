@@ -1,4 +1,4 @@
-# backend/app/models/game_subcategory.py
+# backend/app/models/game_subcategory.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -20,7 +20,7 @@ class GameSubcategory(Base):
 
     # Relationships
     game = relationship("Game", back_populates="subcategories")
-    products = relationship("Product", back_populates="subcategory_obj")
+    products = relationship("Product", back_populates="subcategory_obj", lazy="select")
 
     def __str__(self):
-        return f"{self.game.name} - {self.name}"
+        return f"{self.game.name if self.game else 'Unknown'} - {self.name}"
