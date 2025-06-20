@@ -132,20 +132,24 @@ export default function GamePage() {
     if (selectedProducts.size === 0) return
 
     const filteredProducts = getFilteredProducts()
-    const cartItems = Array.from(selectedProducts).map(productId => {
-      const product = filteredProducts.find(p => p.id === productId)
-      if (!product) return null
+    const cartItems = Array.from(selectedProducts)
+      .map(productId => {
+        const product = filteredProducts.find(p => p.id === productId)
+        if (!product) return null
 
-      return {
-        product: {
-          id: product.id,
-          game_id: product.game_id,
-          name: product.name,
-          price_rub: product.price_rub
-        },
-        inputs: {}
-      }
-    }).filter(Boolean)
+        return {
+          product: {
+            id: product.id,
+            game_id: product.game_id,
+            name: product.name,
+            price_rub: product.price_rub
+          },
+          inputs: {}
+        }
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null) // Исправленная типизация
+
+    if (cartItems.length === 0) return
 
     addItems(cartItems)
     router.push('/order/cart')
