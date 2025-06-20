@@ -164,7 +164,7 @@ export default function CreateProductPage() {
         image_url: imageUrl || null
       }
 
-      await api.post('/admin/products/', productData)
+      await api.post('/admin/products', productData)
       alert('Товар успешно создан!')
       router.push('/admin/products')
     } catch (error) {

@@ -92,7 +92,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const loadProduct = async () => {
     try {
       // Исправлено: добавлен слеш в конце URL
-      const response = await api.get(`/admin/products/${productId}/`)
+      const response = await api.get(`/admin/products/${productId}`)
       const product = response.data
 
       setProduct(product)
@@ -225,7 +225,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       console.log('Отправляем данные:', productData)
 
       // ИСПРАВЛЕНО: Используем правильный URL с слешем в конце
-      const response = await api.put(`/admin/products/${productId}/`, productData)
+      const response = await api.put(`/admin/products/${productId}`, productData)
 
       console.log('Ответ сервера:', response.data)
       alert('Товар успешно обновлен!')
