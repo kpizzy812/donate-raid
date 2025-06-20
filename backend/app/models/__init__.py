@@ -11,10 +11,12 @@ from app.models.referral import ReferralEarning
 from app.models.payment_terms import PaymentTerm
 from app.models.game_faq import GameFAQ
 from app.models.game_instruction import GameInstruction
+from app.models.game_input_field import GameInputField
 
 __all__ = [
     "Game",
-    "GameSubcategory",  # НОВОЕ
+    "GameSubcategory",
+    "GameInputField",
     "Product",
     "User",
     "Order",
