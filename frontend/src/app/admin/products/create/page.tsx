@@ -1,4 +1,4 @@
-// frontend/src/app/admin/products/create/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/admin/products/create/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -9,6 +9,15 @@ import { Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 interface Game {
   id: number
   name: string
+}
+
+interface GameSubcategory {
+  id: number
+  game_id: number
+  name: string
+  description?: string
+  sort_order: number
+  enabled: boolean
 }
 
 interface InputField {
@@ -29,6 +38,7 @@ export default function CreateProductPage() {
 
   // Основные поля
   const [games, setGames] = useState<Game[]>([])
+  const [gameSubcategories, setGameSubcategories] = useState<GameSubcategory[]>([]) // ДОБАВЛЕНО
   const [gameId, setGameId] = useState<number>(0)
   const [name, setName] = useState('')
   const [priceRub, setPriceRub] = useState<number>(0)
@@ -42,10 +52,10 @@ export default function CreateProductPage() {
   const [sortOrder, setSortOrder] = useState<number>(0)
   const [enabled, setEnabled] = useState(true)
 
-  // Новые поля из ТЗ
+  // ИСПРАВЛЕНО: Используем subcategory_id вместо subcategory
   const [specialNote, setSpecialNote] = useState('')
   const [noteType, setNoteType] = useState('warning')
-  const [subcategory, setSubcategory] = useState('')
+  const [subcategoryId, setSubcategoryId] = useState<number | null>(null) // ИЗМЕНЕНО
   const [imageUrl, setImageUrl] = useState('')
   const [imageUploading, setImageUploading] = useState(false)
 
@@ -56,12 +66,48 @@ export default function CreateProductPage() {
     loadGames()
   }, [])
 
+  // ДОБАВЛЕНО: Загружаем подкатегории при выборе игры
+  useEffect(() => {
+    if (gameId > 0) {
+      loadGameSubcategories(gameId)
+    } else {
+      setGameSubcategories([])
+      setSubcategoryId(null)
+    }
+  }, [gameId])
+
   const loadGames = async () => {
     try {
-      const response = await api.get('/admin/games')
-      setGames(response.data)
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/games`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setGames(data)
+      }
     } catch (error) {
       console.error('Ошибка загрузки игр:', error)
+    }
+  }
+
+  // ДОБАВЛЕНО: Загрузка подкатегорий игры
+  const loadGameSubcategories = async (gameId: number) => {
+    try {
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/subcategories/game/${gameId}`,
+        {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      )
+      if (response.ok) {
+        const data = await response.json()
+        setGameSubcategories(data)
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки подкатегорий:', error)
+      setGameSubcategories([])
     }
   }
 
@@ -83,13 +129,21 @@ export default function CreateProductPage() {
       formData.append('file', file)
       formData.append('subfolder', 'products')
 
-      // ИСПРАВЛЕНО: правильный endpoint для админа
-      const response = await api.post('/upload/image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      const token = localStorage.getItem('access_token')
+      // ИСПРАВЛЕНО: Правильный путь /upload/admin/image вместо /admin/upload/image
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/admin/image`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
       })
 
-      if (response.data.success) {
-        setImageUrl(response.data.file_url)
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки')
+      }
+
+      const data = await response.json()
+      if (data.success) {
+        setImageUrl(data.file_url)
       } else {
         throw new Error('Неожиданный ответ сервера')
       }
@@ -138,17 +192,19 @@ export default function CreateProductPage() {
   }
 
   const handleSubmit = async () => {
+    // ИСПРАВЛЕНО: Валидация обязательных полей
     if (!gameId || !name.trim() || priceRub <= 0) {
-      alert('Заполните обязательные поля')
+      alert('Заполните обязательные поля: игра, название, цена')
       return
     }
 
     try {
+      // ИСПРАВЛЕНО: Отправляем правильные поля
       const productData = {
         game_id: gameId,
         name: name.trim(),
         price_rub: priceRub,
-        old_price_rub: oldPriceRub || null,
+        old_price_rub: oldPriceRub,
         min_amount: minAmount,
         max_amount: maxAmount,
         type,
@@ -160,16 +216,32 @@ export default function CreateProductPage() {
         input_fields: inputFields,
         special_note: specialNote.trim() || null,
         note_type: noteType,
-        subcategory: subcategory.trim() || null,
+        subcategory_id: subcategoryId, // ИСПРАВЛЕНО: используем subcategory_id
         image_url: imageUrl || null
       }
 
-      await api.post('/admin/products', productData)
+      console.log('🚀 Отправляем данные товара:', productData)
+
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/products`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(productData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Ошибка создания товара')
+      }
+
       alert('Товар успешно создан!')
       router.push('/admin/products')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка создания товара:', error)
-      alert('Ошибка создания товара')
+      alert(`Ошибка создания товара: ${error.message}`)
     }
   }
 
@@ -179,14 +251,14 @@ export default function CreateProductPage() {
 
       <div className="space-y-6">
         {/* Основная информация */}
-        <div className="bg-zinc-800 p-4 rounded-lg">
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <h2 className="text-lg font-semibold mb-4">Основная информация</h2>
 
-          <div className="grid grid-cols-2 gap-4 mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="text-sm text-zinc-400">Игра</label>
+              <label className="block text-sm font-medium mb-2">Игра *</label>
               <select
-                className="w-full p-2 bg-zinc-700 text-white rounded"
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
                 value={gameId}
                 onChange={e => setGameId(Number(e.target.value))}
               >
@@ -196,111 +268,172 @@ export default function CreateProductPage() {
                 ))}
               </select>
             </div>
+
+            {/* ДОБАВЛЕНО: Выбор подкатегории */}
             <div>
-              <label className="text-sm text-zinc-400">Тип товара</label>
+              <label className="block text-sm font-medium mb-2">Подкатегория</label>
               <select
-                className="w-full p-2 bg-zinc-700 text-white rounded"
-                value={type}
-                onChange={e => setType(e.target.value as 'currency' | 'item' | 'service')}
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                value={subcategoryId || ''}
+                onChange={e => setSubcategoryId(e.target.value ? Number(e.target.value) : null)}
+                disabled={!gameId}
               >
-                <option value="currency">Валюта (золото, кристаллы)</option>
-                <option value="item">Предмет (шмотки, ключи)</option>
-                <option value="service">Услуга (услуги буста и т.п.)</option>
+                <option value="">Без подкатегории</option>
+                {gameSubcategories
+                  .filter(sub => sub.enabled)
+                  .map(subcategory => (
+                    <option key={subcategory.id} value={subcategory.id}>
+                      {subcategory.name}
+                    </option>
+                  ))}
               </select>
+              {!gameId && (
+                <p className="text-xs text-zinc-500 mt-1">Сначала выберите игру</p>
+              )}
+              {gameId && gameSubcategories.length === 0 && (
+                <p className="text-xs text-zinc-500 mt-1">
+                  У этой игры нет подкатегорий. Создайте их в настройках игры.
+                </p>
+              )}
             </div>
           </div>
 
-          <label className="text-sm text-zinc-400">Название товара</label>
-          <input
-            type="text"
-            className="w-full mb-3 p-2 bg-zinc-700 text-white rounded"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="1000 золота, Легендарный меч, Буст до 80 уровня..."
-          />
-
-          <div className="grid grid-cols-3 gap-4 mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
-              <label className="text-sm text-zinc-400">Цена (₽)</label>
+              <label className="block text-sm font-medium mb-2">Название товара *</label>
+              <input
+                type="text"
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="Название товара"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Цена (₽) *</label>
               <input
                 type="number"
-                className="w-full p-2 bg-zinc-700 text-white rounded"
+                step="0.01"
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
                 value={priceRub}
                 onChange={e => setPriceRub(Number(e.target.value))}
               />
             </div>
             <div>
-              <label className="text-sm text-zinc-400">Старая цена (₽) - необязательно</label>
+              <label className="block text-sm font-medium mb-2">Старая цена (₽)</label>
               <input
                 type="number"
-                className="w-full p-2 bg-zinc-700 text-white rounded"
+                step="0.01"
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
                 value={oldPriceRub || ''}
                 onChange={e => setOldPriceRub(e.target.value ? Number(e.target.value) : null)}
                 placeholder="Для зачеркивания"
               />
             </div>
-            <div>
-              <label className="text-sm text-zinc-400">Подкатегория</label>
-              <input
-                type="text"
-                className="w-full p-2 bg-zinc-700 text-white rounded"
-                value={subcategory}
-                onChange={e => setSubcategory(e.target.value)}
-                placeholder="Валюта, Оружие, Буст..."
-              />
-            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
-              <label className="text-sm text-zinc-400">Мин. количество</label>
+              <label className="block text-sm font-medium mb-2">Тип товара *</label>
+              <select
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                value={type}
+                onChange={e => setType(e.target.value as 'currency' | 'item' | 'service')}
+              >
+                <option value="currency">💰 Валюта</option>
+                <option value="item">📦 Предмет</option>
+                <option value="service">🔧 Услуга</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Мин. количество</label>
               <input
                 type="number"
-                className="w-full p-2 bg-zinc-700 text-white rounded"
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
                 value={minAmount}
                 onChange={e => setMinAmount(Number(e.target.value))}
               />
             </div>
             <div>
-              <label className="text-sm text-zinc-400">Макс. количество</label>
+              <label className="block text-sm font-medium mb-2">Макс. количество</label>
               <input
                 type="number"
-                className="w-full p-2 bg-zinc-700 text-white rounded"
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
                 value={maxAmount}
                 onChange={e => setMaxAmount(Number(e.target.value))}
               />
             </div>
           </div>
 
-          <label className="text-sm text-zinc-400">Описание</label>
-          <textarea
-            className="w-full mb-3 p-2 bg-zinc-700 text-white rounded"
-            rows={3}
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            placeholder="Подробное описание товара..."
-          />
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Описание товара</label>
+            <textarea
+              className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+              rows={3}
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              placeholder="Краткое описание товара..."
+            />
+          </div>
 
-          <label className="text-sm text-zinc-400">Инструкция после покупки</label>
-          <textarea
-            className="w-full mb-3 p-2 bg-zinc-700 text-white rounded"
-            rows={3}
-            value={instructions}
-            onChange={e => setInstructions(e.target.value)}
-            placeholder="Что делать после покупки..."
-          />
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Инструкции</label>
+            <textarea
+              className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+              rows={4}
+              value={instructions}
+              onChange={e => setInstructions(e.target.value)}
+              placeholder="Подробные инструкции для товара..."
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Особая пометка</label>
+              <input
+                type="text"
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                value={specialNote}
+                onChange={e => setSpecialNote(e.target.value)}
+                placeholder="Не подходит для РУ аккаунта, Хит продаж..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Тип пометки</label>
+              <select
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                value={noteType}
+                onChange={e => setNoteType(e.target.value)}
+              >
+                <option value="warning">⚠️ Предупреждение (желтый)</option>
+                <option value="info">ℹ️ Информация (синий)</option>
+                <option value="success">✅ Успех (зеленый)</option>
+                <option value="error">❌ Ошибка (красный)</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={enabled}
+              onChange={e => setEnabled(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <label className="text-sm">Активен (отображается на сайте)</label>
+          </div>
         </div>
 
-        {/* 🆕 КАРТИНКА ТОВАРА */}
-        <div className="bg-zinc-800 p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Картинка товара</h2>
+        {/* Изображение товара */}
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <h2 className="text-lg font-semibold mb-4">Изображение товара</h2>
 
           {imageUrl ? (
             <div className="relative inline-block">
               <img
                 src={imageUrl}
-                alt="Превью товара"
-                className="w-32 h-32 object-cover rounded border border-zinc-600"
+                alt="Изображение товара"
+                className="w-48 h-32 object-cover rounded border"
               />
               <button
                 onClick={removeImage}
@@ -313,83 +446,25 @@ export default function CreateProductPage() {
             <button
               onClick={handleImageUpload}
               disabled={imageUploading}
-              className="border-2 border-dashed border-zinc-600 hover:border-zinc-500 rounded-lg p-8 w-full text-center transition-colors disabled:opacity-50"
+              className="border-2 border-dashed border-zinc-300 dark:border-zinc-600 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-lg p-8 w-full text-center transition-colors disabled:opacity-50"
             >
               <div className="flex flex-col items-center gap-2">
                 {imageUploading ? (
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  <Upload className="w-8 h-8 text-zinc-400 animate-spin" />
                 ) : (
                   <ImageIcon className="w-8 h-8 text-zinc-400" />
                 )}
-                <span className="text-zinc-400">
-                  {imageUploading ? 'Загрузка...' : 'Нажмите для загрузки картинки'}
+                <span className="text-zinc-600 dark:text-zinc-400">
+                  {imageUploading ? 'Загрузка...' : 'Нажмите для загрузки изображения'}
                 </span>
-                <span className="text-xs text-zinc-500">PNG, JPG, WEBP до 5MB</span>
+                <span className="text-xs text-zinc-500">JPG, PNG, GIF. Макс. 5MB</span>
               </div>
             </button>
           )}
         </div>
 
-        {/* Настройки и пометки */}
-        <div className="bg-zinc-800 p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">Настройки и пометки</h2>
-
-          <div className="grid grid-cols-2 gap-4 mb-3">
-            <div>
-              <label className="text-sm text-zinc-400">Доставка</label>
-              <select
-                className="w-full p-2 bg-zinc-700 text-white rounded"
-                value={delivery}
-                onChange={e => setDelivery(e.target.value)}
-              >
-                <option value="auto">Автоматическая</option>
-                <option value="manual">Ручная</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-sm text-zinc-400">Порядок сортировки</label>
-              <input
-                type="number"
-                className="w-full p-2 bg-zinc-700 text-white rounded"
-                value={sortOrder}
-                onChange={e => setSortOrder(Number(e.target.value))}
-              />
-            </div>
-          </div>
-
-          <label className="text-sm text-zinc-400">Особая пометка</label>
-          <input
-            type="text"
-            className="w-full mb-2 p-2 bg-zinc-700 text-white rounded"
-            value={specialNote}
-            onChange={e => setSpecialNote(e.target.value)}
-            placeholder="Не подходит для РУ аккаунта, Хит продаж..."
-          />
-
-          <label className="text-sm text-zinc-400">Тип пометки</label>
-          <select
-            className="w-full mb-3 p-2 bg-zinc-700 text-white rounded"
-            value={noteType}
-            onChange={e => setNoteType(e.target.value)}
-          >
-            <option value="warning">⚠️ Предупреждение (желтый)</option>
-            <option value="info">ℹ️ Информация (синий)</option>
-            <option value="success">✅ Успех (зеленый)</option>
-            <option value="error">❌ Ошибка (красный)</option>
-          </select>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={enabled}
-              onChange={e => setEnabled(e.target.checked)}
-            />
-            <label>Активен (отображается на сайте)</label>
-          </div>
-        </div>
-
         {/* Настраиваемые поля для ввода */}
-        <div className="bg-zinc-800 p-4 rounded-lg">
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">Поля для ввода пользователем</h2>
             <button
@@ -403,52 +478,49 @@ export default function CreateProductPage() {
           </div>
 
           {inputFields.length === 0 && (
-            <p className="text-zinc-400 text-sm mb-4">
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">
               Здесь вы можете добавить поля, которые пользователь должен заполнить при покупке
               (например: Email, Player ID, Регион, Сервер и т.д.)
             </p>
           )}
 
           {inputFields.map((field, index) => (
-            <div key={index} className="border border-zinc-600 rounded p-3 mb-3">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Поле {index + 1}</span>
+            <div key={index} className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="font-medium">Поле #{index + 1}</h4>
                 <button
                   onClick={() => removeInputField(index)}
-                  className="text-red-400 hover:text-red-300"
+                  className="text-red-600 hover:text-red-700"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mb-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-zinc-400">Название поля (name)</label>
+                  <label className="block text-sm font-medium mb-1">Название поля</label>
                   <input
                     type="text"
-                    className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
                     value={field.name}
                     onChange={e => updateInputField(index, 'name', e.target.value)}
-                    placeholder="player_id, email, region..."
+                    placeholder="player_id"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-zinc-400">Отображаемое название</label>
+                  <label className="block text-sm font-medium mb-1">Отображаемое название</label>
                   <input
                     type="text"
-                    className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
                     value={field.label}
                     onChange={e => updateInputField(index, 'label', e.target.value)}
-                    placeholder="Player ID, Email адрес, Регион..."
+                    placeholder="ID игрока"
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3 mb-2">
                 <div>
-                  <label className="text-xs text-zinc-400">Тип поля</label>
+                  <label className="block text-sm font-medium mb-1">Тип поля</label>
                   <select
-                    className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
                     value={field.type}
                     onChange={e => updateInputField(index, 'type', e.target.value)}
                   >
@@ -461,65 +533,54 @@ export default function CreateProductPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-zinc-400">Placeholder</label>
+                  <label className="block text-sm font-medium mb-1">Подсказка</label>
                   <input
                     type="text"
-                    className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
                     value={field.placeholder || ''}
                     onChange={e => updateInputField(index, 'placeholder', e.target.value)}
-                    placeholder="Введите ваш Player ID..."
+                    placeholder="Введите ваш ID"
                   />
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={field.required}
-                    onChange={e => updateInputField(index, 'required', e.target.checked)}
-                  />
-                  <label className="ml-2 text-xs">Обязательное</label>
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs text-zinc-400">Подсказка</label>
+              <div className="mt-3">
+                <label className="block text-sm font-medium mb-1">Текст помощи</label>
                 <input
                   type="text"
-                  className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
+                  className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
                   value={field.help_text || ''}
                   onChange={e => updateInputField(index, 'help_text', e.target.value)}
-                  placeholder="Дополнительная информация для пользователя..."
+                  placeholder="Дополнительная информация о поле"
                 />
               </div>
 
-              {field.type === 'select' && (
-                <div className="mt-2">
-                  <label className="text-xs text-zinc-400">Варианты выбора (через запятую)</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 bg-zinc-700 text-white rounded text-sm"
-                    value={field.options?.join(', ') || ''}
-                    onChange={e => updateInputField(index, 'options', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                    placeholder="Европа, Америка, Азия..."
-                  />
-                </div>
-              )}
+              <div className="mt-3 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={field.required}
+                  onChange={e => updateInputField(index, 'required', e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <label className="text-sm">Обязательное поле</label>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Кнопки */}
+        {/* Кнопки действий */}
         <div className="flex gap-4">
           <button
-            onClick={handleSubmit}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded flex items-center gap-2"
-          >
-            Создать товар
-          </button>
-          <button
-            onClick={() => router.push('/admin/products')}
-            className="bg-zinc-600 hover:bg-zinc-700 text-white px-6 py-2 rounded"
+            onClick={() => router.back()}
+            className="px-6 py-3 bg-zinc-500 hover:bg-zinc-600 text-white rounded-lg transition-colors"
           >
             Отмена
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
+            Создать товар
           </button>
         </div>
       </div>

@@ -1,9 +1,8 @@
-// frontend/src/app/admin/games/create/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ С LOGO_URL
+// frontend/src/app/admin/games/create/page.tsx - ИСПРАВЛЕННЫЕ ПУТИ ЗАГРУЗКИ
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { adminApi } from '@/lib/adminApi'
 import { X, Upload, Image as ImageIcon } from 'lucide-react'
 
 export default function CreateGamePage() {
@@ -15,27 +14,41 @@ export default function CreateGamePage() {
   const [instructions, setInstructions] = useState('')
   const [faq, setFaq] = useState('')
   const [bannerUrl, setBannerUrl] = useState('')
-  const [logoUrl, setLogoUrl] = useState('') // ДОБАВЛЕНО: поле для квадратного лого
-  const [subcategoryDescription, setSubcategoryDescription] = useState('') // ДОБАВЛЕНО
+  const [logoUrl, setLogoUrl] = useState('')
+  const [subcategoryDescription, setSubcategoryDescription] = useState('')
   const [autoSupport, setAutoSupport] = useState(true)
   const [enabled, setEnabled] = useState(true)
   const [sortOrder, setSortOrder] = useState(0)
 
   // Состояния загрузки
   const [bannerUploading, setBannerUploading] = useState(false)
-  const [logoUploading, setLogoUploading] = useState(false) // ДОБАВЛЕНО
+  const [logoUploading, setLogoUploading] = useState(false)
 
-  // Загрузка баннера
+  // ИСПРАВЛЕНО: Правильный путь для загрузки баннера
   const uploadBanner = async (file: File) => {
     setBannerUploading(true)
     const formData = new FormData()
     formData.append('file', file)
+    formData.append('subfolder', 'games')
 
     try {
-      const response = await adminApi.post('/admin/upload/image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/admin/image`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
       })
-      setBannerUrl(response.data.url)
+
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки')
+      }
+
+      const data = await response.json()
+      if (data.success) {
+        setBannerUrl(data.file_url)
+      } else {
+        throw new Error('Неожиданный ответ сервера')
+      }
     } catch (error) {
       console.error('Ошибка загрузки баннера:', error)
       alert('Ошибка загрузки баннера')
@@ -44,17 +57,31 @@ export default function CreateGamePage() {
     }
   }
 
-  // ДОБАВЛЕНО: Загрузка лого
+  // ИСПРАВЛЕНО: Правильный путь для загрузки лого
   const uploadLogo = async (file: File) => {
     setLogoUploading(true)
     const formData = new FormData()
     formData.append('file', file)
+    formData.append('subfolder', 'games')
 
     try {
-      const response = await adminApi.post('/admin/upload/image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/admin/image`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
       })
-      setLogoUrl(response.data.url)
+
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки')
+      }
+
+      const data = await response.json()
+      if (data.success) {
+        setLogoUrl(data.file_url)
+      } else {
+        throw new Error('Неожиданный ответ сервера')
+      }
     } catch (error) {
       console.error('Ошибка загрузки лого:', error)
       alert('Ошибка загрузки лого')
@@ -74,7 +101,6 @@ export default function CreateGamePage() {
     input.click()
   }
 
-  // ДОБАВЛЕНО: Обработчик загрузки лого
   const handleLogoUpload = () => {
     const input = document.createElement('input')
     input.type = 'file'
@@ -87,7 +113,7 @@ export default function CreateGamePage() {
   }
 
   const removeBanner = () => setBannerUrl('')
-  const removeLogo = () => setLogoUrl('') // ДОБАВЛЕНО
+  const removeLogo = () => setLogoUrl('')
 
   const getImageUrl = (url: string) => {
     if (url.startsWith('http')) return url
@@ -105,12 +131,12 @@ export default function CreateGamePage() {
     try {
       const gameData = {
         name: name.trim(),
-        description: description.trim() || null, // ДОБАВЛЕНО
+        description: description.trim() || null,
         instructions: instructions.trim() || null,
         faq_content: faq.trim() || null,
         banner_url: bannerUrl || null,
-        logo_url: logoUrl || null, // ДОБАВЛЕНО
-        subcategory_description: subcategoryDescription.trim() || null, // ДОБАВЛЕНО
+        logo_url: logoUrl || null,
+        subcategory_description: subcategoryDescription.trim() || null,
         auto_support: autoSupport,
         enabled,
         sort_order: sortOrder
@@ -118,16 +144,26 @@ export default function CreateGamePage() {
 
       console.log('Отправляем данные игры:', gameData)
 
-      await adminApi.post('/admin/games', gameData)
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/games`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(gameData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Ошибка создания игры')
+      }
+
       alert('Игра успешно создана!')
       router.push('/admin/games')
     } catch (error: any) {
       console.error('Ошибка создания игры:', error)
-      if (error.response) {
-        alert(`Ошибка создания игры: ${error.response.data.detail || error.response.statusText}`)
-      } else {
-        alert('Ошибка создания игры')
-      }
+      alert(`Ошибка создания игры: ${error.message}`)
     }
   }
 
@@ -137,36 +173,35 @@ export default function CreateGamePage() {
 
       <div className="space-y-6">
         {/* Основная информация */}
-        <div className="bg-zinc-800 p-6 rounded-lg">
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <h2 className="text-lg font-semibold mb-4">Основная информация</h2>
 
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm text-zinc-400 mb-2">Название игры *</label>
+              <label className="block text-sm font-medium mb-2">Название игры *</label>
               <input
                 type="text"
-                className="w-full p-3 bg-zinc-700 text-white rounded border border-zinc-600 focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder="Название игры"
               />
             </div>
             <div>
-              <label className="block text-sm text-zinc-400 mb-2">Порядок сортировки</label>
+              <label className="block text-sm font-medium mb-2">Порядок сортировки</label>
               <input
                 type="number"
-                className="w-full p-3 bg-zinc-700 text-white rounded border border-zinc-600 focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
                 value={sortOrder}
                 onChange={e => setSortOrder(Number(e.target.value))}
               />
             </div>
           </div>
 
-          {/* ДОБАВЛЕНО: Описание игры */}
           <div className="mb-4">
-            <label className="block text-sm text-zinc-400 mb-2">Описание игры</label>
+            <label className="block text-sm font-medium mb-2">Описание игры</label>
             <textarea
-              className="w-full p-3 bg-zinc-700 text-white rounded border border-zinc-600 focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
               rows={3}
               value={description}
               onChange={e => setDescription(e.target.value)}
@@ -174,11 +209,10 @@ export default function CreateGamePage() {
             />
           </div>
 
-          {/* ДОБАВЛЕНО: Описание подкатегорий */}
           <div className="mb-4">
-            <label className="block text-sm text-zinc-400 mb-2">Описание подкатегорий</label>
+            <label className="block text-sm font-medium mb-2">Описание подкатегорий</label>
             <textarea
-              className="w-full p-3 bg-zinc-700 text-white rounded border border-zinc-600 focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
               rows={2}
               value={subcategoryDescription}
               onChange={e => setSubcategoryDescription(e.target.value)}
@@ -195,7 +229,7 @@ export default function CreateGamePage() {
                 onChange={e => setAutoSupport(e.target.checked)}
                 className="w-5 h-5"
               />
-              <label htmlFor="autoSupport" className="text-sm text-zinc-400">
+              <label htmlFor="autoSupport" className="text-sm">
                 Автоматическая поддержка
               </label>
             </div>
@@ -207,17 +241,17 @@ export default function CreateGamePage() {
                 onChange={e => setEnabled(e.target.checked)}
                 className="w-5 h-5"
               />
-              <label htmlFor="enabled" className="text-sm text-zinc-400">
+              <label htmlFor="enabled" className="text-sm">
                 Включена
               </label>
             </div>
           </div>
         </div>
 
-        {/* ДОБАВЛЕНО: Логотип игры (квадратная картинка) */}
-        <div className="bg-zinc-800 p-6 rounded-lg">
+        {/* Логотип игры (квадратная картинка) */}
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <h2 className="text-lg font-semibold mb-4">Логотип игры (квадратная картинка)</h2>
-          <p className="text-sm text-zinc-400 mb-4">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
             Квадратное изображение для отображения на главной странице и в карточке игры
           </p>
 
@@ -226,7 +260,7 @@ export default function CreateGamePage() {
               <img
                 src={getImageUrl(logoUrl)}
                 alt="Логотип игры"
-                className="w-32 h-32 object-cover rounded-lg border border-zinc-600"
+                className="w-32 h-32 object-cover rounded-lg border border-zinc-300 dark:border-zinc-600"
                 onError={(e) => {
                   console.error('❌ Ошибка загрузки лого:', logoUrl)
                   e.currentTarget.style.display = 'none'
@@ -243,14 +277,14 @@ export default function CreateGamePage() {
             <button
               onClick={handleLogoUpload}
               disabled={logoUploading}
-              className="border-2 border-dashed border-zinc-600 hover:border-zinc-500 rounded-lg p-8 w-48 h-48 text-center transition-colors disabled:opacity-50 flex flex-col items-center justify-center"
+              className="border-2 border-dashed border-zinc-300 dark:border-zinc-600 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-lg p-8 w-48 h-48 text-center transition-colors disabled:opacity-50 flex flex-col items-center justify-center"
             >
               {logoUploading ? (
                 <Upload className="w-8 h-8 text-zinc-400 animate-spin mb-2" />
               ) : (
                 <ImageIcon className="w-8 h-8 text-zinc-400 mb-2" />
               )}
-              <span className="text-zinc-400 text-sm">
+              <span className="text-zinc-600 dark:text-zinc-400 text-sm">
                 {logoUploading ? 'Загрузка...' : 'Нажмите для загрузки лого'}
               </span>
               <span className="text-xs text-zinc-500 mt-1">
@@ -261,9 +295,9 @@ export default function CreateGamePage() {
         </div>
 
         {/* Баннер игры */}
-        <div className="bg-zinc-800 p-6 rounded-lg">
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <h2 className="text-lg font-semibold mb-4">Баннер игры</h2>
-          <p className="text-sm text-zinc-400 mb-4">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
             Широкое изображение для отображения на странице игры
           </p>
 
@@ -272,7 +306,7 @@ export default function CreateGamePage() {
               <img
                 src={getImageUrl(bannerUrl)}
                 alt="Баннер игры"
-                className="w-full max-w-md h-32 object-cover rounded border border-zinc-600"
+                className="w-full max-w-md h-32 object-cover rounded border border-zinc-300 dark:border-zinc-600"
                 onError={(e) => {
                   console.error('❌ Ошибка загрузки баннера:', bannerUrl)
                   e.currentTarget.style.display = 'none'
@@ -289,7 +323,7 @@ export default function CreateGamePage() {
             <button
               onClick={handleBannerUpload}
               disabled={bannerUploading}
-              className="border-2 border-dashed border-zinc-600 hover:border-zinc-500 rounded-lg p-8 w-full text-center transition-colors disabled:opacity-50"
+              className="border-2 border-dashed border-zinc-300 dark:border-zinc-600 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-lg p-8 w-full text-center transition-colors disabled:opacity-50"
             >
               <div className="flex flex-col items-center gap-2">
                 {bannerUploading ? (
@@ -297,7 +331,7 @@ export default function CreateGamePage() {
                 ) : (
                   <ImageIcon className="w-8 h-8 text-zinc-400" />
                 )}
-                <span className="text-zinc-400">
+                <span className="text-zinc-600 dark:text-zinc-400">
                   {bannerUploading ? 'Загрузка...' : 'Нажмите для загрузки баннера'}
                 </span>
                 <span className="text-xs text-zinc-500">JPG, PNG, GIF. Макс. 5MB</span>
@@ -307,13 +341,13 @@ export default function CreateGamePage() {
         </div>
 
         {/* Инструкции и FAQ */}
-        <div className="bg-zinc-800 p-6 rounded-lg">
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <h2 className="text-lg font-semibold mb-4">Контент</h2>
 
           <div className="mb-4">
-            <label className="block text-sm text-zinc-400 mb-2">Инструкции</label>
+            <label className="block text-sm font-medium mb-2">Инструкции</label>
             <textarea
-              className="w-full p-3 bg-zinc-700 text-white rounded border border-zinc-600 focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
               rows={5}
               value={instructions}
               onChange={e => setInstructions(e.target.value)}
@@ -322,9 +356,9 @@ export default function CreateGamePage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm text-zinc-400 mb-2">FAQ (JSON формат)</label>
+            <label className="block text-sm font-medium mb-2">FAQ (JSON формат)</label>
             <textarea
-              className="w-full p-3 bg-zinc-700 text-white rounded border border-zinc-600 focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
               rows={6}
               value={faq}
               onChange={e => setFaq(e.target.value)}
@@ -337,7 +371,7 @@ export default function CreateGamePage() {
         <div className="flex gap-4">
           <button
             onClick={() => router.back()}
-            className="px-6 py-3 bg-zinc-600 hover:bg-zinc-700 text-white rounded-lg transition-colors"
+            className="px-6 py-3 bg-zinc-500 hover:bg-zinc-600 text-white rounded-lg transition-colors"
           >
             Отмена
           </button>

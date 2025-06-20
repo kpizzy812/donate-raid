@@ -238,7 +238,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       formData.append('subfolder', 'products')
 
       const token = localStorage.getItem('access_token')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/image`, {
+      // ИСПРАВЛЕНО: Используем правильный путь /upload/admin/image
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/admin/image`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
@@ -249,7 +250,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       }
 
       const data = await response.json()
-      setImageUrl(data.file_url)
+      if (data.success) {
+        setImageUrl(data.file_url)
+      } else {
+        throw new Error('Неожиданный ответ сервера')
+      }
     } catch (error) {
       console.error('Ошибка загрузки изображения:', error)
       alert('Ошибка загрузки изображения')
