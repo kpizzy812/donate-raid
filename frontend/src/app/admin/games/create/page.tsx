@@ -1,9 +1,9 @@
-// frontend/src/app/admin/games/create/page.tsx - С УПРАВЛЕНИЕМ ПОДКАТЕГОРИЯМИ
+// frontend/src/app/admin/games/create/page.tsx - ДОБАВЛЯЕМ ПОЛЯ ВВОДА
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { X, Upload, Image as ImageIcon, Plus, Trash2 } from 'lucide-react'
+import { Plus, X, Upload, ImageIcon, Trash2 } from 'lucide-react'
 
 interface Subcategory {
   name: string
@@ -12,112 +12,68 @@ interface Subcategory {
   enabled: boolean
 }
 
+// ДОБАВЛЕНО: Интерфейс для полей ввода
+interface InputField {
+  name: string
+  label: string
+  type: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea'
+  required: boolean
+  placeholder?: string
+  help_text?: string
+  options?: string[]
+  validation_regex?: string
+  min_length?: number
+  max_length?: number
+}
+
 export default function CreateGamePage() {
   const router = useRouter()
 
-  // Состояния формы
+  // Основные поля
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [instructions, setInstructions] = useState('')
   const [faq, setFaq] = useState('')
-  const [bannerUrl, setBannerUrl] = useState('')
-  const [logoUrl, setLogoUrl] = useState('')
   const [subcategoryDescription, setSubcategoryDescription] = useState('')
   const [autoSupport, setAutoSupport] = useState(true)
   const [enabled, setEnabled] = useState(true)
   const [sortOrder, setSortOrder] = useState(0)
 
-  // ДОБАВЛЕНО: Управление подкатегориями
-  const [subcategories, setSubcategories] = useState<Subcategory[]>([])
-
-  // Состояния загрузки
+  // Изображения
+  const [bannerUrl, setBannerUrl] = useState('')
+  const [logoUrl, setLogoUrl] = useState('')
   const [bannerUploading, setBannerUploading] = useState(false)
   const [logoUploading, setLogoUploading] = useState(false)
 
-  // Функции загрузки изображений (исправленные пути)
-  const uploadBanner = async (file: File) => {
-    setBannerUploading(true)
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('subfolder', 'games')
+  // Подкатегории
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([])
 
-    try {
-      const token = localStorage.getItem('access_token')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/admin/image`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData,
-      })
+  // ДОБАВЛЕНО: Поля ввода
+  const [inputFields, setInputFields] = useState<InputField[]>([])
 
-      if (!response.ok) throw new Error('Ошибка загрузки')
-
-      const data = await response.json()
-      if (data.success) {
-        setBannerUrl(data.file_url)
-      } else {
-        throw new Error('Неожиданный ответ сервера')
-      }
-    } catch (error) {
-      console.error('Ошибка загрузки баннера:', error)
-      alert('Ошибка загрузки баннера')
-    } finally {
-      setBannerUploading(false)
-    }
+  // ДОБАВЛЕНО: Функции управления полями ввода
+  const addInputField = () => {
+    setInputFields([...inputFields, {
+      name: '',
+      label: '',
+      type: 'text',
+      required: true,
+      placeholder: '',
+      help_text: ''
+    }])
   }
 
-  const uploadLogo = async (file: File) => {
-    setLogoUploading(true)
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('subfolder', 'games')
-
-    try {
-      const token = localStorage.getItem('access_token')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/admin/image`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData,
-      })
-
-      if (!response.ok) throw new Error('Ошибка загрузки')
-
-      const data = await response.json()
-      if (data.success) {
-        setLogoUrl(data.file_url)
-      } else {
-        throw new Error('Неожиданный ответ сервера')
-      }
-    } catch (error) {
-      console.error('Ошибка загрузки лого:', error)
-      alert('Ошибка загрузки лого')
-    } finally {
-      setLogoUploading(false)
-    }
+  const removeInputField = (index: number) => {
+    setInputFields(inputFields.filter((_, i) => i !== index))
   }
 
-  const handleBannerUpload = () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
-      if (file) uploadBanner(file)
-    }
-    input.click()
+  const updateInputField = (index: number, field: keyof InputField, value: any) => {
+    const updated = [...inputFields]
+    updated[index] = { ...updated[index], [field]: value }
+    setInputFields(updated)
   }
 
-  const handleLogoUpload = () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
-      if (file) uploadLogo(file)
-    }
-    input.click()
-  }
-
-  // ДОБАВЛЕНО: Функции управления подкатегориями
+  // Функции управления подкатегориями (без изменений)
   const addSubcategory = () => {
     setSubcategories([...subcategories, {
       name: '',
@@ -137,13 +93,7 @@ export default function CreateGamePage() {
     setSubcategories(subcategories.filter((_, i) => i !== index))
   }
 
-  const getImageUrl = (url: string) => {
-    if (url.startsWith('http')) return url
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api'
-    const baseUrl = apiUrl.replace('/api', '')
-    return url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`
-  }
-
+  // ОБНОВЛЕННАЯ функция создания игры
   const handleSubmit = async () => {
     if (!name.trim()) {
       alert('Введите название игры')
@@ -152,7 +102,6 @@ export default function CreateGamePage() {
 
     try {
       console.log('🎮 Начинаем создание игры...')
-      console.log('📋 Подкатегории для создания:', subcategories)
 
       // Сначала создаем игру
       const gameData = {
@@ -165,7 +114,8 @@ export default function CreateGamePage() {
         subcategory_description: subcategoryDescription.trim() || null,
         auto_support: autoSupport,
         enabled,
-        sort_order: sortOrder
+        sort_order: sortOrder,
+        input_fields: inputFields  // ДОБАВЛЕНО: отправляем поля ввода
       }
 
       console.log('📤 Отправляем данные игры:', gameData)
@@ -207,8 +157,6 @@ export default function CreateGamePage() {
             enabled: subcategory.enabled
           }
 
-          console.log('📤 Отправляем данные подкатегории:', subcategoryData)
-
           try {
             const subcategoryResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/subcategories/game/${gameId}`, {
               method: 'POST',
@@ -218,8 +166,6 @@ export default function CreateGamePage() {
               },
               body: JSON.stringify(subcategoryData)
             })
-
-            console.log('📡 Ответ API для подкатегории:', subcategoryResponse.status)
 
             if (subcategoryResponse.ok) {
               const createdSubcategory = await subcategoryResponse.json()
@@ -234,25 +180,108 @@ export default function CreateGamePage() {
             console.error('❌ Сетевая ошибка при создании подкатегории:', subcategoryError)
             errorCount++
           }
-        } else {
-          console.log('⏭️ Пропускаем пустую подкатегорию')
         }
       }
 
-      console.log(`📊 Итоги создания подкатегорий: создано ${createdSubcategories}, ошибок ${errorCount}`)
+      console.log(`📊 Итоги: игра создана, подкатегорий ${createdSubcategories}, ошибок ${errorCount}`)
 
       if (errorCount > 0) {
-        alert(`⚠️ Игра создана, но при создании подкатегорий произошли ошибки.\nСоздано: ${createdSubcategories}\nОшибок: ${errorCount}\n\nПроверьте консоль для подробностей.`)
+        alert(`⚠️ Игра создана, но при создании подкатегорий произошли ошибки.\nСоздано: ${createdSubcategories}\nОшибок: ${errorCount}`)
       } else {
         alert(`✅ Игра и ${createdSubcategories} подкатегорий успешно созданы!`)
       }
 
-      // Переходим к списку игр
       router.push('/admin/games')
     } catch (error: any) {
       console.error('❌ Общая ошибка создания игры:', error)
       alert(`❌ Ошибка создания игры: ${error.message}`)
     }
+  }
+
+  // Функции загрузки изображений (без изменений)
+  const uploadBanner = async (file: File) => {
+    setBannerUploading(true)
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('subfolder', 'games')
+
+    try {
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/admin/image`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
+      })
+
+      if (!response.ok) throw new Error('Ошибка загрузки')
+
+      const data = await response.json()
+      if (data.success) {
+        setBannerUrl(data.file_url)
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки баннера:', error)
+      alert('Ошибка загрузки баннера')
+    } finally {
+      setBannerUploading(false)
+    }
+  }
+
+  const uploadLogo = async (file: File) => {
+    setLogoUploading(true)
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('subfolder', 'games')
+
+    try {
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload/admin/image`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
+      })
+
+      if (!response.ok) throw new Error('Ошибка загрузки')
+
+      const data = await response.json()
+      if (data.success) {
+        setLogoUrl(data.file_url)
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки лого:', error)
+      alert('Ошибка загрузки лого')
+    } finally {
+      setLogoUploading(false)
+    }
+  }
+
+  const handleBannerUpload = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) uploadBanner(file)
+    }
+    input.click()
+  }
+
+  const handleLogoUpload = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) uploadLogo(file)
+    }
+    input.click()
+  }
+
+  const getImageUrl = (url: string) => {
+    if (url.startsWith('http')) return url
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api'
+    const baseUrl = apiUrl.replace('/api', '')
+    return url.startsWith('/') ? `${baseUrl}${url}` : `${baseUrl}/${url}`
   }
 
   return (
@@ -293,50 +322,164 @@ export default function CreateGamePage() {
               rows={3}
               value={description}
               onChange={e => setDescription(e.target.value)}
-              placeholder="Краткое описание игры для отображения на карточке..."
+              placeholder="Краткое описание игры..."
             />
           </div>
 
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">Описание подкатегорий</label>
-            <textarea
+            <input
+              type="text"
               className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
-              rows={2}
               value={subcategoryDescription}
               onChange={e => setSubcategoryDescription(e.target.value)}
-              placeholder="Объяснение системы подкатегорий (регионов) для пользователей..."
+              placeholder="Выберите регион"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
-                id="autoSupport"
                 checked={autoSupport}
                 onChange={e => setAutoSupport(e.target.checked)}
-                className="w-5 h-5"
+                className="w-4 h-4"
               />
-              <label htmlFor="autoSupport" className="text-sm">
-                Автоматическая поддержка
-              </label>
-            </div>
-            <div className="flex items-center gap-3">
+              <span className="text-sm">Автоматическая поддержка</span>
+            </label>
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
-                id="enabled"
                 checked={enabled}
                 onChange={e => setEnabled(e.target.checked)}
-                className="w-5 h-5"
+                className="w-4 h-4"
               />
-              <label htmlFor="enabled" className="text-sm">
-                Включена
-              </label>
-            </div>
+              <span className="text-sm">Включена</span>
+            </label>
           </div>
         </div>
 
-        {/* ДОБАВЛЕНО: Управление подкатегориями */}
+        {/* ДОБАВЛЕНО: Поля для ввода пользователем */}
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Поля для ввода пользователем</h2>
+            <button
+              type="button"
+              onClick={addInputField}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Добавить поле
+            </button>
+          </div>
+
+          {inputFields.length === 0 && (
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">
+              Поля, которые пользователь должен заполнить при покупке любого товара этой игры
+              (например: Player ID, Server ID, Email и т.д.)
+            </p>
+          )}
+
+          {inputFields.map((field, index) => (
+            <div key={index} className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="font-medium">Поле #{index + 1}</h4>
+                <button
+                  onClick={() => removeInputField(index)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Название поля</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                    value={field.name}
+                    onChange={e => updateInputField(index, 'name', e.target.value)}
+                    placeholder="player_id"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Отображаемое название</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                    value={field.label}
+                    onChange={e => updateInputField(index, 'label', e.target.value)}
+                    placeholder="Player ID"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Тип поля</label>
+                  <select
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                    value={field.type}
+                    onChange={e => updateInputField(index, 'type', e.target.value)}
+                  >
+                    <option value="text">Текст</option>
+                    <option value="email">Email</option>
+                    <option value="password">Пароль</option>
+                    <option value="number">Число</option>
+                    <option value="select">Выпадающий список</option>
+                    <option value="textarea">Многострочный текст</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Placeholder</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                    value={field.placeholder || ''}
+                    onChange={e => updateInputField(index, 'placeholder', e.target.value)}
+                    placeholder="1121321412"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={field.required}
+                    onChange={e => updateInputField(index, 'required', e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <label className="text-sm">Обязательное</label>
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">Подсказка</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                  value={field.help_text || ''}
+                  onChange={e => updateInputField(index, 'help_text', e.target.value)}
+                  placeholder="Подсказка для пользователя"
+                />
+              </div>
+
+              {field.type === 'select' && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">Варианты (по одному в строке)</label>
+                  <textarea
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                    rows={3}
+                    value={field.options?.join('\n') || ''}
+                    onChange={e => updateInputField(index, 'options', e.target.value.split('\n').filter(opt => opt.trim()))}
+                    placeholder="Россия&#10;Глобал&#10;Индонезия"
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Подкатегории (без изменений) */}
         <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">Подкатегории (регионы)</h2>
@@ -413,7 +556,7 @@ export default function CreateGamePage() {
           ))}
         </div>
 
-        {/* Логотип игры */}
+        {/* Логотип и баннер (без изменений) */}
         <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <h2 className="text-lg font-semibold mb-4">Логотип игры (квадратная картинка)</h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
@@ -442,60 +585,18 @@ export default function CreateGamePage() {
               className="border-2 border-dashed border-zinc-300 dark:border-zinc-600 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-lg p-8 w-48 h-48 text-center transition-colors disabled:opacity-50 flex flex-col items-center justify-center"
             >
               {logoUploading ? (
-                <Upload className="w-8 h-8 text-zinc-400 animate-spin mb-2" />
+                <Upload className="w-8 h-8 text-zinc-400 animate-spin" />
               ) : (
-                <ImageIcon className="w-8 h-8 text-zinc-400 mb-2" />
+                <ImageIcon className="w-8 h-8 text-zinc-400" />
               )}
-              <span className="text-zinc-600 dark:text-zinc-400 text-sm">
-                {logoUploading ? 'Загрузка...' : 'Нажмите для загрузки лого'}
+              <span className="text-zinc-600 dark:text-zinc-400">
+                {logoUploading ? 'Загрузка...' : 'Нажмите для загрузки логотипа'}
               </span>
             </button>
           )}
         </div>
 
-        {/* Баннер игры */}
-        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
-          <h2 className="text-lg font-semibold mb-4">Баннер игры</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
-            Широкое изображение для отображения на странице игры
-          </p>
-
-          {bannerUrl ? (
-            <div className="relative inline-block">
-              <img
-                src={getImageUrl(bannerUrl)}
-                alt="Баннер игры"
-                className="w-full max-w-md h-32 object-cover rounded border border-zinc-300 dark:border-zinc-600"
-                onError={(e) => e.currentTarget.style.display = 'none'}
-              />
-              <button
-                onClick={() => setBannerUrl('')}
-                className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={handleBannerUpload}
-              disabled={bannerUploading}
-              className="border-2 border-dashed border-zinc-300 dark:border-zinc-600 hover:border-zinc-400 dark:hover:border-zinc-500 rounded-lg p-8 w-full text-center transition-colors disabled:opacity-50"
-            >
-              <div className="flex flex-col items-center gap-2">
-                {bannerUploading ? (
-                  <Upload className="w-8 h-8 text-zinc-400 animate-spin" />
-                ) : (
-                  <ImageIcon className="w-8 h-8 text-zinc-400" />
-                )}
-                <span className="text-zinc-600 dark:text-zinc-400">
-                  {bannerUploading ? 'Загрузка...' : 'Нажмите для загрузки баннера'}
-                </span>
-              </div>
-            </button>
-          )}
-        </div>
-
-        {/* Инструкции и FAQ */}
+        {/* Инструкции и FAQ (без изменений) */}
         <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
           <h2 className="text-lg font-semibold mb-4">Контент</h2>
 

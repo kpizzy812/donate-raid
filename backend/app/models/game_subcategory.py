@@ -1,4 +1,4 @@
-# backend/app/models/game_subcategory.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/models/game_subcategory.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОЛЯМИ ВВОДА
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -21,6 +21,11 @@ class GameSubcategory(Base):
     # Relationships
     game = relationship("Game", back_populates="subcategories")
     products = relationship("Product", back_populates="subcategory_obj", lazy="select")
+    input_fields = relationship("GameInputField", back_populates="subcategory", cascade="all, delete-orphan", order_by="GameInputField.sort_order")  # ДОБАВЛЕНО
 
     def __str__(self):
         return f"{self.game.name if self.game else 'Unknown'} - {self.name}"
+
+    def get_input_fields_dict(self):
+        """Возвращает поля ввода в формате для фронтенда"""
+        return [field.to_dict() for field in self.input_fields if field.enabled]

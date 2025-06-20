@@ -1,4 +1,4 @@
-# backend/app/models/game.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОДКАТЕГОРИЯМИ
+# backend/app/models/game.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОЛЯМИ ВВОДА
 from sqlalchemy import Column, Integer, String, Text, Boolean
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -24,6 +24,7 @@ class Game(Base):
     # Relationships
     products = relationship("Product", back_populates="game", cascade="all, delete-orphan")
     subcategories = relationship("GameSubcategory", back_populates="game", cascade="all, delete-orphan", order_by="GameSubcategory.sort_order")
+    input_fields = relationship("GameInputField", back_populates="game", cascade="all, delete-orphan", order_by="GameInputField.sort_order")  # ДОБАВЛЕНО
     faqs = relationship("GameFAQ", back_populates="game", cascade="all, delete-orphan")
     instructions_list = relationship("GameInstruction", back_populates="game", cascade="all, delete-orphan")
     articles = relationship("Article", back_populates="game")
@@ -47,3 +48,7 @@ class Game(Base):
     def get_enabled_subcategories(self):
         """Возвращает только активные подкатегории"""
         return [sub for sub in self.subcategories if sub.enabled]
+
+    def get_input_fields_dict(self):
+        """Возвращает поля ввода в формате для фронтенда"""
+        return [field.to_dict() for field in self.input_fields if field.enabled]

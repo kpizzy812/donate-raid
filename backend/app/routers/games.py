@@ -1,4 +1,4 @@
-# backend/app/routers/games.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОДКАТЕГОРИЯМИ
+# backend/app/routers/games.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОЛЯМИ ВВОДА
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
@@ -22,10 +22,11 @@ def get_db():
 
 @router.get("", response_model=List[GameRead])
 def list_games(q: str = Query("", alias="q"), db: Session = Depends(get_db)):
-    """Получить список всех игр с продуктами и подкатегориями"""
+    """Получить список всех игр с продуктами, подкатегориями и полями ввода"""
     query = db.query(Game).options(
         joinedload(Game.products),
-        joinedload(Game.subcategories)
+        joinedload(Game.subcategories),
+        joinedload(Game.input_fields)  # ДОБАВЛЕНО: загружаем поля ввода
     ).filter(Game.enabled == True)
 
     if q:
@@ -39,10 +40,11 @@ def list_games(q: str = Query("", alias="q"), db: Session = Depends(get_db)):
 
 @router.get("/{game_id}", response_model=GameRead)
 def get_game(game_id: int, db: Session = Depends(get_db)):
-    """Получить конкретную игру с продуктами и подкатегориями"""
+    """Получить конкретную игру с продуктами, подкатегориями и полями ввода"""
     game = db.query(Game).options(
         joinedload(Game.products),
-        joinedload(Game.subcategories)
+        joinedload(Game.subcategories),
+        joinedload(Game.input_fields)  # ДОБАВЛЕНО: загружаем поля ввода
     ).filter(
         Game.id == game_id,
         Game.enabled == True
@@ -53,6 +55,7 @@ def get_game(game_id: int, db: Session = Depends(get_db)):
 
     logger.info(f"🎮 Возвращаем игру: {game.name}")
     logger.info(f"🎮 Товаров: {len(game.products)}, Подкатегорий: {len(game.subcategories)}")
+    logger.info(f"🎮 Полей ввода: {len(game.input_fields)}")  # ДОБАВЛЕНО
     logger.info(f"🎮 FAQ: {bool(game.faq_content)}, Инструкции: {bool(game.instructions)}")
 
     return game

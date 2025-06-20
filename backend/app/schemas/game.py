@@ -1,10 +1,23 @@
-# backend/app/schemas/game.py - ИСПРАВЛЕННАЯ ВЕРСИЯ С ПРАВИЛЬНОЙ ТИПИЗАЦИЕЙ
+# backend/app/schemas/game.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОЛЯМИ ВВОДА
 from pydantic import BaseModel
 from typing import Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.schemas.product import ProductRead
     from app.schemas.game_subcategory import GameSubcategoryRead
+
+# Схема для поля ввода
+class InputField(BaseModel):
+    name: str
+    label: str
+    type: str = "text"  # text, email, password, number, select, textarea
+    required: bool = True
+    placeholder: Optional[str] = None
+    help_text: Optional[str] = None
+    options: Optional[List[str]] = None
+    validation_regex: Optional[str] = None
+    min_length: Optional[int] = None
+    max_length: Optional[int] = None
 
 # Схемы для избежания циклического импорта
 class ProductReadForGame(BaseModel):
@@ -59,6 +72,8 @@ class GameCreate(GameBase):
     faq_content: Optional[str] = None  # FAQ в JSON формате
     sort_order: Optional[int] = 0
     enabled: Optional[bool] = True
+    subcategory_description: Optional[str] = None
+    input_fields: Optional[List[InputField]] = []  # ДОБАВЛЕНО: поля ввода
 
 
 class GameRead(GameBase):
@@ -67,6 +82,7 @@ class GameRead(GameBase):
     enabled: Optional[bool] = True
     faq_content: Optional[str] = None
     subcategory_description: Optional[str] = None
+    input_fields: Optional[List[InputField]] = []  # ДОБАВЛЕНО: поля ввода
     # ИСПРАВЛЕНО: Правильная типизация списков
     products: List[ProductReadForGame] = []
     subcategories: List[GameSubcategoryReadForGame] = []
@@ -94,3 +110,4 @@ class GameUpdate(BaseModel):
     subcategory_description: Optional[str] = None
     sort_order: Optional[int] = None
     enabled: Optional[bool] = None
+    input_fields: Optional[List[InputField]] = None  # ДОБАВЛЕНО: поля ввода
