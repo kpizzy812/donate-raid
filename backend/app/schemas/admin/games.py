@@ -1,4 +1,5 @@
-# backend/app/schemas/admin/games.py - ОБНОВЛЕННАЯ ВЕРСИЯ
+# backend/app/schemas/admin/games.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОЛЯМИ ВВОДА
+
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -7,6 +8,21 @@ class FAQItem(BaseModel):
     """Схема для элемента FAQ"""
     question: str
     answer: str
+
+
+# ДОБАВЛЕНО: Схема для поля ввода с поддержкой subcategory_id
+class InputFieldAdmin(BaseModel):
+    name: str
+    label: str
+    type: str = "text"  # text, email, password, number, select, textarea
+    required: bool = True
+    placeholder: Optional[str] = None
+    help_text: Optional[str] = None
+    options: Optional[List[str]] = None
+    validation_regex: Optional[str] = None
+    min_length: Optional[int] = None
+    max_length: Optional[int] = None
+    subcategory_id: Optional[int] = None  # КЛЮЧЕВОЕ ПОЛЕ для привязки к подкатегории
 
 
 class GameBase(BaseModel):
@@ -18,10 +34,12 @@ class GameBase(BaseModel):
     logo_url: Optional[str] = None  # Квадратная картинка для карточки
     sort_order: Optional[int] = 0
     enabled: Optional[bool] = True
+    subcategory_description: Optional[str] = None  # ДОБАВЛЕНО: описание подкатегорий
 
 
 class GameCreate(GameBase):
     faq_content: Optional[str] = None  # FAQ в JSON формате
+    input_fields: Optional[List[InputFieldAdmin]] = []  # ДОБАВЛЕНО: поля ввода
 
 
 class GameUpdate(BaseModel):
@@ -35,11 +53,14 @@ class GameUpdate(BaseModel):
     faq_content: Optional[str] = None
     sort_order: Optional[int] = None
     enabled: Optional[bool] = None
+    subcategory_description: Optional[str] = None  # ДОБАВЛЕНО
+    input_fields: Optional[List[InputFieldAdmin]] = None  # ДОБАВЛЕНО: поля ввода
 
 
 class GameRead(GameBase):
     id: int
     faq_content: Optional[str] = None
+    input_fields: Optional[List[InputFieldAdmin]] = []  # ДОБАВЛЕНО: поля ввода
 
     # Вычисляемое свойство для FAQ (для фронтенда)
     @property
