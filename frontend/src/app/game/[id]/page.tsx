@@ -139,32 +139,43 @@ export default function GamePage() {
   }
 
   // Покупка выбранных товаров
-  const handleBuySelected = () => {
-    if (selectedProducts.size === 0) return
+const handleBuySelected = () => {
+  if (selectedProducts.size === 0) return
 
-    const filteredProducts = getFilteredProducts()
-    const cartItems = Array.from(selectedProducts)
-      .map(productId => {
-        const product = filteredProducts.find(p => p.id === productId)
-        if (!product) return null
+  const filteredProducts = getFilteredProducts()
 
-        return {
-          product: {
-            id: product.id,
-            game_id: product.game_id,
-            name: product.name,
-            price_rub: product.price_rub
-          },
-          inputs: {}
-        }
-      })
-      .filter((item): item is NonNullable<typeof item> => item !== null) // Исправленная типизация
+  // Получаем поля ввода для активной подкатегории или общие поля
+  const relevantFields = game?.input_fields?.filter(field =>
+    !field.subcategory_id || field.subcategory_id === activeSubcategory
+  ) || []
 
-    if (cartItems.length === 0) return
-
-    addItems(cartItems)
-    router.push('/order/cart')
+  // Если есть обязательные поля, показываем уведомление
+  if (relevantFields.length > 0) {
+    alert(`Для выбранных товаров нужно заполнить поля: ${relevantFields.map(f => f.label).join(', ')}`)
   }
+
+  const cartItems = Array.from(selectedProducts)
+    .map(productId => {
+      const product = filteredProducts.find(p => p.id === productId)
+      if (!product) return null
+
+      return {
+        product: {
+          id: product.id,
+          game_id: product.game_id,
+          name: product.name,
+          price_rub: product.price_rub
+        },
+        inputs: {} // TODO: Здесь должны быть собранные поля
+      }
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null)
+
+  if (cartItems.length === 0) return
+
+  addItems(cartItems)
+  router.push('/order/cart')
+}
 
   // Подсчет общей суммы
   const getTotalPrice = () => {
@@ -445,6 +456,60 @@ export default function GamePage() {
           )}
         </div>
       </div>
+
+      {/* ДОБАВИТЬ ЭТОТ БЛОК: Поля для ввода */}
+      {(() => {
+        const relevantFields = game?.input_fields?.filter(field =>
+          !field.subcategory_id || field.subcategory_id === activeSubcategory
+        ) || []
+
+        if (relevantFields.length === 0) return null
+
+        return (
+          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6">
+            <h3 className="text-lg font-semibold mb-4">Данные для заказа</h3>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+              Заполните поля ниже для оформления заказа
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {relevantFields.map((field, index) => (
+                <div key={index}>
+                  <label className="block text-sm font-medium mb-2">
+                    {field.label}
+                    {field.required && <span className="text-red-500 ml-1">*</span>}
+                  </label>
+
+                  {field.type === 'select' && field.options ? (
+                    <select className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500">
+                      <option value="">Выберите...</option>
+                      {field.options.map((option, i) => (
+                        <option key={i} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  ) : field.type === 'textarea' ? (
+                    <textarea
+                      className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder={field.placeholder}
+                    />
+                  ) : (
+                    <input
+                      type={field.type}
+                      className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                      placeholder={field.placeholder}
+                    />
+                  )}
+
+                  {field.help_text && (
+                    <p className="text-xs text-zinc-500 mt-1">{field.help_text}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Фиксированная кнопка покупки внизу */}
       {selectedProducts.size > 0 && (
