@@ -39,6 +39,7 @@ interface Product {
 interface ProductGridProps {
   products: Product[]
   onAddToCart: (product: Product, userData: Record<string, any>) => void
+  gameInputFields?: InputField[]  // ДОБАВИТЬ ЭТО ПОЛЕ
 }
 
 export default function ProductGrid({ products, onAddToCart }: ProductGridProps) {
@@ -46,7 +47,18 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
   const router = useRouter()
 
   const handleBuyNow = (product: Product) => {
-    // Создаем элемент корзины
+    // Получаем поля ввода для этого товара
+    const relevantFields = gameInputFields.filter(field =>
+      !field.subcategory_id || field.subcategory_id === product.subcategory_id
+    )
+
+    // Если есть обязательные поля, показываем их пользователю
+    if (relevantFields.length > 0) {
+      // Пока что просто уведомляем что есть поля для заполнения
+      alert(`Для этого товара нужно заполнить поля: ${relevantFields.map(f => f.label).join(', ')}`)
+    }
+
+    // Создаем элемент корзины (пока с пустыми полями)
     const cartItem = {
       product: {
         id: product.id,
@@ -54,7 +66,7 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
         name: product.name,
         price_rub: product.price_rub
       },
-      inputs: {} // Пока пустые поля, потом добавим поля от игры/подкатегории
+      inputs: {} // TODO: Здесь должны быть собранные поля
     }
 
     // Добавляем в корзину
@@ -63,7 +75,7 @@ export default function ProductGrid({ products, onAddToCart }: ProductGridProps)
     // Вызываем колбэк
     onAddToCart(product, {})
 
-    // Сразу переходим в корзину (без модалок и тостов)
+    // Сразу переходим в корзину
     router.push('/order/cart')
   }
 

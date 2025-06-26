@@ -26,6 +26,16 @@ interface Product {
   game_id: number
 }
 
+interface InputField {
+  name: string
+  label: string
+  type: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea'
+  required: boolean
+  placeholder?: string
+  help_text?: string
+  options?: string[]
+}
+
 interface GameSubcategory {
   id: number
   game_id: number
@@ -48,6 +58,7 @@ interface Game {
   subcategory_description?: string
   products: Product[]
   subcategories: GameSubcategory[]
+  input_fields?: InputField[]
 }
 
 interface FAQItem {
