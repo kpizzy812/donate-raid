@@ -4,25 +4,38 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from app import models
-
 
 # чтобы alembic видел код
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.core.config   import settings
+from app.core.config import settings
 from app.core.database import Base
 
+# ИСПРАВЛЕНО: Явно импортируем ВСЕ модели
+from app.models.user import User
+from app.models.game import Game
+from app.models.game_subcategory import GameSubcategory  # ДОБАВЛЕНО
+from app.models.game_input_field import GameInputField   # ДОБАВЛЕНО
+from app.models.game_faq import GameFAQ
+from app.models.game_instruction import GameInstruction
+from app.models.product import Product
+from app.models.order import Order
+from app.models.auth_token import AuthToken
+from app.models.blog.article import Article, ArticleTag
+from app.models.support import SupportMessage
+from app.models.referral import ReferralEarning
+from app.models.payment_terms import PaymentTerm
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-# 3) подставляем URL из .env.dev
+# 3) подставляем URL из .env
 config.set_main_option('sqlalchemy.url', settings.DATABASE_URL)
 
 # Interpret the config file for Python logging.
-fileConfig(config.config_file_name)
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
 
 # 4) указываем Alembic, какие метаданные нужно мигрировать
 target_metadata = Base.metadata
@@ -35,8 +48,9 @@ def run_migrations_offline():
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
-        # ... остальное без изменений
+        dialect_opts={"paramstyle": "named"},
     )
+
     with context.begin_transaction():
         context.run_migrations()
 
@@ -53,6 +67,7 @@ def run_migrations_online():
         context.configure(
             connection=connection, target_metadata=target_metadata
         )
+
         with context.begin_transaction():
             context.run_migrations()
 

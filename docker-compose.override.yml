@@ -1,0 +1,26 @@
+# docker-compose.override.yml
+# Этот файл автоматически подхватывается docker-compose и переопределяет настройки для локальной разработки
+# При запуске `docker-compose up` все переменные будут переключены на localhost
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"  # Стандартный порт для локальной разработки
+
+  backend:
+    environment:
+      # Переопределяем URL для локальной разработки
+      - FRONTEND_URL=http://localhost:3001
+      - STATIC_FILES_BASE_URL=http://localhost:8001
+      # DATABASE_URL уже правильный в .env (postgres:5432)
+
+  frontend:
+    environment:
+      # Переопределяем API URL для фронтенда
+      - NEXT_PUBLIC_API_URL=http://localhost:8001/api
+      - NODE_ENV=development
+
+  bot:
+    # Бот использует те же переменные из .env, дополнительной настройки не требует
+    environment:
+      - FRONTEND_URL=http://localhost:3001
