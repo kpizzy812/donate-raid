@@ -22559,3 +22559,375 @@ fastapi.exceptions.ResponseValidationError: 1 validation errors:
 2025-06-26 at 15:01:01 | INFO | games:58 - 🎮 Полей ввода: 1
 2025-06-26 at 15:01:01 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
 2025-06-26 at 15:01:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-26 at 15:24:58 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 15:24:59 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 15:24:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 15:24:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 15:24:59 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 15:24:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 15:24:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 15:24:59 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 15:24:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 15:25:00 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-26 at 15:25:00 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-26 at 15:25:00 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-26 at 15:25:00 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-26 at 15:25:00 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-26 at 15:25:00 | INFO | games:56 - 🎮 Возвращаем игру: Игра 1
+2025-06-26 at 15:25:00 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-26 at 15:25:00 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-26 at 15:25:00 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-26 at 15:25:00 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-26 at 15:25:00 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-26 at 15:25:00 | INFO | games:56 - 🎮 Возвращаем игру: Игра 1
+2025-06-26 at 15:25:00 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-26 at 15:25:00 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-26 at 15:25:00 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-26 at 15:25:00 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/categories
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/tags
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/tags
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/categories
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:03:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:03:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:03:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/me
+2025-06-26 at 17:03:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-26 at 17:03:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/manual/me
+2025-06-26 at 17:03:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/manual/me
+2025-06-26 at 17:03:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/me
+2025-06-26 at 17:03:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-26 at 17:03:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-26 at 17:03:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-26 at 17:03:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-26 at 17:03:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-26 at 17:03:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-26 at 17:03:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-26 at 17:03:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-26 at 17:03:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-26 at 17:03:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-26 at 17:03:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-26 at 17:04:22 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:04:22 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:04:22 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:04:22 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:04:22 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:04:22 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/ed593425c146414dae4cf3c038f073c9.png
+2025-06-26 at 17:04:22 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:04:22 | INFO | main:49 - 📤 304 http://localhost:8001/uploads/admin/ed593425c146414dae4cf3c038f073c9.png
+2025-06-26 at 17:04:22 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:04:22 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:04:22 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:04:48 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:04:48 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:04:48 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:04:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:04:48 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:04:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:04:48 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:04:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:04:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:04:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:04:48 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:04:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:05:06 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 17:05:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:05:16 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:16 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:16 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:16 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:20 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/articles/categories/available
+2025-06-26 at 17:05:20 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/articles/tags/available
+2025-06-26 at 17:05:20 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/articles/tags/available
+2025-06-26 at 17:05:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles/categories/available
+2025-06-26 at 17:05:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles/tags/available
+2025-06-26 at 17:05:20 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/articles/categories/available
+2025-06-26 at 17:05:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles/tags/available
+2025-06-26 at 17:05:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles/categories/available
+2025-06-26 at 17:05:20 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/articles/tags/available
+2025-06-26 at 17:05:20 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/articles/categories/available
+2025-06-26 at 17:05:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles/tags/available
+2025-06-26 at 17:05:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles/categories/available
+2025-06-26 at 17:05:20 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/articles/tags/available
+2025-06-26 at 17:05:20 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/articles/categories/available
+2025-06-26 at 17:05:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles/categories/available
+2025-06-26 at 17:05:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles/tags/available
+2025-06-26 at 17:05:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:59 | INFO | main:43 - 📥 POST http://localhost:8001/api/admin/articles
+2025-06-26 at 17:05:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-26 at 17:06:01 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/articles
+2025-06-26 at 17:06:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-26 at 17:06:01 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/articles
+2025-06-26 at 17:06:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-26 at 17:06:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:06:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:06:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:06:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:06:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:06:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:06:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:06:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:06:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:06:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:06:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:06:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:06:02 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-06-26 at 17:06:02 | INFO | main:49 - 📤 200 http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-06-26 at 17:14:08 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/categories
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/tags
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/categories
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/tags
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:14:09 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:14:09 | INFO | main:49 - 📤 304 http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-06-26 at 17:15:55 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 17:15:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:15:55 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 17:15:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:15:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:15:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 17:15:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:15:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:15:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:15:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:15:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:15:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:15:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:15:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:15:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:15:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:15:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:15:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 17:15:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:15:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:15:56 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-06-26 at 17:15:56 | INFO | main:49 - 📤 304 http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-06-26 at 17:16:23 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:23 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:16:23 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:23 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:23 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:16:23 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:23 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:23 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:16:23 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:45 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:16:45 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:16:45 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:16:45 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:16:45 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:16:45 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:16:45 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:16:45 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:16:45 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:16:45 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:16:45 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:16:45 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:16:46 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:46 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:16:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:46 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:46 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:16:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:47 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:16:47 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:16:47 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/categories
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/tags
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/tags
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/categories
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:24:46 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 304 http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:24:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:25:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:09 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:25:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:09 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:25:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:09 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:25:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:10 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-26 at 17:25:10 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-26 at 17:25:10 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-26 at 17:25:10 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-26 at 17:25:10 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-26 at 17:25:10 | INFO | games:56 - 🎮 Возвращаем игру: Игра 1
+2025-06-26 at 17:25:10 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-26 at 17:25:10 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-26 at 17:25:10 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-26 at 17:25:10 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-26 at 17:25:10 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-26 at 17:25:10 | INFO | games:56 - 🎮 Возвращаем игру: Игра 1
+2025-06-26 at 17:25:10 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-26 at 17:25:10 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-26 at 17:25:10 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-26 at 17:25:10 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-26 at 17:25:11 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/7b58709a962145a3bb5781dd2192478e.png
+2025-06-26 at 17:25:11 | INFO | main:49 - 📤 304 http://localhost:8001/uploads/admin/7b58709a962145a3bb5781dd2192478e.png
+2025-06-26 at 17:25:36 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:25:36 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:25:36 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:25:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:25:36 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-26 at 17:25:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:25:36 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-26 at 17:25:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:25:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-26 at 17:25:36 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-26 at 17:25:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-26 at 17:25:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-26 at 17:25:39 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/test1
+2025-06-26 at 17:25:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/test1
+2025-06-26 at 17:25:39 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/test1
+2025-06-26 at 17:25:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/test1
+2025-06-26 at 17:25:39 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/test1
+2025-06-26 at 17:25:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/test1
+2025-06-26 at 17:25:39 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/test1
+2025-06-26 at 17:25:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/test1
+2025-06-26 at 17:25:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:43 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:25:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:43 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:25:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 17:25:43 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 17:25:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 17:39:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 17:39:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 17:39:46 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:46 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:46 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:46 | INFO | games:19 - 🎮 Admin games list called
+2025-06-26 at 17:39:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:46 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:46 | INFO | games:19 - 🎮 Admin games list called
+2025-06-26 at 17:39:46 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:48 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games/14
+2025-06-26 at 17:39:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-26 at 17:39:48 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games/14
+2025-06-26 at 17:39:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-26 at 17:39:48 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games/14
+2025-06-26 at 17:39:48 | INFO | games:155 - 🎮 Getting game 14
+2025-06-26 at 17:39:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-26 at 17:39:48 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games/14
+2025-06-26 at 17:39:49 | INFO | games:155 - 🎮 Getting game 14
+2025-06-26 at 17:39:49 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-26 at 17:39:53 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/products
+2025-06-26 at 17:39:53 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/products
+2025-06-26 at 17:39:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
+2025-06-26 at 17:39:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
+2025-06-26 at 17:39:53 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/products
+2025-06-26 at 17:39:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
+2025-06-26 at 17:39:53 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/products
+2025-06-26 at 17:39:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
+2025-06-26 at 17:39:58 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:58 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/products/6
+2025-06-26 at 17:39:58 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products/6
+2025-06-26 at 17:39:58 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/products/6
+2025-06-26 at 17:39:58 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products/6
+2025-06-26 at 17:39:58 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/products/6
+2025-06-26 at 17:39:58 | INFO | main:49 - 📤 405 http://localhost:8001/api/admin/products/6
+2025-06-26 at 17:39:58 | INFO | games:19 - 🎮 Admin games list called
+2025-06-26 at 17:39:58 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/products/6
+2025-06-26 at 17:39:58 | INFO | main:49 - 📤 405 http://localhost:8001/api/admin/products/6
+2025-06-26 at 17:39:58 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:58 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-26 at 17:39:58 | INFO | games:19 - 🎮 Admin games list called
+2025-06-26 at 17:39:58 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 17:40:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/products
+2025-06-26 at 17:40:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
+2025-06-26 at 17:40:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/products
+2025-06-26 at 17:40:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products

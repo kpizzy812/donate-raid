@@ -34,6 +34,7 @@ interface InputField {
   placeholder?: string
   help_text?: string
   options?: string[]
+  subcategory_id?: number
 }
 
 interface GameSubcategory {
@@ -78,6 +79,7 @@ export default function GamePage() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
   const [activeSubcategory, setActiveSubcategory] = useState<number | null>(null)
   const [selectedProducts, setSelectedProducts] = useState<Set<number>>(new Set())
+  const [inputValues, setInputValues] = useState<Record<string, string>>({})
 
   useEffect(() => {
     loadGame()
@@ -138,6 +140,14 @@ export default function GamePage() {
     setSelectedProducts(newSelected)
   }
 
+  // Функция для обновления значений полей ввода
+  const handleInputChange = (fieldName: string, value: string) => {
+    setInputValues(prev => ({
+      ...prev,
+      [fieldName]: value
+    }))
+  }
+
   // Покупка выбранных товаров
 const handleBuySelected = () => {
   if (selectedProducts.size === 0) return
@@ -149,10 +159,23 @@ const handleBuySelected = () => {
     !field.subcategory_id || field.subcategory_id === activeSubcategory
   ) || []
 
-  // Если есть обязательные поля, показываем уведомление
-  if (relevantFields.length > 0) {
-    alert(`Для выбранных товаров нужно заполнить поля: ${relevantFields.map(f => f.label).join(', ')}`)
+  // Проверяем заполненность обязательных полей
+  const missingFields = relevantFields.filter(field =>
+    field.required && (!inputValues[field.name] || inputValues[field.name].trim() === '')
+  )
+
+  if (missingFields.length > 0) {
+    alert(`Для выбранных товаров нужно заполнить поля: ${missingFields.map(f => f.label).join(', ')}`)
+    return
   }
+
+  // Собираем введенные данные для соответствующих полей
+  const collectedInputs: Record<string, string> = {}
+  relevantFields.forEach(field => {
+    if (inputValues[field.name]) {
+      collectedInputs[field.name] = inputValues[field.name]
+    }
+  })
 
   const cartItems = Array.from(selectedProducts)
     .map(productId => {
@@ -166,7 +189,7 @@ const handleBuySelected = () => {
           name: product.name,
           price_rub: product.price_rub
         },
-        inputs: {} // TODO: Здесь должны быть собранные поля
+        inputs: collectedInputs // Теперь здесь реальные данные!
       }
     })
     .filter((item): item is NonNullable<typeof item> => item !== null)
@@ -184,6 +207,21 @@ const handleBuySelected = () => {
       const product = filteredProducts.find(p => p.id === productId)
       return total + (product?.price_rub || 0)
     }, 0)
+  }
+
+  // Проверка валидности кнопки покупки
+  const isSubmitDisabled = () => {
+    if (selectedProducts.size === 0) return true
+
+    const relevantFields = game?.input_fields?.filter(field =>
+      !field.subcategory_id || field.subcategory_id === activeSubcategory
+    ) || []
+
+    const missingRequiredFields = relevantFields.filter(field =>
+      field.required && (!inputValues[field.name] || inputValues[field.name].trim() === '')
+    )
+
+    return missingRequiredFields.length > 0
   }
 
   const getImageUrl = (url?: string) => {
@@ -480,10 +518,14 @@ const handleBuySelected = () => {
                     {field.required && <span className="text-red-500 ml-1">*</span>}
                   </label>
 
-                  {field.type === 'select' && field.options ? (
-                    <select className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500">
+                  {field.type === 'select' ? (
+                    <select
+                      className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                      value={inputValues[field.name] || ''}
+                      onChange={(e) => handleInputChange(field.name, e.target.value)}
+                    >
                       <option value="">Выберите...</option>
-                      {field.options.map((option, i) => (
+                      {field.options?.map((option, i) => (
                         <option key={i} value={option}>{option}</option>
                       ))}
                     </select>
@@ -492,12 +534,16 @@ const handleBuySelected = () => {
                       className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
                       rows={3}
                       placeholder={field.placeholder}
+                      value={inputValues[field.name] || ''}
+                      onChange={(e) => handleInputChange(field.name, e.target.value)}
                     />
                   ) : (
                     <input
                       type={field.type}
                       className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
                       placeholder={field.placeholder}
+                      value={inputValues[field.name] || ''}
+                      onChange={(e) => handleInputChange(field.name, e.target.value)}
                     />
                   )}
 
@@ -517,10 +563,15 @@ const handleBuySelected = () => {
           <div className="max-w-4xl mx-auto">
             <button
               onClick={handleBuySelected}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-semibold text-lg transition-colors flex items-center justify-center gap-2"
+              disabled={isSubmitDisabled()}
+              className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${
+                isSubmitDisabled()
+                  ? 'bg-zinc-400 dark:bg-zinc-600 text-zinc-200 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
             >
               <ShoppingCart className="w-5 h-5" />
-              Купить за {totalPrice} ₽
+              {isSubmitDisabled() ? 'Заполните обязательные поля' : `Купить за ${totalPrice} ₽`}
             </button>
             <p className="text-center text-xs text-zinc-500 mt-2">
               Выбрано товаров: {selectedProducts.size}

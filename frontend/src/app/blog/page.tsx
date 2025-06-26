@@ -56,6 +56,7 @@ export default function BlogPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
 
   // Загружаем категории и теги
   useEffect(() => {
@@ -158,19 +159,135 @@ export default function BlogPage() {
 
   const hasActiveFilters = selectedCategories.length > 0 || selectedTags.length > 0 || search.length > 0
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-4">Блог DonateRaid</h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          Новости, гайды и полезная информация о мире игр
-        </p>
+
+return (
+  <div className="max-w-7xl mx-auto px-4 py-8">
+    {/* Header */}
+    <div className="text-center mb-8">
+      <h1 className="text-3xl font-bold mb-4">Блог DonateRaid</h1>
+      <p className="text-zinc-600 dark:text-zinc-400">
+        Новости, гайды и полезная информация о мире игр
+      </p>
+    </div>
+
+    {/* Mobile Filters - Compact */}
+    <div className="lg:hidden mb-6 space-y-4">
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
+        <input
+          type="text"
+          placeholder="Поиск статей..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-full pl-10 pr-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
 
-      <div className="flex gap-8">
-        {/* Sidebar */}
-        <aside className="w-80 space-y-6">
+      {/* Quick Categories */}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {allCategories.slice(0, 6).map(category => (
+          <button
+            key={category.id}
+            onClick={() => toggleCategory(category.name)}
+            className={`px-3 py-1.5 text-sm rounded-full whitespace-nowrap border transition ${
+              selectedCategories.includes(category.name)
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-300 dark:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-700'
+            }`}
+          >
+            {category.name} ({category.article_count})
+          </button>
+        ))}
+        <button
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+          className="px-3 py-1.5 text-sm rounded-full whitespace-nowrap bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition"
+        >
+          <Filter size={14} className="inline mr-1" />
+          Фильтры
+        </button>
+      </div>
+
+      {/* Active Filters on Mobile */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap gap-1">
+          {selectedCategories.map(cat => (
+            <span
+              key={cat}
+              className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs rounded-full"
+            >
+              {cat}
+              <button onClick={() => toggleCategory(cat)} className="hover:bg-blue-200 dark:hover:bg-blue-700 rounded-full p-0.5">
+                <X size={10} />
+              </button>
+            </span>
+          ))}
+          {selectedTags.map(tag => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200 text-xs rounded-full"
+            >
+              #{tag}
+              <button onClick={() => toggleTag(tag)} className="hover:bg-green-200 dark:hover:bg-green-700 rounded-full p-0.5">
+                <X size={10} />
+              </button>
+            </span>
+          ))}
+          <button onClick={clearAllFilters} className="text-red-600 hover:text-red-700 text-xs">
+            Очистить все
+          </button>
+        </div>
+      )}
+
+      {/* Expanded Mobile Filters */}
+      {showMobileFilters && (
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 space-y-4">
+          {/* All Categories */}
+          <div>
+            <h4 className="font-medium mb-2">Все категории</h4>
+            <div className="grid grid-cols-2 gap-2">
+              {allCategories.map(category => (
+                <label key={category.id} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(category.name)}
+                    onChange={() => toggleCategory(category.name)}
+                    className="rounded border-zinc-300 dark:border-zinc-600 text-blue-600"
+                  />
+                  <span className="text-sm">{category.name} ({category.article_count})</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Popular Tags */}
+          {allTags.length > 0 && (
+            <div>
+              <h4 className="font-medium mb-2">Популярные теги</h4>
+              <div className="flex flex-wrap gap-1">
+                {allTags.slice(0, 10).map(tag => (
+                  <button
+                    key={tag.id}
+                    onClick={() => toggleTag(tag.name)}
+                    className={`px-2 py-1 text-xs rounded-full border transition ${
+                      selectedTags.includes(tag.name)
+                        ? 'bg-green-600 text-white border-green-600'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-300 dark:border-zinc-600'
+                    }`}
+                  >
+                    #{tag.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+
+    <div className="flex gap-8">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:block w-80 space-y-6">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
@@ -286,7 +403,7 @@ export default function BlogPage() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1">
+        <main className="flex-1 order-1 lg:order-2">
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
