@@ -1,100 +1,104 @@
 // frontend/src/app/admin/games/[id]/edit/page.tsx
-
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { api } from '@/lib/api'
+import { useGameData } from './hooks/useGameData'
+import { GameBasicInfo } from './components/GameBasicInfo'
+import { GameImages } from './components/GameImages'
+import { GameSubcategories } from './components/GameSubcategories'
+import { GameInputFields } from './components/GameInputFields'
+import { GameContent } from './components/GameContent'
 
 export default function EditGamePage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
 
-  const [loading, setLoading] = useState(true)
-  const [name, setName] = useState('')
-  const [bannerUrl, setBannerUrl] = useState('')
-  const [instructions, setInstructions] = useState('')
-  const [autoSupport, setAutoSupport] = useState(true)
-  const [sortOrder, setSortOrder] = useState(0)
+  const {
+    loading,
+    saving,
+    gameData,
+    updateGameData,
+    saveGame
+  } = useGameData(id)
 
-  useEffect(() => {
-    if (!id) return
-    api.get(`/admin/games/${id}`)
-      .then(res => {
-        const g = res.data
-        setName(g.name)
-        setBannerUrl(g.banner_url || '')
-        setInstructions(g.instructions || '')
-        setAutoSupport(g.auto_support)
-        setSortOrder(g.sort_order)
-      })
-      .catch(err => console.error('Ошибка загрузки игры', err))
-      .finally(() => setLoading(false))
-  }, [id])
-
-  const handleUpdate = async () => {
-    try {
-      await api.put(`/admin/games/${id}`, {
-        name,
-        banner_url: bannerUrl,
-        instructions,
-        auto_support: autoSupport,
-        sort_order: sortOrder,
-      })
+  const handleSave = async () => {
+    const success = await saveGame()
+    if (success) {
       router.push('/admin/games')
-    } catch (err) {
-      console.error('Ошибка при обновлении игры', err)
     }
   }
 
-  if (loading) return <div className="p-6 text-center">Загрузка...</div>
+  if (loading) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto">
+        <div className="flex items-center justify-center min-h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-zinc-600 dark:text-zinc-400">Загрузка данных игры...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="max-w-2xl mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-6">Редактирование игры</h1>
-
-      <input
-        type="text"
-        placeholder="Название игры"
-        className="w-full mb-3 p-2 bg-zinc-800 text-white rounded"
-        value={name}
-        onChange={e => setName(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Ссылка на баннер"
-        className="w-full mb-3 p-2 bg-zinc-800 text-white rounded"
-        value={bannerUrl}
-        onChange={e => setBannerUrl(e.target.value)}
-      />
-      <textarea
-        placeholder="Инструкция (если ручная поддержка)"
-        className="w-full mb-3 p-2 bg-zinc-800 text-white rounded"
-        value={instructions}
-        onChange={e => setInstructions(e.target.value)}
-      />
-      <div className="flex items-center gap-2 mb-3">
-        <input
-          type="checkbox"
-          checked={autoSupport}
-          onChange={e => setAutoSupport(e.target.checked)}
-        />
-        <label>Поддержка автоматическая</label>
+    <div className="p-6 max-w-4xl mx-auto">
+      <div className="flex items-center gap-4 mb-6">
+        <h1 className="text-2xl font-bold">Редактирование игры</h1>
+        <span className="text-zinc-500 dark:text-zinc-400">ID: {id}</span>
       </div>
-      <input
-        type="number"
-        placeholder="Порядок сортировки"
-        className="w-full mb-6 p-2 bg-zinc-800 text-white rounded"
-        value={sortOrder}
-        onChange={e => setSortOrder(parseInt(e.target.value))}
-      />
 
-      <button
-        onClick={handleUpdate}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-      >
-        Сохранить изменения
-      </button>
+      <div className="space-y-6">
+        <GameBasicInfo
+          data={gameData}
+          onChange={updateGameData}
+        />
+
+        <GameImages
+          data={gameData}
+          onChange={updateGameData}
+        />
+
+        <GameSubcategories
+          data={gameData}
+          onChange={updateGameData}
+        />
+
+        <GameInputFields
+          data={gameData}
+          onChange={updateGameData}
+        />
+
+        <GameContent
+          data={gameData}
+          onChange={updateGameData}
+        />
+
+        {/* Кнопки действий */}
+        <div className="flex gap-4 pt-4">
+          <button
+            onClick={() => router.back()}
+            disabled={saving}
+            className="px-6 py-3 bg-zinc-500 hover:bg-zinc-600 text-white rounded-lg transition-colors disabled:opacity-50"
+          >
+            Отмена
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving || !gameData.name.trim()}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            {saving ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Сохранение...
+              </>
+            ) : (
+              'Сохранить изменения'
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

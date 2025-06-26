@@ -22931,3 +22931,92 @@ fastapi.exceptions.ResponseValidationError: 1 validation errors:
 2025-06-26 at 17:40:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
 2025-06-26 at 17:40:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/products
 2025-06-26 at 17:40:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
+2025-06-26 at 18:58:06 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/products
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/products
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/products
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
+2025-06-26 at 18:58:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/products
+2025-06-26 at 18:58:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products
+2025-06-26 at 19:25:39 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 19:25:40 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 19:25:40 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 19:25:40 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 19:25:40 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 19:25:40 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 19:25:40 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-26 at 19:25:40 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/ed593425c146414dae4cf3c038f073c9.png
+2025-06-26 at 19:25:40 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-26 at 19:25:40 | INFO | main:49 - 📤 304 http://localhost:8001/uploads/admin/ed593425c146414dae4cf3c038f073c9.png
+2025-06-26 at 19:25:40 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-26 at 19:25:51 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 19:25:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 19:39:37 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-26 at 19:39:37 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-26 at 19:39:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 19:39:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 19:39:37 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-26 at 19:39:37 | INFO | games:19 - 🎮 Admin games list called
+2025-06-26 at 19:39:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 19:39:37 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-26 at 19:39:37 | INFO | games:19 - 🎮 Admin games list called
+2025-06-26 at 19:39:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 21:11:32 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-26 at 21:13:36 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 21:13:36 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 21:13:36 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 21:13:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 21:13:36 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-26 at 21:13:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 21:13:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 21:13:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 21:13:36 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 21:13:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 21:13:37 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 21:13:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 21:13:37 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 21:13:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 21:13:37 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-26 at 21:13:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-26 at 21:13:41 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-26 at 21:13:41 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-26 at 21:13:41 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 21:13:41 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 21:13:41 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-26 at 21:13:41 | INFO | games:19 - 🎮 Admin games list called
+2025-06-26 at 21:13:41 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-26 at 21:13:41 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-26 at 21:13:41 | INFO | games:19 - 🎮 Admin games list called
+2025-06-26 at 21:13:41 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
