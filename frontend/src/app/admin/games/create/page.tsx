@@ -104,7 +104,7 @@ export default function CreateGamePage() {
     try {
       console.log('🎮 Начинаем создание игры...')
 
-      // Сначала создаем игру
+      // Сначала создаем игру БЕЗ полей ввода (они будут созданы после подкатегорий)
       const gameData = {
         name: name.trim(),
         description: description.trim() || null,
@@ -116,7 +116,7 @@ export default function CreateGamePage() {
         auto_support: autoSupport,
         enabled,
         sort_order: sortOrder,
-        input_fields: inputFields  // ДОБАВЛЕНО: отправляем поля ввода
+        input_fields: []  // ИЗМЕНЕНО: создаем поля ввода отдельно после подкатегорий
       }
 
       console.log('📤 Отправляем данные игры:', gameData)
@@ -140,7 +140,8 @@ export default function CreateGamePage() {
       const gameId = createdGame.id
       console.log('✅ Игра создана с ID:', gameId)
 
-      // Затем создаем подкатегории
+      // Создаем подкатегории и сохраняем mapping индексов к ID
+      const subcategoryIdMapping: { [index: number]: number } = {}
       console.log('🏷️ Начинаем создание подкатегорий...')
       let createdSubcategories = 0
       let errorCount = 0
@@ -171,6 +172,7 @@ export default function CreateGamePage() {
             if (subcategoryResponse.ok) {
               const createdSubcategory = await subcategoryResponse.json()
               console.log('✅ Подкатегория создана:', createdSubcategory)
+              subcategoryIdMapping[i] = createdSubcategory.id  // ДОБАВЛЕНО: сохраняем mapping
               createdSubcategories++
             } else {
               const errorData = await subcategoryResponse.json()
@@ -184,12 +186,52 @@ export default function CreateGamePage() {
         }
       }
 
+      // ДОБАВЛЕНО: Создаем поля ввода с правильными subcategory_id
+      if (inputFields.length > 0) {
+        console.log('📝 Начинаем создание полей ввода...')
+
+        // Маппим поля ввода на правильные subcategory_id
+        const mappedInputFields = inputFields.map(field => {
+          const mappedField = { ...field }
+
+          // Если поле привязано к подкатегории, заменяем индекс на реальный ID
+          if (field.subcategory_id !== null && field.subcategory_id !== undefined) {
+            mappedField.subcategory_id = subcategoryIdMapping[field.subcategory_id] || null
+          }
+
+          return mappedField
+        })
+
+        // Отправляем поля ввода на сервер (если у вас есть отдельный API для этого)
+        // Или обновляем игру с полями ввода
+        try {
+          const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/games/${gameId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              input_fields: mappedInputFields
+            })
+          })
+
+          if (updateResponse.ok) {
+            console.log('✅ Поля ввода созданы')
+          } else {
+            console.error('❌ Ошибка создания полей ввода')
+          }
+        } catch (error) {
+          console.error('❌ Ошибка при создании полей ввода:', error)
+        }
+      }
+
       console.log(`📊 Итоги: игра создана, подкатегорий ${createdSubcategories}, ошибок ${errorCount}`)
 
       if (errorCount > 0) {
         alert(`⚠️ Игра создана, но при создании подкатегорий произошли ошибки.\nСоздано: ${createdSubcategories}\nОшибок: ${errorCount}`)
       } else {
-        alert(`✅ Игра и ${createdSubcategories} подкатегорий успешно созданы!`)
+        alert(`✅ Игра, ${createdSubcategories} подкатегорий и ${inputFields.length} полей ввода успешно созданы!`)
       }
 
       router.push('/admin/games')
@@ -360,6 +402,87 @@ export default function CreateGamePage() {
           </div>
         </div>
 
+        {/* Подкатегории */}
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Подкатегории игры</h2>
+            <button
+              type="button"
+              onClick={addSubcategory}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Добавить подкатегорию
+            </button>
+          </div>
+
+          {subcategories.length === 0 && (
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">
+              Подкатегории позволяют разделить товары по регионам или типам (например: Россия, Глобал, Индонезия для Mobile Legends).
+              Если подкатегории не нужны, можно оставить пустым.
+            </p>
+          )}
+
+          {subcategories.map((subcategory, index) => (
+            <div key={index} className="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4 mb-4">
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="font-medium">Подкатегория #{index + 1}</h4>
+                <button
+                  onClick={() => removeSubcategory(index)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Название подкатегории *</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                    value={subcategory.name}
+                    onChange={e => updateSubcategory(index, 'name', e.target.value)}
+                    placeholder="Россия"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Порядок сортировки</label>
+                  <input
+                    type="number"
+                    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                    value={subcategory.sort_order}
+                    onChange={e => updateSubcategory(index, 'sort_order', Number(e.target.value))}
+                  />
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">Описание</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+                  value={subcategory.description}
+                  onChange={e => updateSubcategory(index, 'description', e.target.value)}
+                  placeholder="Товары для российского сервера"
+                />
+              </div>
+
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={subcategory.enabled}
+                    onChange={e => updateSubcategory(index, 'enabled', e.target.checked)}
+                    className="rounded"
+                  />
+                  <span className="text-sm">Включена</span>
+                </label>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Поля для ввода пользователем */}
 <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
   <div className="flex justify-between items-center mb-4">
@@ -424,9 +547,9 @@ export default function CreateGamePage() {
           >
             <option value="">Для всех подкатегорий</option>
             {subcategories.map((sub, subIndex) => (
-              <option key={subIndex} value={subIndex + 1}>
-                {sub.name || `Подкатегория ${subIndex + 1}`}
-              </option>
+              <option key={subIndex} value={subIndex}>
+              {sub.name || `Подкатегория ${subIndex + 1}`}
+            </option>
             ))}
           </select>
           <p className="text-xs text-zinc-500 mt-1">

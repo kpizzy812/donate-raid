@@ -1,6 +1,5 @@
 // frontend/src/components/Footer.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ С ПРАВОВЫМИ ДОКУМЕНТАМИ
 import Link from 'next/link'
-import { Send, Globe, PlayCircle, Music } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -53,19 +52,19 @@ export default function Footer() {
               href="https://t.me/DonateRaid"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-blue-500 transition p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg"
+              className="hover:opacity-80 transition-opacity"
               aria-label="Telegram"
             >
-              <Send className="w-5 h-5" />
+              <img src="/tg.png" alt="Telegram" className="w-8 h-8 rounded-lg" />
             </a>
             <a
-              href="https://vk.com/donateraid"
+              href="https://vk.com/vikingsgroup"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-blue-500 transition p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg"
+              className="hover:opacity-80 transition-opacity"
               aria-label="VKontakte"
             >
-              <Globe className="w-5 h-5" />
+              <img src="/vk.png" alt="VKontakte" className="w-8 h-8 rounded-lg" />
             </a>
           </div>
 
