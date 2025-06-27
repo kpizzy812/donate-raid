@@ -1,4 +1,4 @@
-# backend/app/routers/admin/articles.py - ОБНОВЛЕННАЯ АДМИНКА С НОВОЙ СИСТЕМОЙ
+# backend/app/routers/admin/articles.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from app.core.database import get_db
@@ -17,12 +17,20 @@ def list_articles(db: Session = Depends(get_db), admin: User = Depends(admin_req
     return db.query(Article).options(joinedload(Article.tags)).order_by(Article.created_at.desc()).all()
 
 
+@router.get("/{article_id}", response_model=ArticleRead)
+def get_article(article_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
+    article = db.query(Article).options(joinedload(Article.tags)).filter(Article.id == article_id).first()
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+    return article
+
+
 @router.post("", response_model=ArticleRead)
 def create_article(article: ArticleCreate, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     from app.services.file_upload import FileUploadService
 
-    # Конвертируем данные для модели
-    article_data = article.dict()
+    # ИСПРАВЛЕНО: используем model_dump() вместо dict()
+    article_data = article.model_dump()
 
     print(f"Получены данные статьи: {article_data}")  # Отладка
 
@@ -73,14 +81,14 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db), admin:
     db.commit()
     db.refresh(new_article)
 
-    # НОВОЕ: Обрабатываем категории как специальные теги
+    # Обрабатываем категории как специальные теги
     if article_data.get("categories"):
         for category_name in article_data["categories"]:
             if not category_name.strip():
                 continue
             new_article.add_category(category_name.strip(), db)
 
-    # НОВОЕ: Обрабатываем обычные теги
+    # Обрабатываем обычные теги
     if article_data.get("tags"):
         for tag_name in article_data["tags"]:
             if not tag_name.strip():
@@ -104,7 +112,8 @@ def update_article(article_id: int, article: ArticleUpdate, db: Session = Depend
     if not db_article:
         raise HTTPException(status_code=404, detail="Article not found")
 
-    article_data = article.dict(exclude_unset=True)
+    # ИСПРАВЛЕНО: используем model_dump() вместо dict()
+    article_data = article.model_dump(exclude_unset=True)
 
     # Обрабатываем base64 изображение (если есть)
     if article_data.get('featured_image') and article_data['featured_image'].startswith('data:image/'):
@@ -118,7 +127,7 @@ def update_article(article_id: int, article: ArticleUpdate, db: Session = Depend
         except Exception as e:
             print(f"Ошибка сохранения изображения: {e}")
 
-    # НОВОЕ: Обрабатываем обновление категорий и тегов
+    # Обрабатываем обновление категорий и тегов
     if "categories" in article_data or "tags" in article_data:
         # Удаляем все старые теги
         db_article.tags.clear()
@@ -172,15 +181,7 @@ def delete_article(article_id: int, db: Session = Depends(get_db), admin: User =
     return {"detail": "Article deleted"}
 
 
-@router.get("/{article_id}", response_model=ArticleRead)
-def get_article(article_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
-    article = db.query(Article).options(joinedload(Article.tags)).filter(Article.id == article_id).first()
-    if not article:
-        raise HTTPException(status_code=404, detail="Article not found")
-    return article
-
-
-# НОВЫЕ ЭНДПОИНТЫ ДЛЯ УПРАВЛЕНИЯ КАТЕГОРИЯМИ И ТЕГАМИ
+# ЭНДПОИНТЫ ДЛЯ УПРАВЛЕНИЯ КАТЕГОРИЯМИ И ТЕГАМИ
 
 @router.get("/categories/available")
 def get_available_categories(db: Session = Depends(get_db), admin: User = Depends(admin_required)):

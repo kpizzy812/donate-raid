@@ -9,14 +9,25 @@ from app.services.auth import admin_required
 
 router = APIRouter()
 
+
 @router.get("", response_model=list[ProductRead])
 def list_products(db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     return db.query(Product).order_by(Product.sort_order.asc()).all()
 
 
+# ДОБАВЛЕНО: недостающий endpoint для получения одного товара
+@router.get("/{product_id}", response_model=ProductRead)
+def get_product(product_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
+    db_product = db.query(Product).filter(Product.id == product_id).first()
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return db_product
+
+
 @router.post("", response_model=ProductRead)
 def create_product(product: ProductCreate, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
-    new_product = Product(**product.dict())
+    # ИСПРАВЛЕНО: используем model_dump() вместо dict() для Pydantic v2
+    new_product = Product(**product.model_dump())
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
@@ -24,12 +35,16 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db), admin:
 
 
 @router.put("/{product_id}", response_model=ProductRead)
-def update_product(product_id: int, product: ProductUpdate, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
+def update_product(product_id: int, product: ProductUpdate, db: Session = Depends(get_db),
+                   admin: User = Depends(admin_required)):
     db_product = db.query(Product).filter(Product.id == product_id).first()
     if not db_product:
         raise HTTPException(status_code=404, detail="Product not found")
-    for field, value in product.dict(exclude_unset=True).items():
+
+    # ИСПРАВЛЕНО: используем model_dump() вместо dict() для Pydantic v2
+    for field, value in product.model_dump(exclude_unset=True).items():
         setattr(db_product, field, value)
+
     db.commit()
     db.refresh(db_product)
     return db_product

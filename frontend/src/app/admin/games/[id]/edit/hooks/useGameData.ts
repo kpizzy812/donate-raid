@@ -73,6 +73,24 @@ export function useGameData(id: string | undefined) {
       console.log('🏷️ Подкатегории в ответе:', data.subcategories)
       console.log('📝 Поля ввода в ответе:', data.input_fields)
 
+      // Загружаем подкатегории отдельно, так как API игры их не включает
+      console.log('🏷️ Загружаем подкатегории отдельным запросом...')
+      let subcategories = []
+      try {
+        const token = localStorage.getItem('access_token')
+        const subcategoriesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/subcategories/game/${id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (subcategoriesResponse.ok) {
+          subcategories = await subcategoriesResponse.json()
+          console.log('🏷️ Подкатегории загружены отдельно:', subcategories)
+        } else {
+          console.log('🏷️ Подкатегории не найдены или ошибка загрузки')
+        }
+      } catch (subcatError) {
+        console.error('❌ Ошибка загрузки подкатегорий:', subcatError)
+      }
+
       setGameData({
         name: data.name || '',
         description: data.description || '',
@@ -84,7 +102,7 @@ export function useGameData(id: string | undefined) {
         sortOrder: data.sort_order || 0,
         bannerUrl: data.banner_url || '',
         logoUrl: data.logo_url || '',
-        subcategories: data.subcategories?.map((sub: any) => {
+        subcategories: subcategories.map((sub: any) => {
           console.log('🏷️ Маппинг подкатегории:', sub)
           return {
             id: sub.id,
@@ -93,7 +111,7 @@ export function useGameData(id: string | undefined) {
             sort_order: sub.sort_order,
             enabled: sub.enabled
           }
-        }) || [],
+        }),
         inputFields: data.input_fields?.map((field: any) => {
           console.log('📝 Маппинг поля ввода:', field)
           return {
@@ -113,7 +131,7 @@ export function useGameData(id: string | undefined) {
         }) || []
       })
 
-      console.log('🎮 Загружено подкатегорий:', data.subcategories?.length || 0)
+      console.log('🎮 Загружено подкатегорий:', subcategories.length)
       console.log('🎮 Загружено полей ввода:', data.input_fields?.length || 0)
 
     } catch (error: any) {
