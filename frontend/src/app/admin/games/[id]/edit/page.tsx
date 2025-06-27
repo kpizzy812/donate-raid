@@ -70,11 +70,17 @@ export default function EditGamePage() {
         <GameSubcategories
           data={gameData}
           onChange={updateGameData}
+          addSubcategory={addSubcategory}
+          removeSubcategory={removeSubcategory}
+          updateSubcategory={updateSubcategory}
         />
 
         <GameInputFields
           data={gameData}
           onChange={updateGameData}
+          addInputField={addInputField}
+          removeInputField={removeInputField}
+          updateInputField={updateInputField}
         />
 
         <GameContent

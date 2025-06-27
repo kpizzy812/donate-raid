@@ -172,7 +172,7 @@ export function GameInputFields({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                 <div>
                   <label className="block text-sm font-medium mb-1 text-zinc-700 dark:text-zinc-300">
-                    Мин. длина
+                    Мин. символов
                   </label>
                   <input
                     type="number"
@@ -180,11 +180,14 @@ export function GameInputFields({
                     value={field.min_length || ''}
                     onChange={e => updateInputField(index, 'min_length', e.target.value ? Number(e.target.value) : undefined)}
                     min="0"
+                    placeholder="0"
+                    title="Минимальное количество символов, которое должен ввести пользователь"
                   />
+                  <p className="text-xs text-zinc-500 mt-1">Сколько минимум символов должен ввести пользователь</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1 text-zinc-700 dark:text-zinc-300">
-                    Макс. длина
+                    Макс. символов
                   </label>
                   <input
                     type="number"
@@ -192,19 +195,28 @@ export function GameInputFields({
                     value={field.max_length || ''}
                     onChange={e => updateInputField(index, 'max_length', e.target.value ? Number(e.target.value) : undefined)}
                     min="1"
+                    placeholder="100"
+                    title="Максимальное количество символов, которое может ввести пользователь"
                   />
+                  <p className="text-xs text-zinc-500 mt-1">Сколько максимум символов может ввести пользователь</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1 text-zinc-700 dark:text-zinc-300">
-                    Regex валидация
+                    Тип проверки
                   </label>
-                  <input
-                    type="text"
+                  <select
                     className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={field.validation_regex || ''}
                     onChange={e => updateInputField(index, 'validation_regex', e.target.value)}
-                    placeholder="^[0-9]+$"
-                  />
+                  >
+                    <option value="">Без проверки</option>
+                    <option value="^[0-9]+$">Только цифры</option>
+                    <option value="^[a-zA-Z0-9]+$">Цифры и латинские буквы</option>
+                    <option value="^[a-zA-Z0-9._-]+$">Цифры, буквы, точки, тире</option>
+                    <option value="^[a-zA-Z0-9@._-]+$">Email формат</option>
+                    <option value="^[0-9]{9,12}$">ID игрока (9-12 цифр)</option>
+                  </select>
+                  <p className="text-xs text-zinc-500 mt-1">Какие символы может вводить пользователь</p>
                 </div>
               </div>
 

@@ -23266,3 +23266,157 @@ fastapi.exceptions.ResponseValidationError: 1 validation errors:
 2025-06-27 at 11:40:28 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
 2025-06-27 at 11:40:28 | INFO | games:37 - 🎮 Возвращаем 1 игр
 2025-06-27 at 11:40:28 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 11:48:21 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-27 at 11:48:21 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-27 at 11:48:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 11:48:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 11:48:21 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 11:48:21 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 11:48:21 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 11:48:21 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 11:48:21 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 11:48:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 11:48:21 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 11:48:21 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 11:48:21 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 11:48:21 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 11:48:21 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 11:48:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 11:48:21 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/7b58709a962145a3bb5781dd2192478e.png
+2025-06-27 at 11:48:21 | INFO | main:49 - 📤 200 http://localhost:8001/uploads/admin/7b58709a962145a3bb5781dd2192478e.png
+2025-06-27 at 11:48:34 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:48:34 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:48:36 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-27 at 11:48:36 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-27 at 11:48:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-27 at 11:48:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-27 at 11:48:36 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-27 at 11:48:36 | INFO | games:19 - 🎮 Admin games list called
+2025-06-27 at 11:48:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-27 at 11:48:36 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-27 at 11:48:36 | INFO | games:19 - 🎮 Admin games list called
+2025-06-27 at 11:48:36 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-27 at 11:48:37 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:48:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:48:37 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:48:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:48:37 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:48:37 | INFO | games:155 - 🎮 Getting game 14
+2025-06-27 at 11:48:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:48:37 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:48:37 | INFO | games:155 - 🎮 Getting game 14
+2025-06-27 at 11:48:37 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:52:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:52:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:52:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:52:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:52:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:52:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:52:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:52:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:52:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:52:56 | INFO | games:155 - 🎮 Getting game 14
+2025-06-27 at 11:52:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:52:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:52:56 | INFO | games:155 - 🎮 Getting game 14
+2025-06-27 at 11:52:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:53:07 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 11:53:07 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 11:53:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 11:53:07 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 11:53:07 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 11:53:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 11:53:07 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 11:53:07 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 11:53:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 11:53:08 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 11:53:08 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 11:53:08 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 11:53:08 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 11:53:08 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 11:53:08 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 11:53:08 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 11:53:08 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 11:53:08 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 11:53:08 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 11:53:08 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 11:53:08 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 11:53:16 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:53:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:53:16 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:53:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:53:16 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:53:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:53:16 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 11:53:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 11:53:18 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-27 at 11:53:18 | INFO | games:19 - 🎮 Admin games list called
+2025-06-27 at 11:53:18 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-27 at 11:53:18 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-27 at 11:53:18 | INFO | games:19 - 🎮 Admin games list called
+2025-06-27 at 11:53:18 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-27 at 11:53:20 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:53:20 | INFO | games:155 - 🎮 Getting game 14
+2025-06-27 at 11:53:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:53:20 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:53:20 | INFO | games:155 - 🎮 Getting game 14
+2025-06-27 at 11:53:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:54:16 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/subcategories/game/14
+2025-06-27 at 11:54:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/subcategories/game/14
+2025-06-27 at 11:54:16 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/subcategories/game/14
+2025-06-27 at 11:54:16 | INFO | subcategories:23 - 🏷️ Получаем подкатегории для игры 14
+2025-06-27 at 11:54:16 | INFO | subcategories:33 - 🏷️ Найдено 1 подкатегорий
+2025-06-27 at 11:54:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/subcategories/game/14
+2025-06-27 at 11:54:16 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/subcategories/1
+2025-06-27 at 11:54:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/subcategories/1
+2025-06-27 at 11:54:16 | INFO | main:43 - 📥 DELETE http://localhost:8001/api/admin/subcategories/1
+2025-06-27 at 11:54:16 | INFO | subcategories:121 - 🏷️ Удаляем подкатегорию 1
+2025-06-27 at 11:54:16 | INFO | main:49 - 📤 400 http://localhost:8001/api/admin/subcategories/1
+2025-06-27 at 11:54:16 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:54:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:54:16 | INFO | main:43 - 📥 PUT http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:54:16 | INFO | games:84 - 🎮 Updating game 14 by admin 2
+2025-06-27 at 11:54:16 | INFO | games:101 - 🎮 Updating input fields for game 14
+2025-06-27 at 11:54:16 | INFO | games:136 - 🎮 Game 14 updated successfully
+2025-06-27 at 11:54:16 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-27 at 11:54:17 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-27 at 11:54:17 | INFO | games:19 - 🎮 Admin games list called
+2025-06-27 at 11:54:17 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-27 at 11:54:17 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-27 at 11:54:17 | INFO | games:19 - 🎮 Admin games list called
+2025-06-27 at 11:54:17 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-27 at 11:54:19 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 11:54:19 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 11:54:19 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 11:54:19 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 11:54:19 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 11:54:19 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 11:54:19 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 11:54:19 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 11:54:19 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 11:54:20 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 11:54:20 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 11:54:20 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 11:54:20 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 11:54:20 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 11:54:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 11:54:20 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 11:54:20 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 11:54:20 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 11:54:20 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 11:54:20 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 11:54:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
