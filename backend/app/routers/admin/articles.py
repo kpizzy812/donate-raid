@@ -1,4 +1,4 @@
-# backend/app/routers/admin/articles.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/routers/admin/articles.py - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from app.core.database import get_db
@@ -17,6 +17,7 @@ def list_articles(db: Session = Depends(get_db), admin: User = Depends(admin_req
     return db.query(Article).options(joinedload(Article.tags)).order_by(Article.created_at.desc()).all()
 
 
+# ВАЖНО: GET /{article_id} должен быть ДО маршрутов типа /categories/available
 @router.get("/{article_id}", response_model=ArticleRead)
 def get_article(article_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     article = db.query(Article).options(joinedload(Article.tags)).filter(Article.id == article_id).first()
@@ -182,6 +183,7 @@ def delete_article(article_id: int, db: Session = Depends(get_db), admin: User =
 
 
 # ЭНДПОИНТЫ ДЛЯ УПРАВЛЕНИЯ КАТЕГОРИЯМИ И ТЕГАМИ
+# ВАЖНО: эти маршруты должны быть ПОСЛЕ /{article_id}
 
 @router.get("/categories/available")
 def get_available_categories(db: Session = Depends(get_db), admin: User = Depends(admin_required)):
