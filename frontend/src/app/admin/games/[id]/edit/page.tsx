@@ -18,7 +18,15 @@ export default function EditGamePage() {
     saving,
     gameData,
     updateGameData,
-    saveGame
+    saveGame,
+    // Функции управления подкатегориями
+    addSubcategory,
+    removeSubcategory,
+    updateSubcategory,
+    // Функции управления полями ввода
+    addInputField,
+    removeInputField,
+    updateInputField
   } = useGameData(id)
 
   const handleSave = async () => {

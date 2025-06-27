@@ -289,11 +289,79 @@ export function useGameData(id: string | undefined) {
     }
   }
 
+  // ======== НОВЫЕ ФУНКЦИИ УПРАВЛЕНИЯ ИНТЕРФЕЙСОМ ========
+
+  // Функции управления подкатегориями
+  const addSubcategory = () => {
+    setGameData(prev => ({
+      ...prev,
+      subcategories: [...prev.subcategories, {
+        name: '',
+        description: '',
+        sort_order: prev.subcategories.length,
+        enabled: true
+      }]
+    }))
+  }
+
+  const removeSubcategory = (index: number) => {
+    setGameData(prev => ({
+      ...prev,
+      subcategories: prev.subcategories.filter((_, i) => i !== index)
+    }))
+  }
+
+  const updateSubcategory = (index: number, field: keyof Subcategory, value: any) => {
+    setGameData(prev => {
+      const updated = [...prev.subcategories]
+      updated[index] = { ...updated[index], [field]: value }
+      return { ...prev, subcategories: updated }
+    })
+  }
+
+  // Функции управления полями ввода
+  const addInputField = () => {
+    setGameData(prev => ({
+      ...prev,
+      inputFields: [...prev.inputFields, {
+        name: '',
+        label: '',
+        type: 'text',
+        required: true,
+        placeholder: '',
+        help_text: ''
+      }]
+    }))
+  }
+
+  const removeInputField = (index: number) => {
+    setGameData(prev => ({
+      ...prev,
+      inputFields: prev.inputFields.filter((_, i) => i !== index)
+    }))
+  }
+
+  const updateInputField = (index: number, field: keyof InputField, value: any) => {
+    setGameData(prev => {
+      const updated = [...prev.inputFields]
+      updated[index] = { ...updated[index], [field]: value }
+      return { ...prev, inputFields: updated }
+    })
+  }
+
   return {
     loading,
     saving,
     gameData,
     updateGameData,
-    saveGame
+    saveGame,
+    // Функции управления подкатегориями
+    addSubcategory,
+    removeSubcategory,
+    updateSubcategory,
+    // Функции управления полями ввода
+    addInputField,
+    removeInputField,
+    updateInputField
   }
 }
