@@ -6,6 +6,7 @@ from app.core.database import get_db
 from app.services.auth import get_current_user
 from app.models.order import Order, OrderStatus, PaymentMethod
 from app.models.user import User
+from app.models.product import Product
 from app.services.referral import ReferralService
 from app.models.referral import ReferralEarning
 from app.schemas.order import OrderCreate, OrderRead
@@ -14,6 +15,7 @@ from bot.notify import notify_manual_order_sync
 from pydantic import BaseModel
 from typing import List
 from decimal import Decimal
+from app.services.robokassa import robokassa_service
 
 router = APIRouter()
 
@@ -267,11 +269,12 @@ class OrderItem(BaseModel):
 class OrderBulkCreate(BaseModel):
     items: List[OrderItem]
 
+
 @router.post("/bulk", response_model=OrderRead)
 def create_bulk_order(
-    data: OrderBulkCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+        data: OrderBulkCreate,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
 ):
     print(f"▶▶▶ Вызван create_bulk_order для user_id={current_user.id} c items={data.items}")
     if not data.items:
@@ -287,7 +290,7 @@ def create_bulk_order(
         product_id=first_item.product_id,
         amount=total_amount,
         currency=first_item.currency,
-        payment_method=first_item.payment_method,
+        payment_method=first_item.payment_method,  # 🆕 Теперь получаем реальное значение
         comment="\n".join([f"[{i.product_id}] {i.comment or ''}" for i in data.items])
     )
 
@@ -295,8 +298,45 @@ def create_bulk_order(
     db.commit()
     db.refresh(new_order)
 
-    print(f"    → Новый bulk-заказ создан, id={new_order.id}, сумма={total_amount}")
+    print(f"    → Новый bulk-заказ создан, id={new_order.id}, сумма={total_amount}, метод={first_item.payment_method}")
 
+    # 🆕 Генерируем payment_url для RoboKassa методов
+    if first_item.payment_method in [PaymentMethod.sberbank, PaymentMethod.sbp]:
+        try:
+            # Создаем описание товара
+            product_names = []
+            for item in data.items:
+                # Пытаемся получить информацию о продукте
+                product = db.query(Product).filter(Product.id == item.product_id).first()
+                if product:
+                    product_names.append(product.name)
+                else:
+                    product_names.append(f"Товар #{item.product_id}")
+
+            description = f"Заказ #{new_order.id}: " + ", ".join(product_names[:3])
+            if len(product_names) > 3:
+                description += f" и еще {len(product_names) - 3} товар(ов)"
+
+            # Генерируем URL для оплаты
+            payment_url = robokassa_service.create_payment_url(
+                order_id=new_order.id,
+                amount=total_amount,
+                currency=first_item.currency,
+                description=description
+            )
+
+            # Сохраняем URL в заказ
+            new_order.payment_url = payment_url
+            db.commit()
+            db.refresh(new_order)
+
+            print(f"    → Сгенерирован payment_url для RoboKassa: {payment_url}")
+
+        except Exception as e:
+            print(f"    → Ошибка генерации payment_url: {e}")
+            # Не прерываем создание заказа из-за ошибки генерации URL
+
+    # Отправка email уведомления
     if current_user.email:
         html = render_template("order_created.html", {
             "order_id": new_order.id,

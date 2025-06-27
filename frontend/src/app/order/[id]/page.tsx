@@ -1,34 +1,23 @@
-// frontend/src/app/order/[id]/page.tsx - ОБНОВЛЕННАЯ ВЕРСИЯ
+// frontend/src/app/order/[id]/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { toast } from 'sonner'
-import { 
-  CreditCard, 
-  Smartphone, 
-  Bitcoin, 
-  DollarSign, 
-  Copy, 
-  ExternalLink, 
-  CheckCircle, 
-  Clock, 
+import {
+  CreditCard,
+  Smartphone,
+  Bitcoin,
+  DollarSign,
+  Copy,
+  ExternalLink,
+  CheckCircle,
+  Clock,
   XCircle,
   ArrowLeft,
   RefreshCw
 } from 'lucide-react'
-
-interface PaymentInfo {
-  order_id: number
-  amount: number
-  currency: string
-  payment_method: string
-  status: string
-  payment_url?: string
-  instructions?: string
-  auto_process: boolean
-}
 
 interface Order {
   id: number
@@ -37,6 +26,7 @@ interface Order {
   status: string
   payment_method: string
   transaction_id?: string
+  payment_url?: string
   comment?: string
   created_at: string
   game?: { id: number; name: string }
@@ -47,13 +37,11 @@ export default function OrderPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const [order, setOrder] = useState<Order | null>(null)
-  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     loadOrder()
-    loadPaymentInfo()
   }, [id])
 
   const loadOrder = async () => {
@@ -64,15 +52,6 @@ export default function OrderPage() {
       console.error('Ошибка загрузки заказа:', error)
       toast.error('Заказ не найден')
       router.push('/me')
-    }
-  }
-
-  const loadPaymentInfo = async () => {
-    try {
-      const response = await api.get(`/orders/${id}/payment-info`)
-      setPaymentInfo(response.data)
-    } catch (error) {
-      console.error('Ошибка загрузки информации об оплате:', error)
     } finally {
       setLoading(false)
     }
@@ -81,7 +60,6 @@ export default function OrderPage() {
   const refreshOrder = async () => {
     setRefreshing(true)
     await loadOrder()
-    await loadPaymentInfo()
     setRefreshing(false)
     toast.success('Информация о заказе обновлена')
   }
@@ -148,10 +126,9 @@ export default function OrderPage() {
 
   const parseUserData = (comment: string) => {
     try {
-      // Пытаемся распарсить JSON из комментария
       const lines = comment.split('\n')
       const userData: Record<string, string> = {}
-      
+
       for (const line of lines) {
         if (line.includes('[Товар') && line.includes(']')) {
           const jsonPart = line.substring(line.indexOf(']') + 1).trim()
@@ -161,7 +138,7 @@ export default function OrderPage() {
           }
         }
       }
-      
+
       return userData
     } catch {
       return {}
@@ -236,7 +213,7 @@ export default function OrderPage() {
                 <span>Выполнен</span>
               </div>
               <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
-                <div 
+                <div
                   className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                   style={{
                     width: order.status === 'pending' ? '25%' :
@@ -252,7 +229,7 @@ export default function OrderPage() {
           {/* Детали заказа */}
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6">
             <h3 className="text-lg font-semibold mb-4">Детали заказа</h3>
-            
+
             <div className="space-y-4">
               {order.game && (
                 <div className="flex justify-between">
@@ -260,7 +237,7 @@ export default function OrderPage() {
                   <span className="font-medium">{order.game.name}</span>
                 </div>
               )}
-              
+
               {order.product && (
                 <div className="flex justify-between">
                   <span className="text-zinc-600 dark:text-zinc-400">Товар:</span>
@@ -312,7 +289,7 @@ export default function OrderPage() {
         <div className="lg:col-span-1">
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 sticky top-6">
             <h3 className="text-lg font-semibold mb-4">Оплата</h3>
-            
+
             <div className="flex items-center gap-3 mb-4">
               {getPaymentMethodIcon(order.payment_method)}
               <div>
@@ -324,26 +301,32 @@ export default function OrderPage() {
             </div>
 
             {/* Информация об оплате для разных способов */}
-            {paymentInfo && (
+            {order && (
               <div className="space-y-4">
                 {/* Банковская карта / СБП - автоматическая оплата */}
                 {(order.payment_method === 'sberbank' || order.payment_method === 'sbp') && (
                   <>
-                    {order.status === 'pending' && paymentInfo.payment_url && (
+                    {order.status === 'pending' && order.payment_url && (
                       <a
-                        href={paymentInfo.payment_url}
+                        href={order.payment_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                       >
                         <ExternalLink className="w-4 h-4" />
-                        Перейти к оплате
+                        Перейти к оплате через RoboKassa
                       </a>
                     )}
-                    
-                    {paymentInfo.instructions && (
+
+                    {order.status === 'pending' && !order.payment_url && (
                       <div className="text-sm text-zinc-600 dark:text-zinc-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                        {paymentInfo.instructions}
+                        Ссылка для оплаты генерируется...
+                      </div>
+                    )}
+
+                    {order.status !== 'pending' && (
+                      <div className="text-sm text-zinc-600 dark:text-zinc-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                        ✅ Заказ оплачен и передан в обработку
                       </div>
                     )}
                   </>
@@ -357,16 +340,18 @@ export default function OrderPage() {
                         <div className="text-sm font-medium">Адрес для перевода:</div>
                         <div className="flex items-center gap-2 p-2 bg-zinc-100 dark:bg-zinc-800 rounded">
                           <code className="flex-1 text-xs font-mono">
-                            {paymentInfo.payment_url || 'АДРЕС_КОШЕЛЬКА'}
+                            {order.payment_url || 'АДРЕС_БУДЕТ_ПРЕДОСТАВЛЕН'}
                           </code>
-                          <button
-                            onClick={() => copyToClipboard(paymentInfo.payment_url || 'АДРЕС_КОШЕЛЬКА')}
-                            className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded"
-                          >
-                            <Copy className="w-4 h-4" />
-                          </button>
+                          {order.payment_url && (
+                            <button
+                              onClick={() => copyToClipboard(order.payment_url!)}
+                              className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded"
+                            >
+                              <Copy className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
-                        
+
                         <div className="text-xs text-zinc-500 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
                           <div className="font-medium mb-1">Важно:</div>
                           <ul className="space-y-1">
@@ -378,13 +363,6 @@ export default function OrderPage() {
                       </div>
                     )}
                   </>
-                )}
-
-                {/* Инструкции */}
-                {paymentInfo.instructions && (
-                  <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                    {paymentInfo.instructions}
-                  </div>
                 )}
               </div>
             )}

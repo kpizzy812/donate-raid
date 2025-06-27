@@ -91,7 +91,9 @@ class Article(Base):
 
     def add_category(self, category_name: str, db):
         """Добавить категорию к статье"""
-        tag = db.query(ArticleTag).filter_by(name=category_name, is_category=True).first()
+        # Сначала ищем тег по имени без учета is_category
+        tag = db.query(ArticleTag).filter_by(name=category_name).first()
+
         if not tag:
             # Создаем новую категорию
             tag_slug = category_name.lower().replace(" ", "-").replace("ё", "e")
@@ -101,13 +103,20 @@ class Article(Base):
             db.add(tag)
             db.commit()
             db.refresh(tag)
+        else:
+            # Если тег существует, обновляем его как категорию
+            if not tag.is_category:
+                tag.is_category = True
+                db.commit()
 
         if tag not in self.tags:
             self.tags.append(tag)
 
     def add_tag(self, tag_name: str, db):
         """Добавить обычный тег к статье"""
-        tag = db.query(ArticleTag).filter_by(name=tag_name, is_category=False).first()
+        # Сначала ищем тег по имени без учета is_category
+        tag = db.query(ArticleTag).filter_by(name=tag_name).first()
+
         if not tag:
             # Создаем новый тег
             tag_slug = tag_name.lower().replace(" ", "-").replace("ё", "e")
@@ -117,6 +126,8 @@ class Article(Base):
             db.add(tag)
             db.commit()
             db.refresh(tag)
+        # Если тег уже существует как категория, оставляем его категорией
+        # (не меняем is_category=True на False)
 
         if tag not in self.tags:
             self.tags.append(tag)

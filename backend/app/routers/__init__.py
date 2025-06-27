@@ -1,9 +1,9 @@
-# backend/app/routers/__init__.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/routers/__init__.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ROBOKASSA
 from fastapi import APIRouter
 from loguru import logger
 
 # Public routes
-from . import games, orders, users, products, auth, support, upload, payment_terms, notifications
+from . import games, orders, users, products, auth, support, upload, payment_terms, notifications, robokassa
 from .blog import article
 
 # Admin routes
@@ -13,7 +13,7 @@ from .admin import (
     orders as admin_orders,
     articles as admin_articles,
     users as admin_users,
-    subcategories as admin_subcategories,  # ДОБАВЛЕНО
+    subcategories as admin_subcategories,
 )
 
 router = APIRouter()
@@ -30,7 +30,11 @@ router.include_router(upload.router, prefix="/api/upload", tags=["Upload"])
 router.include_router(payment_terms.router, prefix="/api/payment-terms", tags=["Payment Terms"])
 router.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
 
-# Admin API - ДОБАВЛЯЕМ ЛОГИРОВАНИЕ
+# 🆕 ROBOKASSA API
+router.include_router(robokassa.router, prefix="/api/robokassa", tags=["RoboKassa"])
+logger.info("✅ RoboKassa роутер зарегистрирован: /api/robokassa")
+
+# Admin API
 logger.info("🔧 Регистрируем admin роутеры...")
 router.include_router(admin_games.router, prefix="/api/admin/games", tags=["Admin Games"])
 logger.info("✅ Admin games роутер зарегистрирован: /api/admin/games")
@@ -39,9 +43,6 @@ router.include_router(admin_products.router, prefix="/api/admin/products", tags=
 router.include_router(admin_orders.router, prefix="/api/admin/orders", tags=["Admin Orders"])
 router.include_router(admin_articles.router, prefix="/api/admin/articles", tags=["Admin Articles"])
 router.include_router(admin_users.router, prefix="/api/admin/users", tags=["Admin Users"])
-
-# ДОБАВЛЕНО: Роутер для подкатегорий
 router.include_router(admin_subcategories.router, prefix="/api/admin/subcategories", tags=["Admin Subcategories"])
-logger.info("✅ Admin subcategories роутер зарегистрирован: /api/admin/subcategories")
 
-logger.info("✅ Все admin роутеры зарегистрированы")
+logger.info("✅ Все роутеры зарегистрированы")

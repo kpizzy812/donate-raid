@@ -25180,3 +25180,1905 @@ DETAIL:  Key (name)=(ПК Игры) already exists.
 [SQL: INSERT INTO article_tags_table (name, slug, color, is_category, created_at) VALUES (%(name)s, %(slug)s, %(color)s, %(is_category)s, %(created_at)s) RETURNING article_tags_table.id]
 [parameters: {'name': 'ПК Игры', 'slug': 'пк-игры', 'color': '#3B82F6', 'is_category': False, 'created_at': datetime.datetime(2025, 6, 27, 14, 0, 53, 459164)}]
 (Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-06-27 at 14:09:13 | INFO | main:43 - 📥 PUT http://localhost:8001/api/admin/articles/6
+2025-06-27 at 14:09:13 | ERROR | main:47 - ❌ Exception during request: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "article_tags_table_name_key"
+DETAIL:  Key (name)=(ПК Игры) already exists.
+
+[SQL: INSERT INTO article_tags_table (name, slug, color, is_category, created_at) VALUES (%(name)s, %(slug)s, %(color)s, %(is_category)s, %(created_at)s) RETURNING article_tags_table.id]
+[parameters: {'name': 'ПК Игры', 'slug': 'пк-игры', 'color': '#3B82F6', 'is_category': False, 'created_at': datetime.datetime(2025, 6, 27, 14, 9, 13, 306764)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7f8a7161a7a0>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f8a7121cfd0>
+    └ <sqlalchemy.engine.base.Connection object at 0x7f8a6afd4990>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'name': 'ПК Игры', 'slug': 'пк-игры', 'color': '#3B82F6', 'is_category': False, 'created_at': datetime.datetime(2025, 6, 27,...
+    │      │       └ 'INSERT INTO article_tags_table (name, slug, color, is_category, created_at) VALUES (%(name)s, %(slug)s, %(color)s, %(is_cate...
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7f8a6afd0400; closed: -1>
+
+psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "article_tags_table_name_key"
+DETAIL:  Key (name)=(ПК Игры) already exists.
+
+
+
+The above exception was the direct cause of the following exception:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7f8a743fa200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7f8a744cb7e0>
+           └ <SpawnProcess name='SpawnProcess-7' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7f8a744cad40>
+    └ <SpawnProcess name='SpawnProcess-7' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7f8a741c89d0>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-7' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-7' parent=8 started>
+    │    └ <function subprocess_started at 0x7f8a7363ede0>
+    └ <SpawnProcess name='SpawnProcess-7' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7f8a7359a2d0>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7f8a7363dbc0>
+           │       │   └ <uvicorn.server.Server object at 0x7f8a7359a2d0>
+           │       └ <function run at 0x7f8a7393fc40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7f8a73503d30>
+           │      └ <function Runner.run at 0x7f8a739971a0>
+           └ <asyncio.runners.Runner object at 0x7f8a73599910>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7f8a731281e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7f8a73599910>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f8a6c539550>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8a6afc28...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8a6af...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7f8a73030a10>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f8a6c539550>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8a6afc28...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8a6af...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8a6afc28...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8a6af...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f8a6c652f50>
+          └ <fastapi.applications.FastAPI object at 0x7f8a73030a10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7f8a6b1bb100>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8a6af...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f8a6e1e2d50>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f8a6c652f50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f8a6b1bab60>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7f8a6afc29d0>
+                     │    └ <function log_requests at 0x7f8a6c0da480>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f8a6e1e2d50>
+
+> File "/app/app/main.py", line 45, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7f8a6afc29d0>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f8a6b1bab60>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ IntegrityError('(psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "article_tags_table_name_key...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f8a6b1baca0>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8a6b1baac0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7f8a6c686710>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f8a6e1e2d50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8001', 'connection': 'keep-alive', 'content-length': '343', 'sec-ch-ua-platform': '"macOS"', 'aut...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f8a6b1baca0>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8a6b1baac0>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7f8a6c01f4c0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f8a6c686710>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f8a6c686710>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8a6b1baac0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f8a6c714f50>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f8a6c686710>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f8a6c686710>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8a6b1baac0>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7f8a6afc2f90>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7f8a6c6f0990>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f8a6c714f50>
+          └ <function wrap_app_handling_exceptions at 0x7f8a722291c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8a6b1bb2e0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8a6b1baac0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7f8a6c6f0990>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8a6b1bb2e0>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8a6b1baac0>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7f8a6c6f0990>>
+          └ <fastapi.routing.APIRouter object at 0x7f8a6c6f0990>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8a6b1bb2e0>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8a6b1baac0>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7f8a7222a7a0>
+          └ APIRoute(path='/api/admin/articles/{article_id}', name='update_article', methods=['PUT'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8a6b1bb2e0>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8a6b1baac0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7f8a6c0db1a0>
+          └ APIRoute(path='/api/admin/articles/{article_id}', name='update_article', methods=['PUT'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8a6b1bb2e0>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8a6b1baac0>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7f8a6c6df010>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7f8a6b1bb920>
+          └ <function wrap_app_handling_exceptions at 0x7f8a722291c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8a6b1bba60>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8a6b1baac0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7f8a6b1bb920>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7f8a6c6df010>
+                     └ <function get_request_handler.<locals>.app at 0x7f8a6c0db2e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7f8a7224c5e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7f8a6afb3810>, 'admin': <app.models.user.User object at 0x7f8a6afd5390>, '...
+                 │                 │         └ <function update_article at 0x7f8a6c5c9120>
+                 │                 └ Dependant(path_params=[ModelField(field_info=Path(PydanticUndefined), name='article_id', mode='validation')], query_params=[]...
+                 └ <function run_in_threadpool at 0x7f8a727b58a0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function update_article at 0x7f8a6c5c9120>, db=<sqlalchemy.orm.session.Session object at 0x7f8a6afb3810>, ...
+                 │     │         └ <function run_sync at 0x7f8a736ce520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7f8a7369b6a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=IntegrityError('(psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/admin/articles.py", line 149, in update_article
+    db_article.add_tag(tag_name.strip(), db)
+    │          │       │        │        └ <sqlalchemy.orm.session.Session object at 0x7f8a6afb3810>
+    │          │       │        └ <method 'strip' of 'str' objects>
+    │          │       └ 'ПК Игры'
+    │          └ <function Article.add_tag at 0x7f8a70b87c40>
+    └ <app.models.blog.article.Article object at 0x7f8a6afd5b90>
+
+  File "/app/app/models/blog/article.py", line 118, in add_tag
+    db.commit()
+    │  └ <function Session.commit at 0x7f8a714e6e80>
+    └ <sqlalchemy.orm.session.Session object at 0x7f8a6afb3810>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+    │     └ <function SessionTransaction.commit at 0x7f8a714e5e40>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f8a6afba0d0>
+  File "<string>", line 2, in commit
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {'_to_root': True}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f8a6afba0d0>
+                └ <function SessionTransaction.commit at 0x7f8a714e5da0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
+    self._prepare_impl()
+    │    └ <function SessionTransaction._prepare_impl at 0x7f8a714e5c60>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f8a6afba0d0>
+  File "<string>", line 2, in _prepare_impl
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f8a6afba0d0>
+                └ <function SessionTransaction._prepare_impl at 0x7f8a714e5bc0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
+    self.session.flush()
+    │    │       └ <function Session.flush at 0x7f8a714e9da0>
+    │    └ <sqlalchemy.orm.session.Session object at 0x7f8a6afb3810>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f8a6afba0d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4345, in flush
+    self._flush(objects)
+    │    │      └ None
+    │    └ <function Session._flush at 0x7f8a714e9f80>
+    └ <sqlalchemy.orm.session.Session object at 0x7f8a6afb3810>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4480, in _flush
+    with util.safe_reraise():
+         │    └ <class 'sqlalchemy.util.langhelpers.safe_reraise'>
+         └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+          │         │              └ <traceback object at 0x7f8a6afd6940>
+          │         └ <method 'with_traceback' of 'BaseException' objects>
+          └ IntegrityError('(psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "article_tags_table_name_key...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4441, in _flush
+    flush_context.execute()
+    │             └ <function UOWTransaction.execute at 0x7f8a714d2840>
+    └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7f8a6afd6110>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+    │   │       └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7f8a6afd6110>
+    │   └ <function SaveUpdateAll.execute at 0x7f8a714d3380>
+    └ SaveUpdateAll(Mapper[ArticleTag(article_tags_table)])
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+    │    │         │               └ <function save_obj at 0x7f8a7141e020>
+    │    │         └ <module 'sqlalchemy.orm.persistence' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py'>
+    │    └ <module 'sqlalchemy.util.preloaded' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/preloaded.py'>
+    └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+    └ <function _emit_insert_statements at 0x7f8a714bd760>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             │          └ <function Connection.execute at 0x7f8a71752de0>
+             └ <sqlalchemy.engine.base.Connection object at 0x7f8a6afd4990>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1415, in execute
+    return meth(
+           └ <bound method ClauseElement._execute_on_connection of <sqlalchemy.sql.dml.Insert object at 0x7f8a6b290910>>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           │          └ <function Connection._execute_clauseelement at 0x7f8a71753100>
+           └ <sqlalchemy.engine.base.Connection object at 0x7f8a6afd4990>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1637, in _execute_clauseelement
+    ret = self._execute_context(
+          │    └ <function Connection._execute_context at 0x7f8a717532e0>
+          └ <sqlalchemy.engine.base.Connection object at 0x7f8a6afd4990>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1842, in _execute_context
+    return self._exec_single_context(
+           │    └ <function Connection._exec_single_context at 0x7f8a71753380>
+           └ <sqlalchemy.engine.base.Connection object at 0x7f8a6afd4990>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1982, in _exec_single_context
+    self._handle_dbapi_exception(
+    │    └ <function Connection._handle_dbapi_exception at 0x7f8a71753600>
+    └ <sqlalchemy.engine.base.Connection object at 0x7f8a6afd4990>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2351, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+          │                    │              │                 └ UniqueViolation('duplicate key value violates unique constraint "article_tags_table_name_key"\nDETAIL:  Key (name)=(ПК Игры) ...
+          │                    │              └ (<class 'psycopg2.errors.UniqueViolation'>, UniqueViolation('duplicate key value violates unique constraint "article_tags_tab...
+          │                    └ <method 'with_traceback' of 'BaseException' objects>
+          └ IntegrityError('(psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "article_tags_table_name_key...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7f8a7161a7a0>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f8a7121cfd0>
+    └ <sqlalchemy.engine.base.Connection object at 0x7f8a6afd4990>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'name': 'ПК Игры', 'slug': 'пк-игры', 'color': '#3B82F6', 'is_category': False, 'created_at': datetime.datetime(2025, 6, 27,...
+    │      │       └ 'INSERT INTO article_tags_table (name, slug, color, is_category, created_at) VALUES (%(name)s, %(slug)s, %(color)s, %(is_cate...
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7f8a6afd0400; closed: -1>
+
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "article_tags_table_name_key"
+DETAIL:  Key (name)=(ПК Игры) already exists.
+
+[SQL: INSERT INTO article_tags_table (name, slug, color, is_category, created_at) VALUES (%(name)s, %(slug)s, %(color)s, %(is_category)s, %(created_at)s) RETURNING article_tags_table.id]
+[parameters: {'name': 'ПК Игры', 'slug': 'пк-игры', 'color': '#3B82F6', 'is_category': False, 'created_at': datetime.datetime(2025, 6, 27, 14, 9, 13, 306764)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-06-27 at 14:12:50 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 14:13:02 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 14:15:54 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/articles/6
+2025-06-27 at 14:15:54 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles/6
+2025-06-27 at 14:15:54 | INFO | main:43 - 📥 PUT http://localhost:8001/api/admin/articles/6
+2025-06-27 at 14:15:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles/6
+2025-06-27 at 14:15:55 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/articles
+2025-06-27 at 14:15:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-27 at 14:15:55 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/articles
+2025-06-27 at 14:15:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-27 at 14:15:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/articles
+2025-06-27 at 14:15:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-27 at 14:15:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/articles
+2025-06-27 at 14:15:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/articles
+2025-06-27 at 14:15:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/categories
+2025-06-27 at 14:15:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/tags
+2025-06-27 at 14:15:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-27 at 14:15:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-27 at 14:15:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles
+2025-06-27 at 14:15:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/categories
+2025-06-27 at 14:15:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-27 at 14:15:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-27 at 14:15:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles
+2025-06-27 at 14:15:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/tags
+2025-06-27 at 14:15:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-27 at 14:15:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-27 at 14:15:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-27 at 14:15:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-27 at 14:15:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-27 at 14:15:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-27 at 14:16:00 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-27 at 14:16:00 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-06-27 at 14:16:00 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-27 at 14:16:00 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-06-27 at 14:16:00 | INFO | main:49 - 📤 200 http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-06-27 at 14:16:00 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-27 at 14:16:00 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-06-27 at 14:16:00 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-06-27 at 14:16:00 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-27 at 14:16:00 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-06-27 at 14:16:29 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles?tags=%D0%A2%D1%8D%D0%B3
+2025-06-27 at 14:16:29 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles?tags=%D0%A2%D1%8D%D0%B3
+2025-06-27 at 14:16:29 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles?tags=%D0%A2%D1%8D%D0%B3
+2025-06-27 at 14:16:29 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles?tags=%D0%A2%D1%8D%D0%B3
+2025-06-27 at 14:16:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-06-27 at 14:16:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-06-27 at 14:18:19 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 14:18:19 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 14:18:19 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 14:18:19 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 14:18:19 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 14:18:19 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/ed593425c146414dae4cf3c038f073c9.png
+2025-06-27 at 14:18:19 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 14:18:19 | INFO | main:49 - 📤 304 http://localhost:8001/uploads/admin/ed593425c146414dae4cf3c038f073c9.png
+2025-06-27 at 14:18:19 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 14:18:19 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 14:18:19 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 14:18:21 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-27 at 14:18:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 14:18:21 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-27 at 14:18:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 14:18:21 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 14:18:21 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 14:18:21 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 14:18:21 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 14:18:21 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 14:18:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 14:18:21 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 14:18:21 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 14:18:21 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 14:18:21 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 14:18:21 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 14:18:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 14:18:21 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/7b58709a962145a3bb5781dd2192478e.png
+2025-06-27 at 14:18:21 | INFO | main:49 - 📤 304 http://localhost:8001/uploads/admin/7b58709a962145a3bb5781dd2192478e.png
+2025-06-27 at 14:18:31 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 14:18:31 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 14:18:31 | INFO | main:49 - 📤 200 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 14:18:31 | INFO | main:49 - 📤 200 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 14:18:31 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 14:18:31 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 14:18:31 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 14:18:31 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 14:34:01 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 14:34:05 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 14:34:13 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 14:34:19 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 14:57:11 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 14:57:14 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 15:16:44 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 15:23:53 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-27 at 15:23:53 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-27 at 15:23:53 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:23:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:23:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:23:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:23:53 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:23:53 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:23:53 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:23:54 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:23:54 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:23:54 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:23:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:23:55 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:23:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:23:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:23:55 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:23:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:23:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:23:55 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:23:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:23:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/me
+2025-06-27 at 15:23:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 15:23:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:23:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:23:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/me
+2025-06-27 at 15:23:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:23:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-27 at 15:23:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 15:23:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:23:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:23:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 15:23:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-27 at 15:23:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 15:23:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:23:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:23:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:24:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:24:02 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:24:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:24:02 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:24:10 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:24:10 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:24:10 | INFO | main:43 - 📥 POST http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:24:11 | ERROR | main:47 - ❌ Exception during request: (psycopg2.errors.InvalidTextRepresentation) invalid input value for enum paymentmethod: "sberbank"
+LINE 1: ...t) VALUES (2, 14, 6, NULL, 100, 'RUB', 'pending', 'sberbank'...
+                                                             ^
+
+[SQL: INSERT INTO orders (user_id, game_id, product_id, manual_game_name, amount, currency, status, payment_method, transaction_id, payment_url, auto_processed, comment, created_at, updated_at) VALUES (%(user_id)s, %(game_id)s, %(product_id)s, %(manual_game_name)s, %(amount)s, %(currency)s, %(status)s, %(payment_method)s, %(transaction_id)s, %(payment_url)s, %(auto_processed)s, %(comment)s, %(created_at)s, %(updated_at)s) RETURNING orders.id]
+[parameters: {'user_id': 2, 'game_id': 14, 'product_id': 6, 'manual_game_name': None, 'amount': Decimal('100'), 'currency': 'RUB', 'status': 'pending', 'payment_method': 'sberbank', 'transaction_id': None, 'payment_url': None, 'auto_processed': True, 'comment': '[6] {"server":"cthdt"}', 'created_at': datetime.datetime(2025, 6, 27, 15, 24, 11, 191836), 'updated_at': datetime.datetime(2025, 6, 27, 15, 24, 11, 191841)}]
+(Background on this error at: https://sqlalche.me/e/20/9h9h)
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7faa0ee22700>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7faa0ea55710>
+    └ <sqlalchemy.engine.base.Connection object at 0x7faa0895d050>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'user_id': 2, 'game_id': 14, 'product_id': 6, 'manual_game_name': None, 'amount': Decimal('100'), 'currency': 'RUB', 'status...
+    │      │       └ 'INSERT INTO orders (user_id, game_id, product_id, manual_game_name, amount, currency, status, payment_method, transaction_id...
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7faa093c2890; closed: -1>
+
+psycopg2.errors.InvalidTextRepresentation: invalid input value for enum paymentmethod: "sberbank"
+LINE 1: ...t) VALUES (2, 14, 6, NULL, 100, 'RUB', 'pending', 'sberbank'...
+                                                             ^
+
+
+
+The above exception was the direct cause of the following exception:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 7
+               └ <function _main at 0x7faa11cfa200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7faa11dcb7e0>
+           └ <SpawnProcess name='SpawnProcess-1' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7faa11dcad40>
+    └ <SpawnProcess name='SpawnProcess-1' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7faa110d1110>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-1' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-1' parent=8 started>
+    │    └ <function subprocess_started at 0x7faa10f3ede0>
+    └ <SpawnProcess name='SpawnProcess-1' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7faa10e86410>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7faa10f3dbc0>
+           │       │   └ <uvicorn.server.Server object at 0x7faa10e86410>
+           │       └ <function run at 0x7faa1176fc40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7faa10df3d30>
+           │      └ <function Runner.run at 0x7faa117c71a0>
+           └ <asyncio.runners.Runner object at 0x7faa10e85950>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7faa10a141e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7faa10e85950>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7faa0b97e390>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7faa0898b2...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7faa089...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7faa1091ce50>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7faa0b97e390>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7faa0898b2...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7faa089...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7faa0898b2...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7faa089...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7faa0b97cdd0>
+          └ <fastapi.applications.FastAPI object at 0x7faa1091ce50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7faa09476ca0>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7faa089...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7faa09fae4d0>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7faa0b97cdd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7faa094768e0>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7faa0898a210>
+                     │    └ <function log_requests at 0x7faa0965fd80>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7faa09fae4d0>
+
+> File "/app/app/main.py", line 45, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7faa0898a210>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7faa094768e0>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ DataError('(psycopg2.errors.InvalidTextRepresentation) invalid input value for enum paymentmethod: "sberbank"\nLINE 1: ...t) ...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7faa09476340>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7faa094765c0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7faa0a4430d0>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7faa09fae4d0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8001', 'connection': 'keep-alive', 'content-length': '134', 'sec-ch-ua-platform': '"macOS"', 'aut...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7faa09476340>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7faa094765c0>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7faa0965d8a0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7faa0a4430d0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7faa0a4430d0>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7faa094765c0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7faa09fc3050>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7faa0a4430d0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7faa0a4430d0>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7faa094765c0>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7faa0898bb90>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7faa09d149d0>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7faa09fc3050>
+          └ <function wrap_app_handling_exceptions at 0x7faa0fa811c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7faa093b63e0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7faa094765c0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7faa09d149d0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7faa093b63e0>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7faa094765c0>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7faa09d149d0>>
+          └ <fastapi.routing.APIRouter object at 0x7faa09d149d0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7faa093b63e0>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7faa094765c0>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7faa0fa827a0>
+          └ APIRoute(path='/api/orders/bulk', name='create_bulk_order', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7faa093b63e0>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7faa094765c0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7faa09ae89a0>
+          └ APIRoute(path='/api/orders/bulk', name='create_bulk_order', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7faa093b63e0>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7faa094765c0>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7faa0898bd10>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7faa0894cea0>
+          └ <function wrap_app_handling_exceptions at 0x7faa0fa811c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7faa0894d620>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7faa094765c0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7faa0894cea0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7faa0898bd10>
+                     └ <function get_request_handler.<locals>.app at 0x7faa09aeb380>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7faa0fa9c5e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7faa08945750>, 'current_user': <app.models.user.User object at 0x7faa0895c...
+                 │                 │         └ <function create_bulk_order at 0x7faa09fb9d00>
+                 │                 └ Dependant(path_params=[], query_params=[], header_params=[], cookie_params=[], body_params=[ModelField(field_info=Body(Pydant...
+                 └ <function run_in_threadpool at 0x7faa1006d800>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function create_bulk_order at 0x7faa09fb9d00>, db=<sqlalchemy.orm.session.Session object at 0x7faa08945750...
+                 │     │         └ <function run_sync at 0x7faa10fd2520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7faa10f9b6a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=DataError('(psycopg2.errors.InvalidTextRepresentation) invalid input value for enum paymentmethod:...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/orders.py", line 298, in create_bulk_order
+    db.commit()
+    │  └ <function Session.commit at 0x7faa0eceede0>
+    └ <sqlalchemy.orm.session.Session object at 0x7faa08945750>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+    │     └ <function SessionTransaction.commit at 0x7faa0ecedda0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7faa09305540>
+  File "<string>", line 2, in commit
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {'_to_root': True}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7faa09305540>
+                └ <function SessionTransaction.commit at 0x7faa0ecedd00>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
+    self._prepare_impl()
+    │    └ <function SessionTransaction._prepare_impl at 0x7faa0ecedbc0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7faa09305540>
+  File "<string>", line 2, in _prepare_impl
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7faa09305540>
+                └ <function SessionTransaction._prepare_impl at 0x7faa0ecedb20>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
+    self.session.flush()
+    │    │       └ <function Session.flush at 0x7faa0ecf5d00>
+    │    └ <sqlalchemy.orm.session.Session object at 0x7faa08945750>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7faa09305540>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4345, in flush
+    self._flush(objects)
+    │    │      └ None
+    │    └ <function Session._flush at 0x7faa0ecf5ee0>
+    └ <sqlalchemy.orm.session.Session object at 0x7faa08945750>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4480, in _flush
+    with util.safe_reraise():
+         │    └ <class 'sqlalchemy.util.langhelpers.safe_reraise'>
+         └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+          │         │              └ <traceback object at 0x7faa09429740>
+          │         └ <method 'with_traceback' of 'BaseException' objects>
+          └ DataError('(psycopg2.errors.InvalidTextRepresentation) invalid input value for enum paymentmethod: "sberbank"\nLINE 1: ...t) ...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4441, in _flush
+    flush_context.execute()
+    │             └ <function UOWTransaction.execute at 0x7faa0ecda7a0>
+    └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7faa0b97e8d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+    │   │       └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7faa0b97e8d0>
+    │   └ <function SaveUpdateAll.execute at 0x7faa0ecdb2e0>
+    └ SaveUpdateAll(Mapper[Order(orders)])
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+    │    │         │               └ <function save_obj at 0x7faa0ec25f80>
+    │    │         └ <module 'sqlalchemy.orm.persistence' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py'>
+    │    └ <module 'sqlalchemy.util.preloaded' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/preloaded.py'>
+    └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+    └ <function _emit_insert_statements at 0x7faa0ecc96c0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             │          └ <function Connection.execute at 0x7faa0ef5ad40>
+             └ <sqlalchemy.engine.base.Connection object at 0x7faa0895d050>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1415, in execute
+    return meth(
+           └ <bound method ClauseElement._execute_on_connection of <sqlalchemy.sql.dml.Insert object at 0x7faa0895d9d0>>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           │          └ <function Connection._execute_clauseelement at 0x7faa0ef5b060>
+           └ <sqlalchemy.engine.base.Connection object at 0x7faa0895d050>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1637, in _execute_clauseelement
+    ret = self._execute_context(
+          │    └ <function Connection._execute_context at 0x7faa0ef5b240>
+          └ <sqlalchemy.engine.base.Connection object at 0x7faa0895d050>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1842, in _execute_context
+    return self._exec_single_context(
+           │    └ <function Connection._exec_single_context at 0x7faa0ef5b2e0>
+           └ <sqlalchemy.engine.base.Connection object at 0x7faa0895d050>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1982, in _exec_single_context
+    self._handle_dbapi_exception(
+    │    └ <function Connection._handle_dbapi_exception at 0x7faa0ef5b560>
+    └ <sqlalchemy.engine.base.Connection object at 0x7faa0895d050>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2351, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+          │                    │              │                 └ InvalidTextRepresentation('invalid input value for enum paymentmethod: "sberbank"\nLINE 1: ...t) VALUES (2, 14, 6, NULL, 100,...
+          │                    │              └ (<class 'psycopg2.errors.InvalidTextRepresentation'>, InvalidTextRepresentation('invalid input value for enum paymentmethod: ...
+          │                    └ <method 'with_traceback' of 'BaseException' objects>
+          └ DataError('(psycopg2.errors.InvalidTextRepresentation) invalid input value for enum paymentmethod: "sberbank"\nLINE 1: ...t) ...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7faa0ee22700>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7faa0ea55710>
+    └ <sqlalchemy.engine.base.Connection object at 0x7faa0895d050>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'user_id': 2, 'game_id': 14, 'product_id': 6, 'manual_game_name': None, 'amount': Decimal('100'), 'currency': 'RUB', 'status...
+    │      │       └ 'INSERT INTO orders (user_id, game_id, product_id, manual_game_name, amount, currency, status, payment_method, transaction_id...
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7faa093c2890; closed: -1>
+
+sqlalchemy.exc.DataError: (psycopg2.errors.InvalidTextRepresentation) invalid input value for enum paymentmethod: "sberbank"
+LINE 1: ...t) VALUES (2, 14, 6, NULL, 100, 'RUB', 'pending', 'sberbank'...
+                                                             ^
+
+[SQL: INSERT INTO orders (user_id, game_id, product_id, manual_game_name, amount, currency, status, payment_method, transaction_id, payment_url, auto_processed, comment, created_at, updated_at) VALUES (%(user_id)s, %(game_id)s, %(product_id)s, %(manual_game_name)s, %(amount)s, %(currency)s, %(status)s, %(payment_method)s, %(transaction_id)s, %(payment_url)s, %(auto_processed)s, %(comment)s, %(created_at)s, %(updated_at)s) RETURNING orders.id]
+[parameters: {'user_id': 2, 'game_id': 14, 'product_id': 6, 'manual_game_name': None, 'amount': Decimal('100'), 'currency': 'RUB', 'status': 'pending', 'payment_method': 'sberbank', 'transaction_id': None, 'payment_url': None, 'auto_processed': True, 'comment': '[6] {"server":"cthdt"}', 'created_at': datetime.datetime(2025, 6, 27, 15, 24, 11, 191836), 'updated_at': datetime.datetime(2025, 6, 27, 15, 24, 11, 191841)}]
+(Background on this error at: https://sqlalche.me/e/20/9h9h)
+2025-06-27 at 15:28:19 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 15:28:23 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 15:28:45 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 15:30:41 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-27 at 15:30:54 | INFO | main:43 - 📥 POST http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:30:54 | INFO | robokassa:36 - 🔑 Строка для подписи: DonateRaid:100:9:OGGw3cnHyM900elNDxy9
+2025-06-27 at 15:30:54 | INFO | robokassa:38 - 🔑 Подпись: 90c7b032a4dd3c166fe4e7076888feee
+2025-06-27 at 15:30:54 | INFO | robokassa:80 - 💳 Создан URL для оплаты заказа #9: https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=DonateRaid&OutSum=100&InvId=9&Description=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%20%239%3A%20%D0%A2%D0%BE%D0%B2&SignatureValue=90c7b032a4dd3c166fe4e7076888feee&Culture=ru&IsTest=1&SuccessURL=https%3A//donateraid.ru/order/9&FailURL=https%3A//donateraid.ru/order/9
+2025-06-27 at 15:31:51 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:31:51 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:31:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:31:51 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:31:51 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:31:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:31:51 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:31:51 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:31:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:31:54 | ERROR | main:47 - ❌ Exception during request: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 148, in call_next
+    message = await recv_stream.receive()
+                    │           └ <function MemoryObjectReceiveStream.receive at 0x7f379e7618a0>
+                    └ MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_rece...
+  File "/usr/local/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+          └ <class 'anyio.EndOfStream'>
+
+anyio.EndOfStream
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7f379f5da200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7f379f6ab7e0>
+           └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7f379f6aad40>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7f379e9d1190>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    └ <function subprocess_started at 0x7f379e83ede0>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7f379e77e3d0>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7f379e83dbc0>
+           │       │   └ <uvicorn.server.Server object at 0x7f379e77e3d0>
+           │       └ <function run at 0x7f379eb3fc40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7f379e6ebd30>
+           │      └ <function Runner.run at 0x7f379eb971a0>
+           └ <asyncio.runners.Runner object at 0x7f379e77d950>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7f379e30c1e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7f379e77d950>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f3797479390>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3796d0f5...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3796d...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7f3796f7ebd0>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f3797479390>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3796d0f5...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3796d...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3796d0f5...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3796d...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f3797d1f5d0>
+          └ <fastapi.applications.FastAPI object at 0x7f3796f7ebd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7f3796e43740>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3796d...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3796e6dfd0>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f3797d1f5d0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f3796f759e0>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7f3796d0e410>
+                     │    └ <function log_requests at 0x7f3796f76de0>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3796e6dfd0>
+
+> File "/app/app/main.py", line 45, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7f3796d0e410>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f3796f759e0>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)')
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f3796e40540>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3796e42840>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3796e6dfd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8001', 'connection': 'keep-alive', 'content-length': '134', 'sec-ch-ua-platform': '"macOS"', 'aut...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f3796e40540>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3796e42840>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7f3796f74720>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3796e42840>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f37978a2990>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3796e42840>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7f37992a4fd0>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7f3797598c50>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f37978a2990>
+          └ <function wrap_app_handling_exceptions at 0x7f379d3651c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3796d54e00>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3796e42840>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7f3797598c50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3796d54e00>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3796e42840>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7f3797598c50>>
+          └ <fastapi.routing.APIRouter object at 0x7f3797598c50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3796d54e00>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3796e42840>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7f379d3667a0>
+          └ APIRoute(path='/api/orders/bulk', name='create_bulk_order', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3796d54e00>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3796e42840>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7f3796f777e0>
+          └ APIRoute(path='/api/orders/bulk', name='create_bulk_order', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3796d54e00>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3796e42840>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7f3797d1e3d0>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7f3796d54ea0>
+          └ <function wrap_app_handling_exceptions at 0x7f379d3651c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3796d54fe0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3796e42840>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7f3796d54ea0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7f3797d1e3d0>
+                     └ <function get_request_handler.<locals>.app at 0x7f3796f77ba0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7f379d3805e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7f37972e0590>, 'current_user': <app.models.user.User object at 0x7f3796d3e...
+                 │                 │         └ <function create_bulk_order at 0x7f3798140a40>
+                 │                 └ Dependant(path_params=[], query_params=[], header_params=[], cookie_params=[], body_params=[ModelField(field_info=Body(Pydant...
+                 └ <function run_in_threadpool at 0x7f379d88d800>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function create_bulk_order at 0x7f3798140a40>, db=<sqlalchemy.orm.session.Session object at 0x7f37972e0590...
+                 │     │         └ <function run_sync at 0x7f379e8d2520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7f379e89b6a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/orders.py", line 347, in create_bulk_order
+    send_email(
+    └ <function send_email at 0x7f379b73a020>
+
+  File "/app/app/services/mailer.py", line 20, in send_email
+    with smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT) as smtp:
+         │       │        │        │            │        └ 465
+         │       │        │        │            └ Settings(DATABASE_URL='postgresql://user:password@postgres:5432/donate_raid', JWT_SECRET='df2f3bb92a9054f54dbb5980ad7b381b745...
+         │       │        │        └ 'smtp.yandex.ru'
+         │       │        └ Settings(DATABASE_URL='postgresql://user:password@postgres:5432/donate_raid', JWT_SECRET='df2f3bb92a9054f54dbb5980ad7b381b745...
+         │       └ <class 'smtplib.SMTP_SSL'>
+         └ <module 'smtplib' from '/usr/local/lib/python3.11/smtplib.py'>
+
+  File "/usr/local/lib/python3.11/smtplib.py", line 1050, in __init__
+    SMTP.__init__(self, host, port, local_hostname, timeout,
+    │    │        │     │     │     │               └ <object object at 0x7f379f7a4390>
+    │    │        │     │     │     └ None
+    │    │        │     │     └ 465
+    │    │        │     └ 'smtp.yandex.ru'
+    │    │        └ <smtplib.SMTP_SSL object at 0x7f379636b410>
+    │    └ <function SMTP.__init__ at 0x7f379b73bf60>
+    └ <class 'smtplib.SMTP'>
+  File "/usr/local/lib/python3.11/smtplib.py", line 255, in __init__
+    (code, msg) = self.connect(host, port)
+                  │    │       │     └ 465
+                  │    │       └ 'smtp.yandex.ru'
+                  │    └ <function SMTP.connect at 0x7f379b748360>
+                  └ <smtplib.SMTP_SSL object at 0x7f379636b410>
+  File "/usr/local/lib/python3.11/smtplib.py", line 341, in connect
+    self.sock = self._get_socket(host, port, self.timeout)
+    │    │      │    │           │     │     │    └ <object object at 0x7f379f7a4390>
+    │    │      │    │           │     │     └ <smtplib.SMTP_SSL object at 0x7f379636b410>
+    │    │      │    │           │     └ 465
+    │    │      │    │           └ 'smtp.yandex.ru'
+    │    │      │    └ <function SMTP_SSL._get_socket at 0x7f379b749580>
+    │    │      └ <smtplib.SMTP_SSL object at 0x7f379636b410>
+    │    └ None
+    └ <smtplib.SMTP_SSL object at 0x7f379636b410>
+  File "/usr/local/lib/python3.11/smtplib.py", line 1057, in _get_socket
+    new_socket = self.context.wrap_socket(new_socket,
+                 │    │       │           └ <socket.socket [closed] fd=-1, family=2, type=1, proto=6>
+                 │    │       └ <function SSLContext.wrap_socket at 0x7f379f256fc0>
+                 │    └ <ssl.SSLContext object at 0x7f379621c830>
+                 └ <smtplib.SMTP_SSL object at 0x7f379636b410>
+  File "/usr/local/lib/python3.11/ssl.py", line 517, in wrap_socket
+    return self.sslsocket_class._create(
+           │    │               └ <classmethod(<function SSLSocket._create at 0x7f379f2d4f40>)>
+           │    └ <class 'ssl.SSLSocket'>
+           └ <ssl.SSLContext object at 0x7f379621c830>
+  File "/usr/local/lib/python3.11/ssl.py", line 1104, in _create
+    self.do_handshake()
+    │    └ <function SSLSocket.do_handshake at 0x7f379f2d63e0>
+    └ <ssl.SSLSocket [closed] fd=-1, family=2, type=1, proto=6>
+  File "/usr/local/lib/python3.11/ssl.py", line 1382, in do_handshake
+    self._sslobj.do_handshake()
+    │    └ None
+    └ <ssl.SSLSocket [closed] fd=-1, family=2, type=1, proto=6>
+
+ssl.SSLEOFError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
+2025-06-27 at 15:31:54 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-27 at 15:31:54 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 15:31:55 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-27 at 15:31:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 15:31:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 15:31:55 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 15:31:55 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 15:31:55 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 15:31:55 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 15:31:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 15:31:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 15:31:55 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 15:31:55 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 15:31:55 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 15:31:55 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 15:31:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 15:32:13 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:32:13 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:32:13 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:32:13 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:32:19 | INFO | main:43 - 📥 POST http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:32:19 | INFO | robokassa:36 - 🔑 Строка для подписи: DonateRaid:100:10:OGGw3cnHyM900elNDxy9
+2025-06-27 at 15:32:19 | INFO | robokassa:38 - 🔑 Подпись: 10156f599accf92a0303b74082b2b281
+2025-06-27 at 15:32:19 | INFO | robokassa:80 - 💳 Создан URL для оплаты заказа #10: https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=DonateRaid&OutSum=100&InvId=10&Description=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%20%2310%3A%20%D0%A2%D0%BE%D0%B2&SignatureValue=10156f599accf92a0303b74082b2b281&Culture=ru&IsTest=1&SuccessURL=https%3A//donateraid.ru/order/10&FailURL=https%3A//donateraid.ru/order/10
+2025-06-27 at 15:33:19 | ERROR | main:47 - ❌ Exception during request: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 148, in call_next
+    message = await recv_stream.receive()
+                    │           └ <function MemoryObjectReceiveStream.receive at 0x7f379e7618a0>
+                    └ MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_rece...
+  File "/usr/local/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+          └ <class 'anyio.EndOfStream'>
+
+anyio.EndOfStream
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7f379f5da200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7f379f6ab7e0>
+           └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7f379f6aad40>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7f379e9d1190>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    └ <function subprocess_started at 0x7f379e83ede0>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7f379e77e3d0>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7f379e83dbc0>
+           │       │   └ <uvicorn.server.Server object at 0x7f379e77e3d0>
+           │       └ <function run at 0x7f379eb3fc40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7f379e6ebd30>
+           │      └ <function Runner.run at 0x7f379eb971a0>
+           └ <asyncio.runners.Runner object at 0x7f379e77d950>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7f379e30c1e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7f379e77d950>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f3797479390>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957b97...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7f3796f7ebd0>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f3797479390>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957b97...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957b97...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f3797d1f5d0>
+          └ <fastapi.applications.FastAPI object at 0x7f3796f7ebd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7f379619a8e0>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3796e6dfd0>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f3797d1f5d0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f379619a980>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7f37957b9110>
+                     │    └ <function log_requests at 0x7f3796f76de0>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3796e6dfd0>
+
+> File "/app/app/main.py", line 45, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7f37957b9110>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f379619a980>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)')
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f379619aac0>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f379619a520>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3796e6dfd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8001', 'connection': 'keep-alive', 'content-length': '133', 'sec-ch-ua-platform': '"macOS"', 'aut...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f379619aac0>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f379619a520>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7f3796f74720>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f379619a520>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f37978a2990>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f379619a520>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7f37957ba550>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7f3797598c50>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f37978a2990>
+          └ <function wrap_app_handling_exceptions at 0x7f379d3651c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f379619a3e0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f379619a520>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7f3797598c50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f379619a3e0>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f379619a520>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7f3797598c50>>
+          └ <fastapi.routing.APIRouter object at 0x7f3797598c50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f379619a3e0>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f379619a520>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7f379d3667a0>
+          └ APIRoute(path='/api/orders/bulk', name='create_bulk_order', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f379619a3e0>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f379619a520>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7f3796f777e0>
+          └ APIRoute(path='/api/orders/bulk', name='create_bulk_order', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f379619a3e0>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f379619a520>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7f37957bb4d0>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7f379619a2a0>
+          └ <function wrap_app_handling_exceptions at 0x7f379d3651c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f379619be20>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f379619a520>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7f379619a2a0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7f37957bb4d0>
+                     └ <function get_request_handler.<locals>.app at 0x7f3796f77ba0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7f379d3805e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7f37957b9850>, 'current_user': <app.models.user.User object at 0x7f379576c...
+                 │                 │         └ <function create_bulk_order at 0x7f3798140a40>
+                 │                 └ Dependant(path_params=[], query_params=[], header_params=[], cookie_params=[], body_params=[ModelField(field_info=Body(Pydant...
+                 └ <function run_in_threadpool at 0x7f379d88d800>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function create_bulk_order at 0x7f3798140a40>, db=<sqlalchemy.orm.session.Session object at 0x7f37957b9850...
+                 │     │         └ <function run_sync at 0x7f379e8d2520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7f379e89b6a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/orders.py", line 347, in create_bulk_order
+    send_email(
+    └ <function send_email at 0x7f379b73a020>
+
+  File "/app/app/services/mailer.py", line 20, in send_email
+    with smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT) as smtp:
+         │       │        │        │            │        └ 465
+         │       │        │        │            └ Settings(DATABASE_URL='postgresql://user:password@postgres:5432/donate_raid', JWT_SECRET='df2f3bb92a9054f54dbb5980ad7b381b745...
+         │       │        │        └ 'smtp.yandex.ru'
+         │       │        └ Settings(DATABASE_URL='postgresql://user:password@postgres:5432/donate_raid', JWT_SECRET='df2f3bb92a9054f54dbb5980ad7b381b745...
+         │       └ <class 'smtplib.SMTP_SSL'>
+         └ <module 'smtplib' from '/usr/local/lib/python3.11/smtplib.py'>
+
+  File "/usr/local/lib/python3.11/smtplib.py", line 1050, in __init__
+    SMTP.__init__(self, host, port, local_hostname, timeout,
+    │    │        │     │     │     │               └ <object object at 0x7f379f7a4390>
+    │    │        │     │     │     └ None
+    │    │        │     │     └ 465
+    │    │        │     └ 'smtp.yandex.ru'
+    │    │        └ <smtplib.SMTP_SSL object at 0x7f37974ea210>
+    │    └ <function SMTP.__init__ at 0x7f379b73bf60>
+    └ <class 'smtplib.SMTP'>
+  File "/usr/local/lib/python3.11/smtplib.py", line 255, in __init__
+    (code, msg) = self.connect(host, port)
+                  │    │       │     └ 465
+                  │    │       └ 'smtp.yandex.ru'
+                  │    └ <function SMTP.connect at 0x7f379b748360>
+                  └ <smtplib.SMTP_SSL object at 0x7f37974ea210>
+  File "/usr/local/lib/python3.11/smtplib.py", line 341, in connect
+    self.sock = self._get_socket(host, port, self.timeout)
+    │    │      │    │           │     │     │    └ <object object at 0x7f379f7a4390>
+    │    │      │    │           │     │     └ <smtplib.SMTP_SSL object at 0x7f37974ea210>
+    │    │      │    │           │     └ 465
+    │    │      │    │           └ 'smtp.yandex.ru'
+    │    │      │    └ <function SMTP_SSL._get_socket at 0x7f379b749580>
+    │    │      └ <smtplib.SMTP_SSL object at 0x7f37974ea210>
+    │    └ None
+    └ <smtplib.SMTP_SSL object at 0x7f37974ea210>
+  File "/usr/local/lib/python3.11/smtplib.py", line 1057, in _get_socket
+    new_socket = self.context.wrap_socket(new_socket,
+                 │    │       │           └ <socket.socket [closed] fd=-1, family=2, type=1, proto=6>
+                 │    │       └ <function SSLContext.wrap_socket at 0x7f379f256fc0>
+                 │    └ <ssl.SSLContext object at 0x7f37957179b0>
+                 └ <smtplib.SMTP_SSL object at 0x7f37974ea210>
+  File "/usr/local/lib/python3.11/ssl.py", line 517, in wrap_socket
+    return self.sslsocket_class._create(
+           │    │               └ <classmethod(<function SSLSocket._create at 0x7f379f2d4f40>)>
+           │    └ <class 'ssl.SSLSocket'>
+           └ <ssl.SSLContext object at 0x7f37957179b0>
+  File "/usr/local/lib/python3.11/ssl.py", line 1104, in _create
+    self.do_handshake()
+    │    └ <function SSLSocket.do_handshake at 0x7f379f2d63e0>
+    └ <ssl.SSLSocket [closed] fd=-1, family=2, type=1, proto=6>
+  File "/usr/local/lib/python3.11/ssl.py", line 1382, in do_handshake
+    self._sslobj.do_handshake()
+    │    └ None
+    └ <ssl.SSLSocket [closed] fd=-1, family=2, type=1, proto=6>
+
+ssl.SSLEOFError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
+2025-06-27 at 15:36:23 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-27 at 15:36:23 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-27 at 15:36:23 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:36:23 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:36:23 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:36:23 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:36:23 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:36:23 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/my
+2025-06-27 at 15:36:23 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/my
+2025-06-27 at 15:36:23 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/my
+2025-06-27 at 15:36:23 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:36:23 | INFO | main:49 - 📤 422 http://localhost:8001/api/orders/my
+2025-06-27 at 15:36:23 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/my
+2025-06-27 at 15:36:23 | INFO | main:49 - 📤 422 http://localhost:8001/api/orders/my
+2025-06-27 at 15:36:40 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/auth/request-link
+2025-06-27 at 15:36:40 | INFO | main:49 - 📤 200 http://localhost:8001/api/auth/request-link
+2025-06-27 at 15:36:40 | INFO | main:43 - 📥 POST http://localhost:8001/api/auth/request-link
+2025-06-27 at 15:37:53 | INFO | main:43 - 📥 POST http://localhost:8001/api/auth/request-link
+2025-06-27 at 15:37:54 | INFO | main:49 - 📤 200 http://localhost:8001/api/auth/request-link
+2025-06-27 at 15:39:26 | ERROR | main:47 - ❌ Exception during request: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 148, in call_next
+    message = await recv_stream.receive()
+                    │           └ <function MemoryObjectReceiveStream.receive at 0x7f379e7618a0>
+                    └ MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_rece...
+  File "/usr/local/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+          └ <class 'anyio.EndOfStream'>
+
+anyio.EndOfStream
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7f379f5da200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7f379f6ab7e0>
+           └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7f379f6aad40>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7f379e9d1190>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+    │    └ <function subprocess_started at 0x7f379e83ede0>
+    └ <SpawnProcess name='SpawnProcess-5' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7f379e77e3d0>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7f379e83dbc0>
+           │       │   └ <uvicorn.server.Server object at 0x7f379e77e3d0>
+           │       └ <function run at 0x7f379eb3fc40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7f379e6ebd30>
+           │      └ <function Runner.run at 0x7f379eb971a0>
+           └ <asyncio.runners.Runner object at 0x7f379e77d950>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7f379e30c1e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7f379e77d950>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f3797479390>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957e6b...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7f3796f7ebd0>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f3797479390>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957e6b...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957e6b...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f3797d1f5d0>
+          └ <fastapi.applications.FastAPI object at 0x7f3796f7ebd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7f379619bf60>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f37957...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3796e6dfd0>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f3797d1f5d0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f37957bef20>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7f37957e6950>
+                     │    └ <function log_requests at 0x7f3796f76de0>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3796e6dfd0>
+
+> File "/app/app/main.py", line 45, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7f37957e6950>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f37957bef20>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)')
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f37957be7a0>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f37957bcae0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3796e6dfd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8001', 'connection': 'keep-alive', 'content-length': '30', 'sec-ch-ua-platform': '"macOS"', 'user...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f37957be7a0>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f37957bcae0>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7f3796f74720>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f37957bcae0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f37978a2990>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f3796e6c710>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f37957bcae0>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7f37957e7d50>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7f3797598c50>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f37978a2990>
+          └ <function wrap_app_handling_exceptions at 0x7f379d3651c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f37957bcc20>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f37957bcae0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7f3797598c50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f37957bcc20>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f37957bcae0>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7f3797598c50>>
+          └ <fastapi.routing.APIRouter object at 0x7f3797598c50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f37957bcc20>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f37957bcae0>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7f379d3667a0>
+          └ APIRoute(path='/api/auth/request-link', name='request_login_link', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f37957bcc20>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f37957bcae0>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7f3796fd1300>
+          └ APIRoute(path='/api/auth/request-link', name='request_login_link', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f37957bcc20>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f37957bcae0>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7f37957e7150>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7f37957bc900>
+          └ <function wrap_app_handling_exceptions at 0x7f379d3651c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f37957bc5e0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f37957bcae0>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7f37957bc900>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7f37957e7150>
+                     └ <function get_request_handler.<locals>.app at 0x7f3796fd13a0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7f379d3805e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7f37963b96d0>, 'data': EmailRequest(email='kvpelvne@gmail.com', referral_c...
+                 │                 │         └ <function request_login_link at 0x7f3799144ea0>
+                 │                 └ Dependant(path_params=[], query_params=[], header_params=[], cookie_params=[], body_params=[ModelField(field_info=Body(Pydant...
+                 └ <function run_in_threadpool at 0x7f379d88d800>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function request_login_link at 0x7f3799144ea0>, db=<sqlalchemy.orm.session.Session object at 0x7f37963b96d...
+                 │     │         └ <function run_sync at 0x7f379e8d2520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7f379e89b6a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/auth.py", line 77, in request_login_link
+    send_email(
+    └ <function send_email at 0x7f379b73a020>
+
+  File "/app/app/services/mailer.py", line 20, in send_email
+    with smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT) as smtp:
+         │       │        │        │            │        └ 465
+         │       │        │        │            └ Settings(DATABASE_URL='postgresql://user:password@postgres:5432/donate_raid', JWT_SECRET='df2f3bb92a9054f54dbb5980ad7b381b745...
+         │       │        │        └ 'smtp.yandex.ru'
+         │       │        └ Settings(DATABASE_URL='postgresql://user:password@postgres:5432/donate_raid', JWT_SECRET='df2f3bb92a9054f54dbb5980ad7b381b745...
+         │       └ <class 'smtplib.SMTP_SSL'>
+         └ <module 'smtplib' from '/usr/local/lib/python3.11/smtplib.py'>
+
+  File "/usr/local/lib/python3.11/smtplib.py", line 1050, in __init__
+    SMTP.__init__(self, host, port, local_hostname, timeout,
+    │    │        │     │     │     │               └ <object object at 0x7f379f7a4390>
+    │    │        │     │     │     └ None
+    │    │        │     │     └ 465
+    │    │        │     └ 'smtp.yandex.ru'
+    │    │        └ <smtplib.SMTP_SSL object at 0x7f37957d37d0>
+    │    └ <function SMTP.__init__ at 0x7f379b73bf60>
+    └ <class 'smtplib.SMTP'>
+  File "/usr/local/lib/python3.11/smtplib.py", line 255, in __init__
+    (code, msg) = self.connect(host, port)
+                  │    │       │     └ 465
+                  │    │       └ 'smtp.yandex.ru'
+                  │    └ <function SMTP.connect at 0x7f379b748360>
+                  └ <smtplib.SMTP_SSL object at 0x7f37957d37d0>
+  File "/usr/local/lib/python3.11/smtplib.py", line 341, in connect
+    self.sock = self._get_socket(host, port, self.timeout)
+    │    │      │    │           │     │     │    └ <object object at 0x7f379f7a4390>
+    │    │      │    │           │     │     └ <smtplib.SMTP_SSL object at 0x7f37957d37d0>
+    │    │      │    │           │     └ 465
+    │    │      │    │           └ 'smtp.yandex.ru'
+    │    │      │    └ <function SMTP_SSL._get_socket at 0x7f379b749580>
+    │    │      └ <smtplib.SMTP_SSL object at 0x7f37957d37d0>
+    │    └ None
+    └ <smtplib.SMTP_SSL object at 0x7f37957d37d0>
+  File "/usr/local/lib/python3.11/smtplib.py", line 1057, in _get_socket
+    new_socket = self.context.wrap_socket(new_socket,
+                 │    │       │           └ <socket.socket [closed] fd=-1, family=2, type=1, proto=6>
+                 │    │       └ <function SSLContext.wrap_socket at 0x7f379f256fc0>
+                 │    └ <ssl.SSLContext object at 0x7f3795717e30>
+                 └ <smtplib.SMTP_SSL object at 0x7f37957d37d0>
+  File "/usr/local/lib/python3.11/ssl.py", line 517, in wrap_socket
+    return self.sslsocket_class._create(
+           │    │               └ <classmethod(<function SSLSocket._create at 0x7f379f2d4f40>)>
+           │    └ <class 'ssl.SSLSocket'>
+           └ <ssl.SSLContext object at 0x7f3795717e30>
+  File "/usr/local/lib/python3.11/ssl.py", line 1104, in _create
+    self.do_handshake()
+    │    └ <function SSLSocket.do_handshake at 0x7f379f2d63e0>
+    └ <ssl.SSLSocket [closed] fd=-1, family=2, type=1, proto=6>
+  File "/usr/local/lib/python3.11/ssl.py", line 1382, in do_handshake
+    self._sslobj.do_handshake()
+    │    └ None
+    └ <ssl.SSLSocket [closed] fd=-1, family=2, type=1, proto=6>
+
+ssl.SSLEOFError: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)
+2025-06-27 at 15:42:41 | INFO | main:43 - 📥 GET http://localhost:8001/api/auth/verify?token=beac5928-a76c-4052-8d38-7b371908fe3d
+2025-06-27 at 15:42:41 | INFO | main:49 - 📤 200 http://localhost:8001/api/auth/verify?token=beac5928-a76c-4052-8d38-7b371908fe3d
+2025-06-27 at 15:42:41 | INFO | main:43 - 📥 GET http://localhost:8001/api/auth/verify?token=beac5928-a76c-4052-8d38-7b371908fe3d
+2025-06-27 at 15:42:41 | INFO | main:49 - 📤 400 http://localhost:8001/api/auth/verify?token=beac5928-a76c-4052-8d38-7b371908fe3d
+2025-06-27 at 15:42:41 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:42:42 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:42:42 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:42:42 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:42:42 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:42:42 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:42:42 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:42 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:42:42 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:42 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:42 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:42:42 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:43 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:42:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:43 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:42:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:43 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:42:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:43 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:42:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:42:48 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-27 at 15:42:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 15:42:48 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-27 at 15:42:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 15:42:48 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 15:42:48 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 15:42:48 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 15:42:48 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 15:42:48 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 15:42:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 15:42:48 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 15:42:48 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 15:42:48 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 15:42:48 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 15:42:48 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 15:42:48 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 15:42:55 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:42:55 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:42:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:42:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:42:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:42:55 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:42:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:42:55 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:43:01 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:43:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:43:01 | INFO | main:43 - 📥 POST http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:43:01 | INFO | robokassa:36 - 🔑 Строка для подписи: DonateRaid:100:11:OGGw3cnHyM900elNDxy9
+2025-06-27 at 15:43:01 | INFO | robokassa:38 - 🔑 Подпись: fca982550f4f0a20190537622a90a49e
+2025-06-27 at 15:43:01 | INFO | robokassa:80 - 💳 Создан URL для оплаты заказа #11: https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=DonateRaid&OutSum=100&InvId=11&Description=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%20%2311%3A%20%D0%A2%D0%BE%D0%B2&SignatureValue=fca982550f4f0a20190537622a90a49e&Culture=ru&IsTest=1&SuccessURL=https%3A//donateraid.ru/order/11&FailURL=https%3A//donateraid.ru/order/11
+2025-06-27 at 15:43:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:49:06 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-27 at 15:49:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:06 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-27 at 15:49:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:49:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:49:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:49:06 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:49:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:06 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:49:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:49:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:49:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:49:07 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:07 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:49:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:08 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:49:08 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:08 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:49:08 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:08 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:08 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:49:08 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:49:08 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:49:08 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:08 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:49:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:09 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:49:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:49:47 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 15:49:47 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 15:49:47 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 15:49:47 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 15:49:47 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 15:49:47 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 15:49:47 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-27 at 15:49:47 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-27 at 15:49:47 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-27 at 15:49:47 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-27 at 15:49:47 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-27 at 15:49:47 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-27 at 15:49:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:49:56 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:49:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:49:56 | INFO | main:49 - 📤 404 http://localhost:8001/api/api/payment-terms/
+2025-06-27 at 15:50:01 | INFO | main:43 - 📥 POST http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:50:01 | INFO | robokassa:36 - 🔑 Строка для подписи: DonateRaid:100:12:OGGw3cnHyM900elNDxy9
+2025-06-27 at 15:50:01 | INFO | robokassa:38 - 🔑 Подпись: ff3fdc26591a3eb0d96245aa98f1930a
+2025-06-27 at 15:50:01 | INFO | robokassa:80 - 💳 Создан URL для оплаты заказа #12: https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=DonateRaid&OutSum=100&InvId=12&Description=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%20%2312%3A%20%D0%A2%D0%BE%D0%B2&SignatureValue=ff3fdc26591a3eb0d96245aa98f1930a&Culture=ru&IsTest=1&SuccessURL=https%3A//donateraid.ru/order/12&FailURL=https%3A//donateraid.ru/order/12
+2025-06-27 at 15:50:03 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/bulk
+2025-06-27 at 15:50:05 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:50:05 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:50:05 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:50:05 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:50:05 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:50:05 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:50:05 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-27 at 15:50:05 | INFO | games:37 - 🎮 Возвращаем 1 игр
+2025-06-27 at 15:50:05 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-27 at 15:50:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/me
+2025-06-27 at 15:50:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 15:50:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:50:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:50:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:50:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/me
+2025-06-27 at 15:50:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-27 at 15:50:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:50:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 15:50:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:50:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:50:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 15:50:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-27 at 15:50:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 15:50:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:50:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:50:11 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/12
+2025-06-27 at 15:50:11 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/12
+2025-06-27 at 15:50:11 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/12
+2025-06-27 at 15:50:11 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/12
+2025-06-27 at 15:50:11 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/12
+2025-06-27 at 15:50:11 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/12
+2025-06-27 at 15:50:11 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/12
+2025-06-27 at 15:50:11 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/12
+2025-06-27 at 15:50:57 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:50:57 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:50:57 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:50:57 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/my
+2025-06-27 at 15:50:57 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/my
+2025-06-27 at 15:50:57 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/my
+2025-06-27 at 15:50:57 | INFO | main:49 - 📤 422 http://localhost:8001/api/orders/my
+2025-06-27 at 15:50:57 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:50:57 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/my
+2025-06-27 at 15:50:57 | INFO | main:49 - 📤 422 http://localhost:8001/api/orders/my
+2025-06-27 at 15:51:07 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:51:07 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-27 at 15:51:07 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:51:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 15:51:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:51:07 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-27 at 15:51:07 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:51:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 15:51:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:51:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:51:07 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:51:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 15:51:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/9
+2025-06-27 at 15:51:09 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/9
+2025-06-27 at 15:51:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/9
+2025-06-27 at 15:51:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/9
+2025-06-27 at 15:51:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/9
+2025-06-27 at 15:51:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/9
+2025-06-27 at 15:51:09 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/9
+2025-06-27 at 15:51:09 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/9
+2025-06-27 at 15:51:23 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/9
+2025-06-27 at 15:51:23 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/9
+2025-06-27 at 15:51:33 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:51:33 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:51:33 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-27 at 15:51:33 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-27 at 15:51:33 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/my
+2025-06-27 at 15:51:33 | INFO | main:49 - 📤 422 http://localhost:8001/api/orders/my
+2025-06-27 at 15:51:33 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/my
+2025-06-27 at 15:51:33 | INFO | main:49 - 📤 422 http://localhost:8001/api/orders/my
+2025-06-27 at 17:53:00 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:01 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:01 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:01 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:01 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:01 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:01 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:01 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:01 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:55 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-06-27 at 17:53:55 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-06-27 at 17:53:56 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/12
+2025-06-27 at 17:53:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/12
+2025-06-27 at 17:53:56 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/12
+2025-06-27 at 17:53:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/12
+2025-06-27 at 17:53:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/12
+2025-06-27 at 17:53:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/12
+2025-06-27 at 17:53:56 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/12
+2025-06-27 at 17:53:56 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/12

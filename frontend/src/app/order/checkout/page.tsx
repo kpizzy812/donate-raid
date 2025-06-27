@@ -110,7 +110,7 @@ export default function CheckoutPage() {
             product_id: item.product.id,
             amount: item.product.price_rub,
             currency: 'RUB',
-            payment_method: method === 'sberbank' || method === 'sbp' ? 'auto' : 'manual',
+            payment_method: method,
             comment: JSON.stringify(item.inputs),
           }))
         }),
@@ -157,7 +157,7 @@ export default function CheckoutPage() {
 
   const getPaymentMethodName = (method: string) => {
     switch (method) {
-      case 'sberbank': return 'Сбербанк Касса'
+      case 'sberbank': return 'Банковская карта'
       case 'sbp': return 'СБП'
       case 'ton': return 'TON'
       case 'usdt': return 'USDT TON'
@@ -259,10 +259,10 @@ export default function CheckoutPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { key: 'sberbank', name: 'Сбербанк Касса', desc: 'Visa, MasterCard, МИР' },
+                { key: 'sberbank', name: 'Банковская карта', desc: 'Visa, MasterCard, МИР' },
                 { key: 'sbp', name: 'СБП', desc: 'Система быстрых платежей' },
-                { key: 'ton', name: 'TON', desc: 'Ручная оплата криптовалютой' },
-                { key: 'usdt', name: 'USDT TON', desc: 'Ручная оплата стейблкоином' },
+                { key: 'ton', name: 'TON', desc: 'Оплата криптовалютой' },
+                { key: 'usdt', name: 'USDT TON', desc: 'Оплата стейблкоином' },
               ].map((pm) => (
                 <button
                   key={pm.key}
