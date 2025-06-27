@@ -125,10 +125,15 @@ export default function CheckoutPage() {
       const orderId = data.id
 
       toast.success('Заказ успешно создан!')
-
-      // Очищаем корзину и переходим к заказу
       clearCart()
-      router.push(`/order/${orderId}`)
+
+      // ИСПРАВЛЕНО: Для RoboKassa методов сразу редиректим на оплату
+      if (data.payment_url && (method === 'sberbank' || method === 'sbp')) {
+        window.location.href = data.payment_url
+      } else {
+        // Для криптовалют и ручных методов - на страницу заказа
+        router.push(`/order/${orderId}`)
+      }
 
     } catch (err: any) {
       toast.error(err.message || 'Ошибка при создании заказа')
@@ -231,8 +236,7 @@ export default function CheckoutPage() {
 
                     {/* Пользовательские данные */}
                     {Object.keys(item.inputs).length > 0 && (
-                      <div className="mt-3 space-y-1">
-                        <div className="text-xs text-zinc-500 font-medium mb-1">Данные заказа:</div>
+                      <div className="mt-2 space-y-1">
                         {Object.entries(item.inputs).map(([key, value]) => (
                           <div key={key} className="text-xs text-zinc-600 dark:text-zinc-400">
                             <span className="font-medium">{key}:</span> {value}
@@ -253,31 +257,26 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Способы оплаты */}
+          {/* Выбор способа оплаты */}
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6">
             <h2 className="text-lg font-semibold mb-4">💳 Способ оплаты</h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                { key: 'sberbank', name: 'Банковская карта', desc: 'Visa, MasterCard, МИР' },
-                { key: 'sbp', name: 'СБП', desc: 'Система быстрых платежей' },
-                { key: 'ton', name: 'TON', desc: 'Оплата криптовалютой' },
-                { key: 'usdt', name: 'USDT TON', desc: 'Оплата стейблкоином' },
-              ].map((pm) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {['sberbank', 'sbp', 'ton', 'usdt'].map((pm) => (
                 <button
-                  key={pm.key}
-                  onClick={() => setMethod(pm.key as any)}
-                  className={`p-4 border-2 rounded-lg text-left transition-colors ${
-                    method === pm.key
+                  key={pm}
+                  onClick={() => setMethod(pm as any)}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    method === pm
                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                       : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    {getPaymentMethodIcon(pm.key)}
+                    {getPaymentMethodIcon(pm)}
                     <div>
-                      <div className="font-medium">{pm.name}</div>
-                      <div className="text-sm text-zinc-500">{pm.desc}</div>
+                      <div className="font-medium">{getPaymentMethodName(pm)}</div>
+                      <div className="text-sm text-zinc-500">{getPaymentMethodDescription(pm)}</div>
                     </div>
                   </div>
                 </button>
@@ -327,10 +326,6 @@ export default function CheckoutPage() {
                     <Link href="/legal/offer" target="_blank" className="text-blue-600 hover:underline">
                       публичной офертой
                     </Link>
-                    . В случае возврата средства зачисляются на баланс аккаунта согласно{' '}
-                    <Link href="/legal/refund" target="_blank" className="text-blue-600 hover:underline">
-                      политике возврата
-                    </Link>
                     .
                   </p>
                 </div>
@@ -339,33 +334,26 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        {/* Боковая панель - итоги */}
+        {/* Итого */}
         <div className="lg:col-span-1">
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 sticky top-6">
             <h3 className="text-lg font-semibold mb-4">Итого</h3>
 
-            {/* Детализация */}
-            <div className="space-y-2 mb-4">
-              {items.map((item, i) => (
-                <div key={i} className="flex justify-between text-sm">
-                  <span className="text-zinc-600 dark:text-zinc-400">{item.product.name}</span>
-                  <span>₽{item.product.price_rub}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4 mb-6">
-              <div className="flex justify-between text-lg font-bold">
-                <span>Итого:</span>
+            <div className="space-y-2 mb-6">
+              <div className="flex justify-between">
+                <span>Товары ({items.length}):</span>
                 <span>₽{total}</span>
+              </div>
+              <div className="flex justify-between font-bold text-lg border-t border-zinc-200 dark:border-zinc-700 pt-2">
+                <span>К оплате:</span>
+                <span className="text-green-600">₽{total}</span>
               </div>
             </div>
 
-            {/* Кнопка оплаты */}
             <button
               onClick={handleSubmit}
-              disabled={loading || !method}
-              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white px-6 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+              disabled={!method || loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -380,20 +368,8 @@ export default function CheckoutPage() {
               )}
             </button>
 
-            {/* Дополнительная информация */}
-            <div className="mt-4 text-xs text-zinc-500 space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>Безопасная оплата</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>Быстрая обработка</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span>Поддержка 24/7</span>
-              </div>
+            <div className="mt-3 text-xs text-zinc-500 dark:text-zinc-400 text-center">
+              Безопасные платежи через SSL
             </div>
           </div>
         </div>

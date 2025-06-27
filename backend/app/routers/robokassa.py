@@ -1,5 +1,6 @@
 # backend/app/routers/robokassa.py
 from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.order import Order, OrderStatus
@@ -112,35 +113,49 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Database error")
 
 
-@router.get("/success/{order_id}")
-async def robokassa_success(order_id: int, db: Session = Depends(get_db)):
+@router.get("/success")
+async def robokassa_success(request: Request, db: Session = Depends(get_db)):
     """
     Success URL - пользователь попадает сюда после успешной оплаты
-    Просто перенаправляем на страницу заказа
+    RoboKassa передает InvId через GET параметры
     """
-    logger.info(f"✅ Success redirect для заказа #{order_id}")
+    # Получаем InvId из GET параметров
+    inv_id = request.query_params.get("InvId")
+    if not inv_id:
+        logger.error("❌ Нет InvId в Success URL")
+        return RedirectResponse(url="https://donateraid.ru/")
+
+    logger.info(f"✅ Success redirect для заказа #{inv_id}")
 
     # Можно добавить дополнительную логику если нужно
-    order = db.query(Order).filter(Order.id == order_id).first()
+    order = db.query(Order).filter(Order.id == int(inv_id)).first()
     if order:
-        logger.info(f"📋 Заказ #{order_id} найден, статус: {order.status}")
+        logger.info(f"📋 Заказ #{inv_id} найден, статус: {order.status}")
 
-    # Frontend сам отобразит актуальную информацию о заказе
-    return {"status": "success", "order_id": order_id}
+    # Редиректим на страницу заказа
+    return RedirectResponse(url=f"https://donateraid.ru/order/{inv_id}")
 
 
-@router.get("/fail/{order_id}")
-async def robokassa_fail(order_id: int, db: Session = Depends(get_db)):
+@router.get("/fail")
+async def robokassa_fail(request: Request, db: Session = Depends(get_db)):
     """
     Fail URL - пользователь попадает сюда при неудачной оплате
+    RoboKassa передает InvId через GET параметры
     """
-    logger.info(f"❌ Fail redirect для заказа #{order_id}")
+    # Получаем InvId из GET параметров
+    inv_id = request.query_params.get("InvId")
+    if not inv_id:
+        logger.error("❌ Нет InvId в Fail URL")
+        return RedirectResponse(url="https://donateraid.ru/")
 
-    order = db.query(Order).filter(Order.id == order_id).first()
+    logger.info(f"❌ Fail redirect для заказа #{inv_id}")
+
+    order = db.query(Order).filter(Order.id == int(inv_id)).first()
     if order:
-        logger.info(f"📋 Заказ #{order_id} найден, статус: {order.status}")
+        logger.info(f"📋 Заказ #{inv_id} найден, статус: {order.status}")
 
-    return {"status": "failed", "order_id": order_id}
+    # Редиректим на страницу заказа (статус останется pending)
+    return RedirectResponse(url=f"https://donateraid.ru/order/{inv_id}")
 
 
 @router.get("/payment-methods")

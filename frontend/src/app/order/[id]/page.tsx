@@ -1,4 +1,3 @@
-// frontend/src/app/order/[id]/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
@@ -11,7 +10,6 @@ import {
   Bitcoin,
   DollarSign,
   Copy,
-  ExternalLink,
   CheckCircle,
   Clock,
   XCircle,
@@ -114,7 +112,7 @@ export default function OrderPage() {
 
   const getPaymentMethodName = (method: string) => {
     switch (method) {
-      case 'sberbank': return 'Сбербанк Касса'
+      case 'sberbank': return 'Банковская карта'
       case 'sbp': return 'СБП'
       case 'ton': return 'TON'
       case 'usdt': return 'USDT TON'
@@ -130,7 +128,7 @@ export default function OrderPage() {
       const userData: Record<string, string> = {}
 
       for (const line of lines) {
-        if (line.includes('[Товар') && line.includes(']')) {
+        if (line.includes('[') && line.includes(']')) {
           const jsonPart = line.substring(line.indexOf(']') + 1).trim()
           if (jsonPart.startsWith('{')) {
             const parsed = JSON.parse(jsonPart)
@@ -224,6 +222,17 @@ export default function OrderPage() {
                 />
               </div>
             </div>
+
+            {/* Дополнительная информация о статусе */}
+            <div className="mt-4 p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
+              <div className="text-sm text-zinc-600 dark:text-zinc-400">
+                {order.status === 'pending' && 'Ожидаем поступления оплаты'}
+                {order.status === 'paid' && 'Оплата получена, заказ готовится к выполнению'}
+                {order.status === 'processing' && 'Заказ выполняется нашими специалистами'}
+                {order.status === 'done' && 'Заказ успешно выполнен!'}
+                {order.status === 'canceled' && 'Заказ был отменен'}
+              </div>
+            </div>
           </div>
 
           {/* Детали заказа */}
@@ -285,10 +294,10 @@ export default function OrderPage() {
           </div>
         </div>
 
-        {/* Боковая панель - оплата */}
+        {/* Боковая панель */}
         <div className="lg:col-span-1">
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 sticky top-6">
-            <h3 className="text-lg font-semibold mb-4">Оплата</h3>
+            <h3 className="text-lg font-semibold mb-4">Информация об оплате</h3>
 
             <div className="flex items-center gap-3 mb-4">
               {getPaymentMethodIcon(order.payment_method)}
@@ -300,72 +309,40 @@ export default function OrderPage() {
               </div>
             </div>
 
-            {/* Информация об оплате для разных способов */}
-            {order && (
-              <div className="space-y-4">
-                {/* Банковская карта / СБП - автоматическая оплата */}
-                {(order.payment_method === 'sberbank' || order.payment_method === 'sbp') && (
-                  <>
-                    {order.status === 'pending' && order.payment_url && (
-                      <a
-                        href={order.payment_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        Перейти к оплате через RoboKassa
-                      </a>
-                    )}
+            {/* Статус оплаты */}
+            <div className="mb-4 p-3 rounded-lg">
+              {order.status === 'pending' && (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                  <div className="text-sm text-yellow-800 dark:text-yellow-200">
+                    ⏳ Ожидаем оплату заказа
+                  </div>
+                </div>
+              )}
 
-                    {order.status === 'pending' && !order.payment_url && (
-                      <div className="text-sm text-zinc-600 dark:text-zinc-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                        Ссылка для оплаты генерируется...
-                      </div>
-                    )}
+              {order.status === 'processing' && (
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                  <div className="text-sm text-green-800 dark:text-green-200">
+                    ✅ Заказ оплачен и передан в обработку
+                  </div>
+                </div>
+              )}
 
-                    {order.status !== 'pending' && (
-                      <div className="text-sm text-zinc-600 dark:text-zinc-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
-                        ✅ Заказ оплачен и передан в обработку
-                      </div>
-                    )}
-                  </>
-                )}
+              {order.status === 'done' && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                  <div className="text-sm text-blue-800 dark:text-blue-200">
+                    🎉 Заказ выполнен успешно!
+                  </div>
+                </div>
+              )}
 
-                {/* Криптовалюта - ручная оплата */}
-                {(order.payment_method === 'ton' || order.payment_method === 'usdt') && (
-                  <>
-                    {order.status === 'pending' && (
-                      <div className="space-y-3">
-                        <div className="text-sm font-medium">Адрес для перевода:</div>
-                        <div className="flex items-center gap-2 p-2 bg-zinc-100 dark:bg-zinc-800 rounded">
-                          <code className="flex-1 text-xs font-mono">
-                            {order.payment_url || 'АДРЕС_БУДЕТ_ПРЕДОСТАВЛЕН'}
-                          </code>
-                          {order.payment_url && (
-                            <button
-                              onClick={() => copyToClipboard(order.payment_url!)}
-                              className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded"
-                            >
-                              <Copy className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-
-                        <div className="text-xs text-zinc-500 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
-                          <div className="font-medium mb-1">Важно:</div>
-                          <ul className="space-y-1">
-                            <li>• Переведите точную сумму</li>
-                            <li>• Сохраните хеш транзакции</li>
-                            <li>• Отправьте хеш в поддержку</li>
-                          </ul>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
+              {order.status === 'canceled' && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                  <div className="text-sm text-red-800 dark:text-red-200">
+                    ❌ Заказ отменен
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Поддержка */}
             <div className="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-700">
