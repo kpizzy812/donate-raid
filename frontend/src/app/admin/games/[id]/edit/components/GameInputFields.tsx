@@ -100,12 +100,21 @@ export function GameInputFields({
                     <option value="">Общее для всех подкатегорий</option>
                     {data.subcategories
                       .filter(sub => sub.enabled && sub.name.trim())
-                      .map((subcategory, subIndex) => (
-                        <option key={subcategory.id || subIndex} value={subcategory.id || -subIndex - 1}>
-                          {subcategory.name}
-                        </option>
-                      ))}
+                      .map((subcategory, subIndex) => {
+                        // Для подкатегорий с ID используем их ID
+                        // Для новых подкатегорий (без ID) используем отрицательные значения
+                        const optionValue = subcategory.id || (-subIndex - 1)
+                        return (
+                          <option key={subcategory.id || `new-${subIndex}`} value={optionValue}>
+                            {subcategory.name} {!subcategory.id ? ' (новая)' : ''}
+                          </option>
+                        )
+                      })}
                   </select>
+                  <p className="text-xs text-zinc-500 mt-1">
+                    Подкатегорий найдено: {data.subcategories.length}
+                    {data.subcategories.length === 0 && ' - создайте подкатегории выше'}
+                  </p>
                 </div>
               </div>
 

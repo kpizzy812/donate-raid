@@ -17,13 +17,18 @@ export function GameSubcategories({
   removeSubcategory,
   updateSubcategory
 }: Props) {
+  console.log('🏷️ GameSubcategories отрендерился с данными:', data.subcategories)
+
   return (
     <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg border border-zinc-200 dark:border-zinc-700">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Подкатегории игры</h2>
         <button
           type="button"
-          onClick={addSubcategory}
+          onClick={() => {
+            console.log('🏷️ Нажата кнопка "Добавить подкатегорию"')
+            addSubcategory()
+          }}
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -32,6 +37,9 @@ export function GameSubcategories({
       </div>
 
       <div className="mb-4">
+        <p className="text-sm text-blue-600 dark:text-blue-400 mb-2">
+          📊 Загружено подкатегорий: {data.subcategories.length}
+        </p>
         <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
           Описание подкатегорий
         </label>

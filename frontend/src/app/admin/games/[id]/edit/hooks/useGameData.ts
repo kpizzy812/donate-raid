@@ -70,6 +70,8 @@ export function useGameData(id: string | undefined) {
       const response = await api.get(`/admin/games/${id}`)
       const data = response.data
       console.log('🎮 Данные игры получены:', data)
+      console.log('🏷️ Подкатегории в ответе:', data.subcategories)
+      console.log('📝 Поля ввода в ответе:', data.input_fields)
 
       setGameData({
         name: data.name || '',
@@ -82,28 +84,37 @@ export function useGameData(id: string | undefined) {
         sortOrder: data.sort_order || 0,
         bannerUrl: data.banner_url || '',
         logoUrl: data.logo_url || '',
-        subcategories: data.subcategories?.map((sub: any) => ({
-          id: sub.id,
-          name: sub.name,
-          description: sub.description || '',
-          sort_order: sub.sort_order,
-          enabled: sub.enabled
-        })) || [],
-        inputFields: data.input_fields?.map((field: any) => ({
-          id: field.id,
-          name: field.name,
-          label: field.label,
-          type: field.field_type || field.type || 'text',
-          required: field.required,
-          placeholder: field.placeholder || '',
-          help_text: field.help_text || '',
-          options: field.options || [],
-          validation_regex: field.validation_regex || '',
-          min_length: field.min_length,
-          max_length: field.max_length,
-          subcategory_id: field.subcategory_id
-        })) || []
+        subcategories: data.subcategories?.map((sub: any) => {
+          console.log('🏷️ Маппинг подкатегории:', sub)
+          return {
+            id: sub.id,
+            name: sub.name,
+            description: sub.description || '',
+            sort_order: sub.sort_order,
+            enabled: sub.enabled
+          }
+        }) || [],
+        inputFields: data.input_fields?.map((field: any) => {
+          console.log('📝 Маппинг поля ввода:', field)
+          return {
+            id: field.id,
+            name: field.name,
+            label: field.label,
+            type: field.field_type || field.type || 'text',
+            required: field.required,
+            placeholder: field.placeholder || '',
+            help_text: field.help_text || '',
+            options: field.options || [],
+            validation_regex: field.validation_regex || '',
+            min_length: field.min_length,
+            max_length: field.max_length,
+            subcategory_id: field.subcategory_id
+          }
+        }) || []
       })
+
+      console.log('🎮 Загружено подкатегорий:', data.subcategories?.length || 0)
+      console.log('🎮 Загружено полей ввода:', data.input_fields?.length || 0)
 
     } catch (error: any) {
       console.error('❌ Ошибка загрузки игры:', error)
