@@ -1,4 +1,4 @@
-// frontend/src/components/ProductGrid.tsx - ПЕРЕРАБОТАННАЯ ВЕРСИЯ БЕЗ МОДАЛОК
+// frontend/src/components/ProductGrid.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useState } from 'react'
@@ -15,6 +15,7 @@ interface InputField {
   placeholder?: string
   help_text?: string
   options?: string[]
+  subcategory_id?: number  // ДОБАВЛЕНО: поле для привязки к подкатегории
 }
 
 interface Product {
@@ -27,6 +28,7 @@ interface Product {
   type: 'currency' | 'item' | 'service'
   subcategory?: string
   subcategory_name?: string
+  subcategory_id?: number  // ДОБАВЛЕНО: для сравнения с полями ввода
   special_note?: string
   note_type: string
   input_fields?: InputField[]
@@ -42,15 +44,16 @@ interface ProductGridProps {
   gameInputFields?: InputField[]  // ДОБАВИТЬ ЭТО ПОЛЕ
 }
 
-export default function ProductGrid({ products, onAddToCart }: ProductGridProps) {
+// ИСПРАВЛЕНО: добавлен gameInputFields в деструктуризацию
+export default function ProductGrid({ products, onAddToCart, gameInputFields }: ProductGridProps) {
   const { addItems } = useCart()
   const router = useRouter()
 
   const handleBuyNow = (product: Product) => {
-    // Получаем поля ввода для этого товара
-    const relevantFields = gameInputFields.filter(field =>
+    // ИСПРАВЛЕНО: добавлена безопасная проверка и правильное сравнение
+    const relevantFields = gameInputFields?.filter(field =>
       !field.subcategory_id || field.subcategory_id === product.subcategory_id
-    )
+    ) || []
 
     // Если есть обязательные поля, показываем их пользователю
     if (relevantFields.length > 0) {

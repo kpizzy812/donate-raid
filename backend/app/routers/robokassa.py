@@ -10,6 +10,7 @@ from app.services.mailer import send_email, render_template
 from loguru import logger
 from fastapi.responses import RedirectResponse
 from typing import Dict
+from sqlalchemy.orm import joinedload
 
 router = APIRouter()
 
@@ -22,12 +23,50 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
     """
     logger.info("🔔 Получен Result webhook от RoboKassa")
 
-    # Получаем данные из POST запроса
-    if request.headers.get("content-type") == "application/x-www-form-urlencoded":
-        form_data = await request.form()
-        data = dict(form_data)
-    else:
-        data = await request.json()
+    # Логируем заголовки для отладки
+    logger.info(f"📋 Content-Type: {request.headers.get('content-type')}")
+    logger.info(f"📋 User-Agent: {request.headers.get('user-agent')}")
+
+    # ИСПРАВЛЕНО: более надежная обработка данных от RoboKassa
+    data = {}
+    try:
+        content_type = request.headers.get("content-type", "").lower()
+
+        # Сначала пытаемся получить данные как form data (основной способ RoboKassa)
+        if "application/x-www-form-urlencoded" in content_type or not content_type:
+            form_data = await request.form()
+            data = dict(form_data)
+            logger.info("📥 Данные получены как form data")
+        else:
+            # Если не form data, пытаемся как JSON (резервный способ)
+            try:
+                data = await request.json()
+                logger.info("📥 Данные получены как JSON")
+            except Exception as json_error:
+                logger.warning(f"⚠️ Не удалось парсить как JSON: {json_error}")
+                # Попытка получить как form data в любом случае
+                try:
+                    form_data = await request.form()
+                    data = dict(form_data)
+                    logger.info("📥 Данные получены как form data (резервно)")
+                except Exception as form_error:
+                    logger.error(
+                        f"❌ Не удалось получить данные ни одним способом: form_error={form_error}, json_error={json_error}")
+
+                    # Попытка получить raw данные для отладки
+                    try:
+                        body = await request.body()
+                        logger.error(f"📄 Raw body: {body}")
+                    except:
+                        logger.error("❌ Не удалось получить даже raw body")
+
+                    raise HTTPException(status_code=400, detail="Unable to parse request data")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Критическая ошибка при получении данных: {e}")
+        raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
 
     logger.info(f"📦 Данные от RoboKassa: {data}")
 
@@ -40,7 +79,14 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
         email = data.get("EMail")  # Email плательщика (опционально)
 
         if not all([out_sum, inv_id, signature_value]):
-            raise ValueError("Отсутствуют обязательные параметры")
+            missing_params = []
+            if not out_sum: missing_params.append("OutSum")
+            if not inv_id: missing_params.append("InvId")
+            if not signature_value: missing_params.append("SignatureValue")
+
+            logger.error(f"❌ Отсутствуют обязательные параметры: {missing_params}")
+            logger.error(f"📋 Все полученные данные: {data}")
+            raise ValueError(f"Отсутствуют обязательные параметры: {', '.join(missing_params)}")
 
     except Exception as e:
         logger.error(f"❌ Ошибка парсинга данных от RoboKassa: {e}")
@@ -51,8 +97,13 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
         logger.error("❌ Неверная подпись от RoboKassa")
         raise HTTPException(status_code=400, detail="Invalid signature")
 
-    # Находим заказ
-    order = db.query(Order).filter(Order.id == int(inv_id)).first()
+    # Находим заказ С ПОЛЬЗОВАТЕЛЕМ
+    order = db.query(Order).options(
+        joinedload(Order.user),  # ДОБАВЛЕНО: загружаем пользователя
+        joinedload(Order.game),
+        joinedload(Order.product)
+    ).filter(Order.id == int(inv_id)).first()
+
     if not order:
         logger.error(f"❌ Заказ #{inv_id} не найден")
         raise HTTPException(status_code=404, detail="Order not found")
@@ -62,11 +113,11 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
     # Проверяем, что заказ еще не оплачен
     if order.status != OrderStatus.pending:
         logger.warning(f"⚠️ Заказ #{order.id} уже имеет статус {order.status}")
-        return {"status": "OK"}  # Возвращаем OK чтобы RoboKassa не слал повторно
+        return {"status": "OK"}
 
     # Обновляем заказ
     try:
-        order.status = OrderStatus.processing  # Сразу в обработку
+        order.status = OrderStatus.processing
         order.transaction_id = f"robokassa_{inv_id}_{out_sum}"
 
         db.commit()
@@ -74,7 +125,37 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
 
         logger.info(f"✅ Заказ #{order.id} помечен как оплаченный и отправлен в обработку")
 
-        # Уведомление админам в Telegram
+        # ИСПРАВЛЕНО: Улучшенное уведомление админам в Telegram
+        user_info = "👤 Гость"
+        if order.user:
+            user_info = f"👤 {order.user.username or 'Без имени'}"
+            if order.user.email:
+                user_info += f" ({order.user.email})"
+            user_info += f" [ID: {order.user.id}]"
+
+        game_info = f"🎮 {order.game.name}" if order.game else "🎮 Неизвестная игра"
+        product_info = f"📦 {order.product.name}" if order.product else "📦 Неизвестный товар"
+
+        # Парсим пользовательские данные из comment
+        user_data_info = ""
+        if order.comment:
+            try:
+                import json
+                import re
+
+                # Ищем JSON в комментарии
+                json_matches = re.findall(r'\{[^}]+\}', order.comment)
+                if json_matches:
+                    parsed_data = json.loads(json_matches[0])
+                    user_data_items = []
+                    for key, value in parsed_data.items():
+                        user_data_items.append(f"  • {key}: {value}")
+
+                    if user_data_items:
+                        user_data_info = f"\n📝 Данные пользователя:\n" + "\n".join(user_data_items)
+            except Exception as e:
+                logger.warning(f"Не удалось парсить данные пользователя: {e}")
+
         user_info = f"👤 {order.user.username}" if order.user else "👤 Гость"
         game_info = f"🎮 {order.game.name}" if order.game else "🎮 Неизвестная игра"
         product_info = f"📦 {order.product.name}" if order.product else "📦 Неизвестный товар"
@@ -87,7 +168,8 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
             f"{product_info}\n"
             f"💵 Сумма: <b>{order.amount} {order.currency}</b>\n"
             f"💳 Способ: RoboKassa\n"
-            f"🆔 Транзакция: <code>{order.transaction_id}</code>"
+            f"🆔 Транзакция: <code>{order.transaction_id}</code>",
+            order_id=order.id  # ДОБАВЛЕНО: передаем order_id для кнопок
         )
 
         # Отправляем email пользователю если есть
@@ -114,8 +196,12 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Database error")
 
 
+# Замените в файле backend/app/routers/robokassa.py
+
 @router.get("/success")
+@router.post("/success")  # ДОБАВЛЕНО: поддержка POST
 async def robokassa_success(
+        request: Request,  # ДОБАВЛЕНО: для обработки POST данных
         OutSum: str = None,
         InvId: str = None,
         SignatureValue: str = None,
@@ -123,10 +209,22 @@ async def robokassa_success(
 ):
     """
     Success URL - пользователь попадает сюда после успешной оплаты
-    Robokassa передает параметры через query string
+    RoboKassa может отправлять как GET, так и POST запросы
     """
-    logger.info(f"✅ Success redirect от RoboKassa")
-    logger.info(f"📦 Параметры: OutSum={OutSum}, InvId={InvId}, SignatureValue={SignatureValue}")
+    logger.info(f"✅ Success redirect от RoboKassa (метод: {request.method})")
+
+    # Для POST запросов получаем данные из form data
+    if request.method == "POST":
+        try:
+            form_data = await request.form()
+            OutSum = form_data.get("OutSum") or OutSum
+            InvId = form_data.get("InvId") or InvId
+            SignatureValue = form_data.get("SignatureValue") or SignatureValue
+            logger.info(f"📦 POST данные: OutSum={OutSum}, InvId={InvId}")
+        except Exception as e:
+            logger.warning(f"⚠️ Ошибка парсинга POST данных: {e}")
+    else:
+        logger.info(f"📦 GET параметры: OutSum={OutSum}, InvId={InvId}, SignatureValue={SignatureValue}")
 
     # Проверяем наличие InvId (ID заказа)
     if InvId:
@@ -136,19 +234,24 @@ async def robokassa_success(
             if order:
                 logger.info(f"📋 Заказ #{order_id} найден, статус: {order.status}")
 
-                # Перенаправляем на фронтенд страницу заказа
-                return RedirectResponse(url=f"https://donateraid.ru/order/{order_id}?payment=success")
+                # ИСПРАВЛЕНО: Перенаправляем на фронтенд страницу заказа
+                redirect_url = f"https://donateraid.ru/order/{order_id}?payment=success"
+                logger.info(f"🔄 Перенаправляем на: {redirect_url}")
+                return RedirectResponse(url=redirect_url, status_code=302)
             else:
                 logger.warning(f"⚠️ Заказ #{order_id} не найден")
         except ValueError:
             logger.error(f"❌ Неверный формат InvId: {InvId}")
 
     # Если что-то пошло не так, перенаправляем на главную
-    return RedirectResponse(url="https://donateraid.ru/")
+    logger.info("🏠 Перенаправляем на главную страницу")
+    return RedirectResponse(url="https://donateraid.ru/", status_code=302)
 
 
 @router.get("/fail")
+@router.post("/fail")  # ДОБАВЛЕНО: поддержка POST для fail
 async def robokassa_fail(
+        request: Request,  # ДОБАВЛЕНО: для обработки POST данных
         OutSum: str = None,
         InvId: str = None,
         SignatureValue: str = None,
@@ -156,9 +259,22 @@ async def robokassa_fail(
 ):
     """
     Fail URL - пользователь попадает сюда при неудачной оплате
+    RoboKassa может отправлять как GET, так и POST запросы
     """
-    logger.info(f"❌ Fail redirect от RoboKassa")
-    logger.info(f"📦 Параметры: OutSum={OutSum}, InvId={InvId}, SignatureValue={SignatureValue}")
+    logger.info(f"❌ Fail redirect от RoboKassa (метод: {request.method})")
+
+    # Для POST запросов получаем данные из form data
+    if request.method == "POST":
+        try:
+            form_data = await request.form()
+            OutSum = form_data.get("OutSum") or OutSum
+            InvId = form_data.get("InvId") or InvId
+            SignatureValue = form_data.get("SignatureValue") or SignatureValue
+            logger.info(f"📦 POST данные: OutSum={OutSum}, InvId={InvId}")
+        except Exception as e:
+            logger.warning(f"⚠️ Ошибка парсинга POST данных: {e}")
+    else:
+        logger.info(f"📦 GET параметры: OutSum={OutSum}, InvId={InvId}, SignatureValue={SignatureValue}")
 
     # Проверяем наличие InvId (ID заказа)
     if InvId:
@@ -168,15 +284,18 @@ async def robokassa_fail(
             if order:
                 logger.info(f"📋 Заказ #{order_id} найден, статус: {order.status}")
 
-                # Перенаправляем на фронтенд страницу заказа с параметром ошибки
-                return RedirectResponse(url=f"https://donateraid.ru/order/{order_id}?payment=failed")
+                # ИСПРАВЛЕНО: Перенаправляем на фронтенд страницу заказа с параметром ошибки
+                redirect_url = f"https://donateraid.ru/order/{order_id}?payment=failed"
+                logger.info(f"🔄 Перенаправляем на: {redirect_url}")
+                return RedirectResponse(url=redirect_url, status_code=302)
             else:
                 logger.warning(f"⚠️ Заказ #{order_id} не найден")
         except ValueError:
             logger.error(f"❌ Неверный формат InvId: {InvId}")
 
     # Если что-то пошло не так, перенаправляем на главную
-    return RedirectResponse(url="https://donateraid.ru/")
+    logger.info("🏠 Перенаправляем на главную страницу")
+    return RedirectResponse(url="https://donateraid.ru/", status_code=302)
 
 
 @router.get("/payment-methods")

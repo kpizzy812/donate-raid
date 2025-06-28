@@ -1,4 +1,4 @@
-# backend/app/services/telegram.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/services/telegram.py - ИСПРАВЛЕННАЯ ВЕРСИЯ С КНОПКАМИ ДЛЯ ПЛАТНЫХ ЗАКАЗОВ
 import asyncio
 import aiohttp
 from typing import Optional
@@ -80,21 +80,35 @@ def notify_order_sync(message: str):
 
 def notify_manual_order_sync(message: str, order_id: int = None):
     """Уведомление о ручном заказе с клавиатурой"""
-    # Импортируем здесь чтобы избежать циклических импортов
-    from bot.handlers.manual_orders import manual_order_keyboard
-
     keyboard = None
     if order_id:
-        kb = manual_order_keyboard(order_id)
-        # Конвертируем aiogram клавиатуру в JSON для API
-        keyboard = kb.model_dump() if hasattr(kb, 'model_dump') else None
+        # Создаем клавиатуру в формате Telegram Bot API
+        keyboard = {
+            "inline_keyboard": [
+                [{"text": "✅ Принять", "callback_data": f"approve_{order_id}"}],
+                [{"text": "↩️ Отклонить с возвратом", "callback_data": f"reject_with_refund_{order_id}"}],
+                [{"text": "❌ Удалить", "callback_data": f"delete_order_{order_id}"}]
+            ]
+        }
 
     telegram_notifier.send_message_sync(message, reply_markup=keyboard)
 
 
-def notify_payment_sync(message: str):
-    """Уведомление об оплате"""
-    telegram_notifier.send_message_sync(message)
+def notify_payment_sync(message: str, order_id: int = None):
+    """Уведомление об оплате с кнопками управления"""
+    keyboard = None
+    if order_id:
+        # Создаем клавиатуру в формате Telegram Bot API
+        keyboard = {
+            "inline_keyboard": [
+                [
+                    {"text": "✅ Выполнен", "callback_data": f"paid_complete_{order_id}"},
+                    {"text": "💸 Возврат", "callback_data": f"paid_refund_{order_id}"}
+                ]
+            ]
+        }
+
+    telegram_notifier.send_message_sync(message, reply_markup=keyboard)
 
 
 # Для использования в роутерах
