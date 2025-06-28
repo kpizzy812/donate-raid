@@ -301,6 +301,7 @@ def create_bulk_order(
     print(f"    → Новый bulk-заказ создан, id={new_order.id}, сумма={total_amount}, метод={first_item.payment_method}")
 
     # 🆕 Генерируем payment_url для RoboKassa методов
+    payment_url_generated = True
     if first_item.payment_method in [PaymentMethod.sberbank, PaymentMethod.sbp]:
         try:
             # Создаем описание товара
@@ -334,22 +335,33 @@ def create_bulk_order(
 
         except Exception as e:
             print(f"    → Ошибка генерации payment_url: {e}")
-            # Не прерываем создание заказа из-за ошибки генерации URL
+            payment_url_generated = False
+            # Удаляем заказ если не удалось сгенерировать URL оплаты
+            db.delete(new_order)
+            db.commit()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Ошибка создания ссылки на оплату: {str(e)}"
+            )
 
-    # Отправка email уведомления
-    if current_user.email:
-        html = render_template("order_created.html", {
-            "order_id": new_order.id,
-            "amount": new_order.amount,
-            "currency": new_order.currency,
-            "username": current_user.username,
-        })
-        send_email(
-            to=current_user.email,
-            subject="✅ Заказ создан | Donate Raid",
-            body=html
-        )
-        print(f"    → Отправлено письмо пользователю {current_user.email}")
+    # Отправка email уведомления ТОЛЬКО если заказ успешно создан
+    if payment_url_generated and current_user.email:
+        try:
+            html = render_template("order_created.html", {
+                "order_id": new_order.id,
+                "amount": new_order.amount,
+                "currency": new_order.currency,
+                "username": current_user.username,
+            })
+            send_email(
+                to=current_user.email,
+                subject="✅ Заказ создан | Donate Raid",
+                body=html
+            )
+            print(f"    → Отправлено письмо пользователю {current_user.email}")
+        except Exception as e:
+            print(f"    → Ошибка отправки письма: {e}")
+            # Письмо не критично, не прерываем создание заказа
 
     return new_order
 

@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { toast } from 'sonner'
+import { useSearchParams } from 'next/navigation'
 import {
   CreditCard,
   Smartphone,
@@ -35,6 +36,8 @@ export default function OrderPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const [order, setOrder] = useState<Order | null>(null)
+  const searchParams = useSearchParams()
+  const paymentStatus = searchParams.get('payment')
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
@@ -163,9 +166,51 @@ export default function OrderPage() {
   const userData = order.comment ? parseUserData(order.comment) : {}
 
   return (
-    <div className="py-8 max-w-4xl mx-auto space-y-6 px-4">
-      {/* Заголовок */}
-      <div className="flex items-center gap-4">
+  <div className="py-8 max-w-4xl mx-auto space-y-6 px-4">
+
+    {/* Уведомления - НОВЫЙ КОД */}
+    {paymentStatus === 'failed' && (
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div className="flex items-start">
+          <div className="flex-shrink-0">
+            <XCircle className="h-5 w-5 text-red-400" />
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+              Ошибка оплаты
+            </h3>
+            <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+              <p>
+                Оплата не была завершена. Вы можете попробовать еще раз.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {paymentStatus === 'success' && (
+      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+        <div className="flex items-start">
+          <div className="flex-shrink-0">
+            <CheckCircle className="h-5 w-5 text-green-400" />
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-green-800 dark:text-green-200">
+              Оплата прошла успешно!
+            </h3>
+            <div className="mt-2 text-sm text-green-700 dark:text-green-300">
+              <p>
+                Ваш заказ обрабатывается. Вы получите уведомление, когда он будет готов.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Заголовок */}
+    <div className="flex items-center gap-4">
         <button
           onClick={() => router.push('/me')}
           className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"

@@ -8,6 +8,7 @@ from app.services.robokassa import robokassa_service
 from app.services.telegram import notify_payment_sync
 from app.services.mailer import send_email, render_template
 from loguru import logger
+from fastapi.responses import RedirectResponse
 from typing import Dict
 
 router = APIRouter()
@@ -114,48 +115,68 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
 
 
 @router.get("/success")
-async def robokassa_success(request: Request, db: Session = Depends(get_db)):
+async def robokassa_success(
+        OutSum: str = None,
+        InvId: str = None,
+        SignatureValue: str = None,
+        db: Session = Depends(get_db)
+):
     """
     Success URL - пользователь попадает сюда после успешной оплаты
-    RoboKassa передает InvId через GET параметры
+    Robokassa передает параметры через query string
     """
-    # Получаем InvId из GET параметров
-    inv_id = request.query_params.get("InvId")
-    if not inv_id:
-        logger.error("❌ Нет InvId в Success URL")
-        return RedirectResponse(url="https://donateraid.ru/")
+    logger.info(f"✅ Success redirect от RoboKassa")
+    logger.info(f"📦 Параметры: OutSum={OutSum}, InvId={InvId}, SignatureValue={SignatureValue}")
 
-    logger.info(f"✅ Success redirect для заказа #{inv_id}")
+    # Проверяем наличие InvId (ID заказа)
+    if InvId:
+        try:
+            order_id = int(InvId)
+            order = db.query(Order).filter(Order.id == order_id).first()
+            if order:
+                logger.info(f"📋 Заказ #{order_id} найден, статус: {order.status}")
 
-    # Можно добавить дополнительную логику если нужно
-    order = db.query(Order).filter(Order.id == int(inv_id)).first()
-    if order:
-        logger.info(f"📋 Заказ #{inv_id} найден, статус: {order.status}")
+                # Перенаправляем на фронтенд страницу заказа
+                return RedirectResponse(url=f"https://donateraid.ru/order/{order_id}?payment=success")
+            else:
+                logger.warning(f"⚠️ Заказ #{order_id} не найден")
+        except ValueError:
+            logger.error(f"❌ Неверный формат InvId: {InvId}")
 
-    # Редиректим на страницу заказа
-    return RedirectResponse(url=f"https://donateraid.ru/order/{inv_id}")
+    # Если что-то пошло не так, перенаправляем на главную
+    return RedirectResponse(url="https://donateraid.ru/")
 
 
 @router.get("/fail")
-async def robokassa_fail(request: Request, db: Session = Depends(get_db)):
+async def robokassa_fail(
+        OutSum: str = None,
+        InvId: str = None,
+        SignatureValue: str = None,
+        db: Session = Depends(get_db)
+):
     """
     Fail URL - пользователь попадает сюда при неудачной оплате
-    RoboKassa передает InvId через GET параметры
     """
-    # Получаем InvId из GET параметров
-    inv_id = request.query_params.get("InvId")
-    if not inv_id:
-        logger.error("❌ Нет InvId в Fail URL")
-        return RedirectResponse(url="https://donateraid.ru/")
+    logger.info(f"❌ Fail redirect от RoboKassa")
+    logger.info(f"📦 Параметры: OutSum={OutSum}, InvId={InvId}, SignatureValue={SignatureValue}")
 
-    logger.info(f"❌ Fail redirect для заказа #{inv_id}")
+    # Проверяем наличие InvId (ID заказа)
+    if InvId:
+        try:
+            order_id = int(InvId)
+            order = db.query(Order).filter(Order.id == order_id).first()
+            if order:
+                logger.info(f"📋 Заказ #{order_id} найден, статус: {order.status}")
 
-    order = db.query(Order).filter(Order.id == int(inv_id)).first()
-    if order:
-        logger.info(f"📋 Заказ #{inv_id} найден, статус: {order.status}")
+                # Перенаправляем на фронтенд страницу заказа с параметром ошибки
+                return RedirectResponse(url=f"https://donateraid.ru/order/{order_id}?payment=failed")
+            else:
+                logger.warning(f"⚠️ Заказ #{order_id} не найден")
+        except ValueError:
+            logger.error(f"❌ Неверный формат InvId: {InvId}")
 
-    # Редиректим на страницу заказа (статус останется pending)
-    return RedirectResponse(url=f"https://donateraid.ru/order/{inv_id}")
+    # Если что-то пошло не так, перенаправляем на главную
+    return RedirectResponse(url="https://donateraid.ru/")
 
 
 @router.get("/payment-methods")

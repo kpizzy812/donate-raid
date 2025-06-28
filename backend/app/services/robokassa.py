@@ -69,9 +69,9 @@ class RoboKassaService:
         if receipt:
             params["Receipt"] = receipt
 
-        # Success/Fail URL'ы
-        params["SuccessURL"] = f"https://donateraid.ru/order/{order_id}"
-        params["FailURL"] = f"https://donateraid.ru/order/{order_id}"
+        # ИСПРАВЛЕНО: правильные URL'ы для робокассы
+        params["SuccessURL"] = "https://donateraid.ru/api/robokassa/success"
+        params["FailURL"] = "https://donateraid.ru/api/robokassa/fail"
 
         # Формируем финальный URL
         query_string = "&".join([f"{key}={requests.utils.quote(str(value))}" for key, value in params.items()])
