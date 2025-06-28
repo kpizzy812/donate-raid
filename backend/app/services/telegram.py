@@ -41,13 +41,18 @@ class TelegramNotifier:
                 # Добавляем клавиатуру если есть
                 if reply_markup:
                     payload["reply_markup"] = reply_markup
+                    logger.info(f"🔍 Отправляем клавиатуру: {reply_markup}")
+
+                logger.info(f"🔍 Полный payload для Telegram API: {payload}")
 
                 async with aiohttp.ClientSession() as session:
                     async with session.post(url, json=payload) as response:
+                        response_text = await response.text()
                         if response.status == 200:
                             logger.info(f"Уведомление отправлено в чат {chat_id}")
                         else:
                             logger.error(f"Ошибка отправки в чат {chat_id}: {response.status}")
+                            logger.error(f"Ответ Telegram API: {response_text}")
 
             except Exception as e:
                 logger.error(f"Ошибка отправки уведомления в Telegram: {e}")

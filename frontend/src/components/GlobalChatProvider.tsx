@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, X, Bell } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
 // Динамически загружаем чат без SSR
@@ -10,7 +10,10 @@ const SupportChat = dynamic(() => import('./SupportChat'), {
   ssr: false,
   loading: () => (
     <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg h-full flex items-center justify-center">
-      <p className="text-zinc-500 dark:text-zinc-400">Загрузка чата...</p>
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-zinc-500 dark:text-zinc-400">Загрузка чата...</p>
+      </div>
     </div>
   )
 })
@@ -74,7 +77,6 @@ export default function GlobalChatProvider() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
           {/* Контейнер чата */}
           <div className="relative w-full max-w-2xl h-[600px] max-h-[90vh]">
-            {/* ИСПРАВЛЕНО: передаем onClose в ваш оригинальный SupportChat */}
             <SupportChat onClose={() => setIsChatOpen(false)} />
           </div>
         </div>

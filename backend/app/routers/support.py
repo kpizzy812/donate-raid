@@ -1,5 +1,5 @@
 # backend/app/routers/support.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
-from fastapi import APIRouter, Depends, Request, Query
+from fastapi import APIRouter, Depends, Request, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.support import SupportMessage, SupportStatus
@@ -8,14 +8,16 @@ from app.models.user import User
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
-from bot.handlers.support import notify_new_support_message
 from loguru import logger
 
 router = APIRouter()
 
+
 # Pydantic схемы
 class SupportMessageCreate(BaseModel):
     message: str
+    guest_id: Optional[str] = None
+
 
 class SupportMessageRead(BaseModel):
     id: int
@@ -29,11 +31,27 @@ class SupportMessageRead(BaseModel):
     class Config:
         from_attributes = True
 
+
+# ИСПРАВЛЕННАЯ функция уведомления - запускается в фоне
+async def send_telegram_notification(user_id: int = None, text: str = None, guest_id: str = None):
+    """Фоновая задача для отправки уведомления в Telegram"""
+    try:
+        from bot.handlers.support import notify_new_support_message
+        await notify_new_support_message(
+            user_id=user_id,
+            text=text,
+            guest_id=guest_id
+        )
+        logger.info("✅ Telegram уведомление отправлено")
+    except Exception as e:
+        logger.warning(f"⚠️ Ошибка уведомления в Telegram: {e}")
+
+
 @router.post("/send", response_model=SupportMessageRead)
 async def create_support_message(
         data: SupportMessageCreate,
+        background_tasks: BackgroundTasks,  # ИСПРАВЛЕНО: добавлен BackgroundTasks
         request: Request,
-        guest_id: Optional[str] = Query(None),
         db: Session = Depends(get_db),
 ):
     """Создать сообщение в поддержку"""
@@ -51,6 +69,16 @@ async def create_support_message(
         logger.warning(f"⚠️ Ошибка получения пользователя: {e}")
         user = None  # Продолжаем как гость
 
+    # Определяем guest_id
+    guest_id = None
+    if not user:
+        guest_id = data.guest_id
+        if not guest_id:
+            # Генерируем guest_id если не передан
+            import uuid
+            guest_id = str(uuid.uuid4())[:8]
+            logger.info(f"🆔 Сгенерирован новый guest_id: {guest_id}")
+
     # Создаем сообщение
     message = SupportMessage(
         user_id=user.id if user else None,
@@ -65,40 +93,16 @@ async def create_support_message(
     db.commit()
     db.refresh(message)
 
-    logger.info(f"📝 Создано сообщение: user_id={message.user_id}, guest_id={message.guest_id}, message='{message.message}'")
+    logger.info(
+        f"📝 Создано сообщение: user_id={message.user_id}, guest_id={message.guest_id}, message='{message.message}'")
 
-    # 🆕 ДОБАВЛЯЕМ WEBSOCKET УВЕДОМЛЕНИЕ ДЛЯ ПОЛЬЗОВАТЕЛЯ
-    try:
-        from app.routers.websocket_support import notify_support_websocket
-
-        message_data = {
-            "id": message.id,
-            "message": message.message,
-            "is_from_user": message.is_from_user,
-            "created_at": message.created_at.isoformat(),
-            "status": message.status.value
-        }
-
-        # Уведомляем через WebSocket (для real-time обновления в браузере)
-        await notify_support_websocket(
-            user_id=user.id if user else None,
-            guest_id=guest_id if not user else None,
-            message_data=message_data
-        )
-        logger.info("✅ WebSocket уведомление отправлено")
-    except Exception as e:
-        logger.error(f"❌ Ошибка WebSocket уведомления: {e}")
-
-    # Уведомляем админов в Telegram
-    try:
-        await notify_new_support_message(
-            user_id=user.id if user else None,
-            text=data.message,
-            guest_id=guest_id if not user else None
-        )
-        logger.info("✅ Telegram уведомление отправлено")
-    except Exception as e:
-        logger.warning(f"⚠️ Ошибка уведомления в Telegram: {e}")
+    # ИСПРАВЛЕНО: запускаем уведомление в фоне
+    background_tasks.add_task(
+        send_telegram_notification,
+        user_id=user.id if user else None,
+        text=data.message,
+        guest_id=guest_id if not user else None
+    )
 
     return message
 
@@ -130,3 +134,17 @@ async def get_my_support_messages(
         return []
 
     return messages
+
+
+# ДОБАВЛЕННЫЙ endpoint для совместимости
+@router.post("/messages")
+async def get_support_messages_post(
+        data: dict,
+        request: Request,
+        db: Session = Depends(get_db),
+):
+    """Получить сообщения поддержки (POST версия для совместимости)"""
+    guest_id = data.get('guest_id')
+
+    # Переадресовываем на GET endpoint
+    return await get_my_support_messages(request, guest_id, db)

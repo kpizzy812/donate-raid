@@ -1,252 +1,269 @@
-// frontend/src/app/me/page.tsx - УЛУЧШЕННАЯ ВЕРСИЯ
+// frontend/src/components/SupportChat.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useUser } from '@/hooks/useUser'
-import { User as UserIcon, Mail, CreditCard, LogOut, Package, History, Settings } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Send, X, MessageCircle, Minimize2, Maximize2 } from 'lucide-react'
 
-type Order = {
+interface SupportMessage {
   id: number
-  game: string
-  product: string
-  amount: number
-  status: string
+  message: string
+  is_from_user: boolean
   created_at: string
+  status?: string
 }
 
-export default function MePage() {
-  const { user, logout, loading: userLoading } = useUser()
-  const [orders, setOrders] = useState<Order[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const router = useRouter()
+interface SupportChatProps {
+  onClose: () => void
+}
 
-  useEffect(() => {
-    if (!userLoading && !user) {
-      router.replace('/login')
-      return
-    }
+// Генерация guest_id
+function generateGuestId(): string {
+  const existingId = localStorage.getItem('guest_id')
+  if (existingId) return existingId
 
-    if (user) {
-      fetchOrders()
-    }
-  }, [user, userLoading, router])
+  const newId = Math.random().toString(36).substring(2, 15)
+  localStorage.setItem('guest_id', newId)
+  return newId
+}
 
-  const fetchOrders = async () => {
+export default function SupportChat({ onClose }: SupportChatProps) {
+  const [messages, setMessages] = useState<SupportMessage[]>([])
+  const [inputMessage, setInputMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
+  const [guestId] = useState<string>(generateGuestId())
+  const [token] = useState<string | null>(localStorage.getItem('access_token'))
+
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const lastMessageCountRef = useRef(0)
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Прокрутка к последнему сообщению
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [])
+
+  // Загрузка сообщений
+  const loadMessages = useCallback(async (silent = false) => {
+    if (!silent) setIsLoading(true)
+
     try {
-      const token = localStorage.getItem('access_token')
-      if (!token) return
+      const params = new URLSearchParams()
+      if (!token && guestId) {
+        params.append('guest_id', guestId)
+      }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/my`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/support/my?${params}`, {
+        method: 'GET',
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
       })
 
-      if (res.ok) {
-        const data = await res.json()
-        setOrders(data.slice(0, 5)) // Показываем только последние 5 заказов
+      if (response.ok) {
+        const data = await response.json()
+
+        // Проверяем, изменилось ли количество сообщений
+        const currentCount = data.length
+        if (currentCount !== lastMessageCountRef.current) {
+          setMessages(data)
+          lastMessageCountRef.current = currentCount
+
+          // Прокручиваем только если добавились новые сообщения
+          setTimeout(scrollToBottom, 100)
+        }
+      } else {
+        console.error('Ошибка загрузки сообщений:', response.status)
       }
-    } catch (err) {
-      console.error('Ошибка загрузки заказов:', err)
+    } catch (error) {
+      console.error('Ошибка загрузки сообщений:', error)
     } finally {
-      setLoading(false)
+      if (!silent) setIsLoading(false)
     }
-  }
+  }, [token, guestId, scrollToBottom])
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'text-green-600 bg-green-100 dark:bg-green-900'
-      case 'pending': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900'
-      case 'cancelled': return 'text-red-600 bg-red-100 dark:bg-red-900'
-      default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900'
+  // Отправка сообщения
+  const sendMessage = useCallback(async () => {
+    if (!inputMessage.trim()) return
+
+    const messageText = inputMessage.trim()
+    setInputMessage('')
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/support/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          message: messageText,
+          guest_id: !token ? guestId : undefined
+        })
+      })
+
+      if (response.ok) {
+        // Сразу перезагружаем сообщения
+        await loadMessages(true)
+      } else {
+        console.error('Ошибка отправки сообщения:', response.status)
+        setInputMessage(messageText) // Восстанавливаем текст при ошибке
+      }
+    } catch (error) {
+      console.error('Ошибка отправки сообщения:', error)
+      setInputMessage(messageText) // Восстанавливаем текст при ошибке
     }
-  }
+  }, [inputMessage, token, guestId, loadMessages])
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'completed': return 'Завершен'
-      case 'pending': return 'В обработке'
-      case 'cancelled': return 'Отменен'
-      default: return status
+  // Обработка нажатия Enter
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage()
     }
-  }
+  }, [sendMessage])
 
-  if (userLoading || loading) {
-    return (
-      <div className="py-10 max-w-4xl mx-auto px-4 text-center">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-        <p className="mt-4 text-zinc-500">Загружаем данные...</p>
-      </div>
-    )
-  }
+  // Форматирование времени
+  const formatTime = useCallback((dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }, [])
 
-  if (!user) {
-    return null
-  }
+  // Инициализация при загрузке
+  useEffect(() => {
+    loadMessages()
+  }, [loadMessages])
+
+  // Настройка polling для новых сообщений
+  useEffect(() => {
+    if (!isMinimized) {
+      pollingIntervalRef.current = setInterval(() => {
+        loadMessages(true)
+      }, 3000) // Каждые 3 секунды
+
+      return () => {
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current)
+        }
+      }
+    }
+  }, [isMinimized, loadMessages])
+
+  // Фокус на input при открытии
+  useEffect(() => {
+    if (!isMinimized && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isMinimized])
 
   return (
-    <div className="py-6 max-w-4xl mx-auto px-4 pb-20 md:pb-6">
-      {error && (
-        <div className="mb-6 p-4 bg-red-100 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
-          <p className="text-red-600 dark:text-red-400">{error}</p>
+    <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 flex flex-col h-full overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800">
+        <div className="flex items-center gap-3">
+          <div className="bg-blue-600 p-2 rounded-full">
+            <MessageCircle className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-zinc-900 dark:text-white">
+              Поддержка DonateRaid
+            </h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Обычно отвечаем в течение 5 минут
+            </p>
+          </div>
         </div>
-      )}
 
-      {/* Заголовок */}
-      <div className="text-center mb-8">
-        <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
-          <UserIcon size={32} className="text-blue-600" />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsMinimized(!isMinimized)}
+            className="p-2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700"
+          >
+            {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
+          </button>
+          <button
+            onClick={onClose}
+            className="p-2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Личный кабинет</h1>
-        <p className="text-zinc-500 dark:text-zinc-400">Управляйте своим аккаунтом и заказами</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Основная информация */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Информация о пользователе */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <UserIcon size={20} />
-              Информация о профиле
-            </h2>
-            
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
-                <Mail size={20} className="text-zinc-500" />
-                <div>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">Email</p>
-                  <p className="font-medium">{user.email}</p>
-                </div>
+      {/* Messages */}
+      {!isMinimized && (
+        <>
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50 dark:bg-zinc-900">
+            {isLoading ? (
+              <div className="text-center text-zinc-400">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                <p>Загрузка сообщений...</p>
               </div>
-
-              {user.username && (
-                <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
-                  <UserIcon size={20} className="text-zinc-500" />
-                  <div>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">Имя пользователя</p>
-                    <p className="font-medium">{user.username}</p>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
-                <Settings size={20} className="text-zinc-500" />
-                <div>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">ID пользователя</p>
-                  <p className="font-medium">#{user.id}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Последние заказы */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                <History size={20} />
-                Последние заказы
-              </h2>
-              <a 
-                href="/orders" 
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                Все заказы →
-              </a>
-            </div>
-
-            {orders.length === 0 ? (
-              <div className="text-center py-8">
-                <Package size={48} className="text-zinc-300 dark:text-zinc-600 mx-auto mb-4" />
-                <p className="text-zinc-500 dark:text-zinc-400">У вас пока нет заказов</p>
-                <a 
-                  href="/" 
-                  className="inline-block mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition text-sm"
-                >
-                  Перейти в каталог
-                </a>
+            ) : messages.length === 0 ? (
+              <div className="text-center text-zinc-400 py-8">
+                <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p className="text-lg font-medium mb-2">Начните диалог с поддержкой</p>
+                <p className="text-sm">Мы обычно отвечаем в течение 5 минут</p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {orders.map((order) => (
-                  <div 
-                    key={order.id} 
-                    className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-750 transition"
+              messages.map((message) => (
+                <div
+                  key={`msg-${message.id}`}
+                  className={`flex ${message.is_from_user ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[80%] p-3 rounded-lg ${
+                      message.is_from_user
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-700'
+                    }`}
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-sm">#{order.id}</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                          {getStatusText(order.status)}
-                        </span>
-                      </div>
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400 truncate">
-                        {order.game} • {order.product}
-                      </p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                        {new Date(order.created_at).toLocaleDateString('ru-RU')}
-                      </p>
+                    <div className="whitespace-pre-wrap break-words">
+                      {message.message}
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="font-semibold">{order.amount.toFixed(2)} ₽</p>
+                    <div className={`text-xs mt-2 ${
+                      message.is_from_user
+                        ? 'text-blue-200'
+                        : 'text-zinc-500 dark:text-zinc-400'
+                    }`}>
+                      {formatTime(message.created_at)}
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))
             )}
-          </div>
-        </div>
-
-        {/* Боковая панель */}
-        <div className="space-y-6">
-          {/* Баланс */}
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <CreditCard size={24} />
-              <h3 className="text-lg font-semibold">Баланс</h3>
-            </div>
-            <div className="text-3xl font-bold mb-2">
-              {user.balance.toFixed(2)} ₽
-            </div>
-            <p className="text-blue-100 text-sm mb-4">
-              Доступно для покупок
-            </p>
-            <button className="w-full bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition text-sm font-medium">
-              Пополнить баланс
-            </button>
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* Быстрые действия */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4">Быстрые действия</h3>
-            <div className="space-y-3">
-              <a 
-                href="/orders" 
-                className="flex items-center gap-3 p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition"
+          {/* Input */}
+          <div className="p-4 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
+            <div className="flex gap-3">
+              <textarea
+                ref={inputRef}
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Напишите ваше сообщение..."
+                className="flex-1 resize-none bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={1}
+                style={{ maxHeight: '120px' }}
+              />
+              <button
+                onClick={sendMessage}
+                disabled={!inputMessage.trim()}
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-300 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors flex-shrink-0"
               >
-                <Package size={20} className="text-zinc-500" />
-                <span className="text-sm">Мои заказы</span>
-              </a>
-              <a 
-                href="/support" 
-                className="flex items-center gap-3 p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition"
-              >
-                <Mail size={20} className="text-zinc-500" />
-                <span className="text-sm">Поддержка</span>
-              </a>
-              <button 
-                onClick={logout}
-                className="flex items-center gap-3 p-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition w-full text-left text-red-600 dark:text-red-400"
-              >
-                <LogOut size={20} />
-                <span className="text-sm">Выйти из аккаунта</span>
+                <Send className="w-5 h-5" />
               </button>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   )
 }
