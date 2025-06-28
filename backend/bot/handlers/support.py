@@ -1,4 +1,4 @@
-# backend/bot/handlers/support.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/bot/handlers/support.py - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
@@ -49,11 +49,11 @@ async def notify_new_support_message(user_id: int = None, text: str = None, gues
 
     # Проверяем настройки
     if not settings.TG_BOT_TOKEN:
-        logger.warning("❌ TG_BOT_TOKEN не настроен")
+        logger.warning("❌ TG_BOT_TOKEN не настроен - уведомления в Telegram отключены")
         return
 
     if not settings.TG_ADMIN_CHAT_IDS:
-        logger.warning("❌ TG_ADMIN_CHAT_IDS не настроен")
+        logger.warning("❌ TG_ADMIN_CHAT_IDS не настроен - уведомления в Telegram отключены")
         return
 
     logger.info(f"📨 [Уведомление] user_id={user_id} | guest_id={guest_id} | message='{text[:50]}...'")
@@ -62,12 +62,17 @@ async def notify_new_support_message(user_id: int = None, text: str = None, gues
     try:
         username = "Гость"
         user_info = ""
+        identifier_info = ""
 
         if user_id:
             user = db.query(User).filter_by(id=user_id).first()
             if user:
                 username = user.username or user.email or f"ID: {user_id}"
                 user_info = f"📧 {user.email}\n💰 Баланс: {user.balance or 0} ₽\n"
+                identifier_info = f"👤 Пользователь ID: {user_id}"
+        else:
+            username = f"Гость {guest_id[:8] if guest_id else 'неизвестен'}"
+            identifier_info = f"👻 Гость ID: {guest_id}"
 
         # Считаем количество сообщений в диалоге
         if user_id:
@@ -79,6 +84,7 @@ async def notify_new_support_message(user_id: int = None, text: str = None, gues
 
         message_text = (
             f"📨 <b>Новое сообщение от {username}</b>\n\n"
+            f"{identifier_info}\n"
             f"{user_info}"
             f"💬 Сообщений в диалоге: {message_count}\n"
             f"🕒 Время: {datetime.now().strftime('%H:%M')}\n\n"
@@ -93,6 +99,10 @@ async def notify_new_support_message(user_id: int = None, text: str = None, gues
                 admin_ids.append(int(chat_id))
             elif chat_id.lstrip('-').isdigit():  # Поддержка отрицательных ID групп
                 admin_ids.append(int(chat_id))
+
+        if not admin_ids:
+            logger.warning("❌ Не найдено валидных ID администраторов")
+            return
 
         logger.info(f"📤 Отправляем уведомление {len(admin_ids)} администраторам: {admin_ids}")
 
@@ -198,6 +208,48 @@ async def send_reply_support(msg: Message, state: FSMContext):
         db.close()
 
     await state.clear()
+
+
+# Просмотр истории диалога
+@router.callback_query(F.data.startswith("support_view_"))
+async def view_support_dialog(call: CallbackQuery):
+    data = call.data
+    db = get_db()
+
+    try:
+        if data.startswith("support_view_user_"):
+            user_id = int(data.replace("support_view_user_", ""))
+            messages = db.query(SupportMessage).filter_by(user_id=user_id).order_by(
+                SupportMessage.created_at.desc()).limit(10).all()
+
+            user = db.query(User).get(user_id)
+            label = user.username or user.email or f"ID: {user_id}" if user else f"ID: {user_id}"
+            kb = support_keyboard(user_id=user_id)
+        else:
+            guest_id = data.replace("support_view_guest_", "")
+            messages = db.query(SupportMessage).filter_by(guest_id=guest_id).order_by(
+                SupportMessage.created_at.desc()).limit(10).all()
+            label = f"Гость: {guest_id[:8]}..."
+            kb = support_keyboard(guest_id=guest_id)
+
+        if not messages:
+            history = "История диалога пуста."
+        else:
+            history = f"📋 <b>История диалога с {label}</b>\n\n"
+            for msg in reversed(messages):  # Показываем в хронологическом порядке
+                sender = "👤 Пользователь" if msg.is_from_user else "🆘 Поддержка"
+                time_str = msg.created_at.strftime('%d.%m %H:%M')
+                history += f"{sender} ({time_str}):\n{msg.message}\n\n"
+
+        await call.message.edit_text(
+            history,
+            parse_mode="HTML",
+            reply_markup=kb
+        )
+    finally:
+        db.close()
+
+    await call.answer()
 
 
 # Возврат к списку диалогов

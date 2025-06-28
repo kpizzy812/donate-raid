@@ -1,4 +1,4 @@
-# backend/app/routers/support.py - ИСПРАВЛЕННАЯ ВЕРСИЯ
+# backend/app/routers/support.py - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
 from fastapi import APIRouter, Depends, Request, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.core.database import get_db
@@ -50,7 +50,7 @@ async def send_telegram_notification(user_id: int = None, text: str = None, gues
 @router.post("/send", response_model=SupportMessageRead)
 async def create_support_message(
         data: SupportMessageCreate,
-        background_tasks: BackgroundTasks,  # ИСПРАВЛЕНО: добавлен BackgroundTasks
+        background_tasks: BackgroundTasks,
         request: Request,
         db: Session = Depends(get_db),
 ):
@@ -67,17 +67,17 @@ async def create_support_message(
             logger.info("ℹ️ Токен авторизации не найден, работаем как гость")
     except Exception as e:
         logger.warning(f"⚠️ Ошибка получения пользователя: {e}")
-        user = None  # Продолжаем как гость
+        user = None
 
     # Определяем guest_id
     guest_id = None
     if not user:
+        if not data.guest_id:
+            logger.error("❌ Для неавторизованного пользователя требуется guest_id")
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="guest_id is required for unauthenticated users")
         guest_id = data.guest_id
-        if not guest_id:
-            # Генерируем guest_id если не передан
-            import uuid
-            guest_id = str(uuid.uuid4())[:8]
-            logger.info(f"🆔 Сгенерирован новый guest_id: {guest_id}")
+        logger.info(f"🆔 Используем guest_id: {guest_id}")
 
     # Создаем сообщение
     message = SupportMessage(
@@ -94,9 +94,9 @@ async def create_support_message(
     db.refresh(message)
 
     logger.info(
-        f"📝 Создано сообщение: user_id={message.user_id}, guest_id={message.guest_id}, message='{message.message}'")
+        f"📝 Создано сообщение: ID={message.id}, user_id={message.user_id}, guest_id={message.guest_id}, message='{message.message}'")
 
-    # ИСПРАВЛЕНО: запускаем уведомление в фоне
+    # Запускаем уведомление в фоне
     background_tasks.add_task(
         send_telegram_notification,
         user_id=user.id if user else None,
@@ -121,22 +121,43 @@ async def get_my_support_messages(
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
             user = get_current_user_from_request_sync(request, db)
-    except Exception:
+            logger.info(f"📨 Загружаем сообщения для авторизованного пользователя ID={user.id}")
+    except Exception as e:
+        logger.info(f"ℹ️ Не удалось получить пользователя: {e}")
         pass
+
+    messages = []
 
     if user:
         # Для авторизованного пользователя
         messages = db.query(SupportMessage).filter_by(user_id=user.id).order_by(SupportMessage.created_at).all()
+        logger.info(f"📨 Найдено {len(messages)} сообщений для пользователя ID={user.id}")
     elif guest_id:
         # Для гостя
         messages = db.query(SupportMessage).filter_by(guest_id=guest_id).order_by(SupportMessage.created_at).all()
+        logger.info(f"📨 Найдено {len(messages)} сообщений для гостя {guest_id}")
     else:
+        logger.warning("⚠️ Не удалось определить пользователя или guest_id")
         return []
 
-    return messages
+    # Преобразуем в список словарей для лучшей совместимости
+    result = []
+    for msg in messages:
+        result.append({
+            "id": msg.id,
+            "user_id": msg.user_id,
+            "guest_id": msg.guest_id,
+            "message": msg.message,
+            "is_from_user": msg.is_from_user,
+            "created_at": msg.created_at.isoformat(),
+            "status": msg.status.value if hasattr(msg.status, 'value') else str(msg.status)
+        })
+
+    logger.info(f"📤 Возвращаем {len(result)} сообщений")
+    return result
 
 
-# ДОБАВЛЕННЫЙ endpoint для совместимости
+# ДОБАВЛЕННЫЙ endpoint для совместимости (если используется где-то)
 @router.post("/messages")
 async def get_support_messages_post(
         data: dict,

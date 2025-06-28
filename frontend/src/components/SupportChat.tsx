@@ -1,4 +1,4 @@
-// frontend/src/components/SupportChat.tsx - С WEBSOCKET
+// frontend/src/components/SupportChat.tsx - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
@@ -16,274 +16,56 @@ interface SupportChatProps {
   onClose: () => void
 }
 
+// Генерация и сохранение guest_id
+function generateGuestId(): string {
+  let guestId = localStorage.getItem('support_guest_id') // используем отдельный ключ для поддержки
+
+  if (!guestId) {
+    guestId = 'guest_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now()
+    localStorage.setItem('support_guest_id', guestId)
+    console.log('🆔 Создан новый guest_id:', guestId)
+  } else {
+    console.log('🆔 Использую существующий guest_id:', guestId)
+  }
+
+  return guestId
+}
+
 export default function SupportChat({ onClose }: SupportChatProps) {
   const [messages, setMessages] = useState<SupportMessage[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [chatInitialized, setChatInitialized] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
-  const [guestId, setGuestId] = useState<string>('')
-  const [token, setToken] = useState<string | null>(null)
-  const [roomId, setRoomId] = useState<string>('')
-
-  // WebSocket refs
-  const wsRef = useRef<WebSocket | null>(null)
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const shouldReconnectRef = useRef(true)
+  const [guestId] = useState<string>(generateGuestId())
+  const [token] = useState<string | null>(localStorage.getItem('access_token'))
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const lastMessageCountRef = useRef(0)
 
-    // Инициализация при загрузке компонента
-    useEffect(() => {
-    const storedToken = localStorage.getItem('access_token')
-    const storedGuestId = localStorage.getItem('guest_id') || generateGuestId()
-
-    setToken(storedToken)
-    setGuestId(storedGuestId)
-
-    // Определяем room_id для WebSocket
-    if (storedToken) {
-      // Нужно получить user_id из токена
-      try {
-        const payload = JSON.parse(atob(storedToken.split('.')[1]))
-        console.log('🔑 Token payload:', payload)
-        setRoomId(`user_${payload.sub}`)
-        console.log('🏠 Room ID установлен:', `user_${payload.sub}`)
-      } catch (e) {
-        console.error('❌ Ошибка парсинга токена:', e)
-        setRoomId(`guest_${storedGuestId}`)
-        console.log('🏠 Room ID установлен (fallback):', `guest_${storedGuestId}`)
-      }
-    } else {
-      setRoomId(`guest_${storedGuestId}`)
-      console.log('🏠 Room ID установлен (guest):', `guest_${storedGuestId}`)
-    }
-
-    loadMessages()
-    setChatInitialized(true)
-    }, [])
-
-  // WebSocket connection
-  useEffect(() => {
-    if (!chatInitialized || !roomId) return
-
-    connectWebSocket()
-
-    return () => {
-      shouldReconnectRef.current = false
-      disconnectWebSocket()
-    }
-  }, [chatInitialized, roomId])
-
-  const connectWebSocket = useCallback(() => {
-  if (wsRef.current?.readyState === WebSocket.OPEN) return
-
-  try {
-    // ИСПРАВЛЕННЫЙ URL: правильный путь к WebSocket
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8001'}/ws/support/ws/${roomId}`
-    console.log('🔌 Подключаемся к WebSocket:', wsUrl)
-
-    wsRef.current = new WebSocket(wsUrl)
-
-    wsRef.current.onopen = () => {
-      console.log('✅ WebSocket connected to:', wsUrl)
-      // Очищаем таймер переподключения
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current)
-        reconnectTimeoutRef.current = null
-      }
-    }
-
-    wsRef.current.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        console.log('📨 Получено WebSocket сообщение:', data)
-
-        if (data.type === 'new_message' && data.data) {
-          // Добавляем новое сообщение
-          setMessages(prev => {
-            // Проверяем, что сообщение ещё не добавлено
-            const exists = prev.find(msg => msg.id === data.data.id)
-            if (exists) return prev
-
-            return [...prev, data.data].sort((a, b) =>
-              new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-            )
-          })
-        }
-      } catch (error) {
-        console.error('Ошибка парсинга WebSocket сообщения:', error)
-      }
-    }
-
-    wsRef.current.onclose = (event) => {
-      console.log('🔌 WebSocket disconnected. Code:', event.code, 'Reason:', event.reason)
-      wsRef.current = null
-
-      // Переподключение через 3 секунды если нужно
-      if (shouldReconnectRef.current) {
-        console.log('🔄 Переподключение через 3 секунды...')
-        reconnectTimeoutRef.current = setTimeout(() => {
-          connectWebSocket()
-        }, 3000)
-      }
-    }
-
-    wsRef.current.onerror = (error) => {
-      console.error('❌ WebSocket error:', error)
-      console.error('❌ Проблема с подключением к:', wsUrl)
-    }
-
-  } catch (error) {
-    console.error('Ошибка создания WebSocket:', error)
-  }
-}, [roomId])
-
-  const disconnectWebSocket = useCallback(() => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current)
-      reconnectTimeoutRef.current = null
-    }
-
-    if (wsRef.current) {
-      wsRef.current.close()
-      wsRef.current = null
-    }
-  }, [])
-
-  const scrollToBottomSmooth = useCallback(() => {
+  // Прокрутка к последнему сообщению
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [])
 
-  const shouldAutoScroll = messages.length > lastMessageCountRef.current
-
-  useEffect(() => {
-    if (lastMessageCountRef.current) {
-      if (shouldAutoScroll) {
-        setTimeout(scrollToBottomSmooth, 100)
-      }
-      lastMessageCountRef.current = messages.length
-    }
-  }, [messages, scrollToBottomSmooth, shouldAutoScroll])
-
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus()
-    }
-  }, [])
-
-  // Fallback polling для случаев когда WebSocket недоступен
-  useEffect(() => {
-    if (!chatInitialized || !guestId) return
-
-    const interval = setInterval(() => {
-      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-        loadMessagesQuietly()
-      }
-    }, 10000) // Проверяем каждые 10 секунд если нет WebSocket
-
-    return () => clearInterval(interval)
-  }, [chatInitialized, guestId])
-
-  const generateGuestId = () => {
-    const id = 'guest_' + Math.random().toString(36).substr(2, 9)
-    localStorage.setItem('guest_id', id)
-    return id
-  }
-
-  const loadMessagesQuietly = async () => {
-    if (!guestId) return
+  // Загрузка сообщений
+  const loadMessages = useCallback(async (silent = false) => {
+    if (!silent) setIsLoading(true)
 
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/support/my?guest_id=${guestId}`
-      const headers: Record<string, string> = {}
+      console.log('📥 Загружаем сообщения для:', token ? 'авторизованного пользователя' : `гостя ${guestId}`)
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
+      const params = new URLSearchParams()
+
+      // Для неавторизованных пользователей всегда передаем guest_id
+      if (!token) {
+        params.append('guest_id', guestId)
       }
 
-      const response = await fetch(url, { headers })
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/support/my${params.toString() ? '?' + params.toString() : ''}`
+      console.log('📡 URL запроса:', url)
 
-      if (response.ok) {
-        const data = await response.json()
-        const serverMessages: SupportMessage[] = Array.isArray(data) ? data : []
-
-        setMessages(prev => {
-          const optimisticMessages = prev.filter(msg =>
-            msg.status === 'sending' || msg.status === 'sent'
-          )
-
-          if (serverMessages.length === prev.filter(msg => !optimisticMessages.includes(msg)).length && optimisticMessages.length === 0) {
-            return prev
-          }
-
-          const combined = [...serverMessages]
-
-          optimisticMessages.forEach(optMsg => {
-            const exists = serverMessages.find((sMsg: SupportMessage) =>
-              sMsg.message === optMsg.message &&
-              Math.abs(new Date(sMsg.created_at).getTime() - new Date(optMsg.created_at).getTime()) < 5000
-            )
-            if (!exists) {
-              combined.push(optMsg)
-            }
-          })
-
-          return combined.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-        })
-      }
-    } catch (error) {
-      console.error('Ошибка при тихой загрузке сообщений:', error)
-    }
-  }
-
-  const loadMessages = async () => {
-    if (!guestId) return
-
-    setIsLoading(true)
-    try {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/support/my?guest_id=${guestId}`
-      const headers: Record<string, string> = {}
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
-
-      const response = await fetch(url, { headers })
-
-      if (response.ok) {
-        const data = await response.json()
-        const newMessages = Array.isArray(data) ? data : []
-        setMessages(newMessages)
-        lastMessageCountRef.current = newMessages.length
-      }
-    } catch (error) {
-      console.error('Ошибка загрузки сообщений:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const sendMessage = async () => {
-    if (!inputMessage.trim() || !guestId) return
-
-    const tempId = Date.now()
-    const optimisticMessage: SupportMessage = {
-      id: tempId,
-      message: inputMessage.trim(),
-      is_from_user: true,
-      created_at: new Date().toISOString(),
-      status: 'sending'
-    }
-
-    // Добавляем сообщение оптимистично
-    setMessages(prev => [...prev, optimisticMessage])
-    setInputMessage('')
-
-    try {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/support/send`
       const headers: Record<string, string> = {
         'Content-Type': 'application/json'
       }
@@ -292,14 +74,83 @@ export default function SupportChat({ onClose }: SupportChatProps) {
         headers['Authorization'] = `Bearer ${token}`
       }
 
-      const body = {
-        message: optimisticMessage.message,
-        guest_id: guestId
+      const response = await fetch(url, {
+        method: 'GET',
+        headers
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('📨 Получены сообщения:', data)
+
+        const newMessages = Array.isArray(data) ? data : []
+
+        // Проверяем, изменилось ли количество сообщений
+        const currentCount = newMessages.length
+        if (currentCount !== lastMessageCountRef.current || !silent) {
+          setMessages(newMessages)
+          lastMessageCountRef.current = currentCount
+
+          // Прокручиваем только если добавились новые сообщения
+          if (currentCount > lastMessageCountRef.current || !silent) {
+            setTimeout(scrollToBottom, 100)
+          }
+        }
+      } else {
+        console.error('❌ Ошибка загрузки сообщений:', response.status, response.statusText)
+        const errorText = await response.text()
+        console.error('❌ Детали ошибки:', errorText)
+      }
+    } catch (error) {
+      console.error('❌ Ошибка загрузки сообщений:', error)
+    } finally {
+      if (!silent) setIsLoading(false)
+    }
+  }, [token, guestId, scrollToBottom])
+
+  // Отправка сообщения
+  const sendMessage = useCallback(async () => {
+    if (!inputMessage.trim()) return
+
+    const messageText = inputMessage.trim()
+    setInputMessage('')
+
+    // Добавляем сообщение оптимистично
+    const tempMessage: SupportMessage = {
+      id: Date.now(), // временный ID
+      message: messageText,
+      is_from_user: true,
+      created_at: new Date().toISOString(),
+      status: 'sending'
+    }
+
+    setMessages(prev => [...prev, tempMessage])
+    setTimeout(scrollToBottom, 50)
+
+    try {
+      console.log('📤 Отправляем сообщение:', messageText)
+      console.log('📤 Для:', token ? 'авторизованного пользователя' : `гостя ${guestId}`)
+
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
       }
 
-      console.log('📤 Отправляем сообщение:', body)
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
 
-      const response = await fetch(url, {
+      const body: any = {
+        message: messageText
+      }
+
+      // Для неавторизованных пользователей передаем guest_id
+      if (!token) {
+        body.guest_id = guestId
+      }
+
+      console.log('📤 Тело запроса:', body)
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/support/send`, {
         method: 'POST',
         headers,
         body: JSON.stringify(body)
@@ -309,114 +160,153 @@ export default function SupportChat({ onClose }: SupportChatProps) {
         const data = await response.json()
         console.log('✅ Сообщение отправлено:', data)
 
-        // Обновляем статус сообщения
-        setMessages(prev => prev.map(msg =>
-          msg.id === tempId ? { ...data, status: 'sent' } : msg
-        ))
-      } else {
-        const errorData = await response.json()
-        console.error('❌ Ошибка отправки:', errorData)
+        // Убираем временное сообщение и сразу перезагружаем все сообщения
+        setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id))
 
-        // Помечаем сообщение как неотправленное
-        setMessages(prev => prev.map(msg =>
-          msg.id === tempId ? { ...msg, status: 'error' } : msg
-        ))
+        // Перезагружаем сообщения через небольшую задержку
+        setTimeout(() => {
+          loadMessages(true)
+        }, 500)
+
+      } else {
+        console.error('❌ Ошибка отправки сообщения:', response.status, response.statusText)
+        const errorText = await response.text()
+        console.error('❌ Детали ошибки:', errorText)
+
+        // Убираем временное сообщение при ошибке
+        setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id))
+        setInputMessage(messageText) // Восстанавливаем текст
       }
     } catch (error) {
       console.error('❌ Ошибка отправки сообщения:', error)
 
-      // Помечаем сообщение как неотправленное
-      setMessages(prev => prev.map(msg =>
-        msg.id === tempId ? { ...msg, status: 'error' } : msg
-      ))
+      // Убираем временное сообщение при ошибке
+      setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id))
+      setInputMessage(messageText) // Восстанавливаем текст
     }
-  }
+  }, [inputMessage, token, guestId, loadMessages, scrollToBottom])
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  // Обработка нажатия Enter
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       sendMessage()
     }
-  }
+  }, [sendMessage])
+
+  // Форматирование времени
+  const formatTime = useCallback((dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }, [])
+
+  // Инициализация при загрузке
+  useEffect(() => {
+    console.log('🚀 Инициализация чата поддержки')
+    console.log('🔑 Token:', token ? 'есть' : 'нет')
+    console.log('🆔 Guest ID:', guestId)
+
+    loadMessages()
+  }, [loadMessages])
+
+  // Настройка polling для автоматического получения новых сообщений
+  useEffect(() => {
+    // Устанавливаем polling каждые 3 секунды (независимо от минимизации)
+    pollingIntervalRef.current = setInterval(() => {
+      console.log('🔄 Polling - проверяем новые сообщения...')
+      loadMessages(true)
+    }, 3000)
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current)
+      }
+    }
+  }, [loadMessages])
+
+  // Фокус на input при открытии
+  useEffect(() => {
+    if (!isMinimized && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isMinimized])
 
   return (
-    <div className={`bg-white dark:bg-zinc-900 rounded-lg shadow-lg h-full flex flex-col transition-all ${
-      isMinimized ? 'h-16' : ''
-    }`}>
+    <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="bg-blue-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+      <div className="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800">
         <div className="flex items-center gap-3">
-          <MessageCircle className="w-5 h-5" />
+          <div className="bg-blue-600 p-2 rounded-full">
+            <MessageCircle className="w-5 h-5 text-white" />
+          </div>
           <div>
-            <h3 className="font-semibold">Поддержка</h3>
-            <p className="text-xs text-blue-200">
-              {wsRef.current?.readyState === WebSocket.OPEN ? 'Онлайн' : 'Подключение...'}
+            <h3 className="font-semibold text-zinc-900 dark:text-white">
+              Поддержка DonateRaid
+            </h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              {token ? 'Авторизован' : `Гость ${guestId.slice(-8)}`} • Отвечаем в течение 5 минут
             </p>
           </div>
         </div>
+
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsMinimized(!isMinimized)}
-            className="hover:bg-blue-700 p-1 rounded transition-colors"
-            title={isMinimized ? 'Развернуть' : 'Свернуть'}
+            className="p-2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700"
           >
             {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
           </button>
           <button
             onClick={onClose}
-            className="hover:bg-blue-700 p-1 rounded transition-colors"
-            title="Закрыть чат"
+            className="p-2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
       </div>
 
+      {/* Messages */}
       {!isMinimized && (
         <>
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50 dark:bg-zinc-800">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50 dark:bg-zinc-900">
             {isLoading && messages.length === 0 ? (
-              <div className="text-center text-zinc-500">
-                <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <div className="text-center text-zinc-400">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
                 <p>Загрузка сообщений...</p>
               </div>
             ) : messages.length === 0 ? (
-              <div className="text-center text-zinc-500">
-                <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                <h4 className="font-medium mb-2">Начните диалог с поддержкой</h4>
+              <div className="text-center text-zinc-400 py-8">
+                <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p className="text-lg font-medium mb-2">Начните диалог с поддержкой</p>
                 <p className="text-sm">Мы обычно отвечаем в течение 5 минут</p>
               </div>
             ) : (
               messages.map((message) => (
                 <div
-                  key={message.id}
+                  key={`msg-${message.id}`}
                   className={`flex ${message.is_from_user ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[80%] p-3 rounded-lg text-sm relative ${
+                    className={`max-w-[80%] p-3 rounded-lg ${
                       message.is_from_user
                         ? 'bg-blue-600 text-white'
-                        : 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm'
+                        : 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm border border-zinc-200 dark:border-zinc-700'
                     }`}
                   >
-                    <div className="whitespace-pre-wrap">{message.message}</div>
-                    <div className={`text-xs mt-1 flex items-center gap-1 ${
-                      message.is_from_user ? 'text-blue-200' : 'text-zinc-500'
+                    <div className="whitespace-pre-wrap break-words">
+                      {message.message}
+                    </div>
+                    <div className={`text-xs mt-2 flex items-center gap-2 ${
+                      message.is_from_user
+                        ? 'text-blue-200'
+                        : 'text-zinc-500 dark:text-zinc-400'
                     }`}>
-                      <span>
-                        {new Date(message.created_at).toLocaleTimeString('ru-RU', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
-                      {message.is_from_user && (
-                        <span className="ml-1">
-                          {message.status === 'sending' && '⏳'}
-                          {message.status === 'sent' && '✓'}
-                          {message.status === 'error' && '❌'}
-                          {!message.status && '✓✓'}
-                        </span>
+                      <span>{formatTime(message.created_at)}</span>
+                      {message.status === 'sending' && (
+                        <span className="text-xs opacity-70">Отправляется...</span>
                       )}
                     </div>
                   </div>
@@ -427,7 +317,7 @@ export default function SupportChat({ onClose }: SupportChatProps) {
           </div>
 
           {/* Input */}
-          <div className="p-4 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-700">
+          <div className="p-4 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
             <div className="flex gap-3">
               <textarea
                 ref={inputRef}
@@ -435,21 +325,17 @@ export default function SupportChat({ onClose }: SupportChatProps) {
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Напишите ваше сообщение..."
-                className="flex-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 p-3 rounded-lg resize-none text-sm border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="flex-1 resize-none bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 border border-zinc-300 dark:border-zinc-600 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={1}
-                disabled={isLoading}
+                style={{ maxHeight: '120px' }}
               />
               <button
                 onClick={sendMessage}
-                disabled={!inputMessage.trim() || isLoading}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-400 disabled:cursor-not-allowed text-white p-3 rounded-lg transition-colors flex items-center justify-center"
-                title="Отправить сообщение"
+                disabled={!inputMessage.trim()}
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-300 disabled:cursor-not-allowed text-white p-2 rounded-lg transition-colors flex-shrink-0"
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-5 h-5" />
               </button>
-            </div>
-            <div className="text-xs text-zinc-500 mt-2">
-              Нажмите Enter для отправки, Shift+Enter для новой строки
             </div>
           </div>
         </>
