@@ -17,7 +17,7 @@ router = APIRouter()
 @router.get("", response_model=list[GameRead])
 def list_games(db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     logger.info("🎮 Admin games list called")
-    return db.query(Game).order_by(Game.sort_order.asc()).all()
+    return db.query(Game).filter(Game.is_deleted == False).order_by(Game.sort_order.asc()).all()
 
 
 @router.post("", response_model=GameRead)
@@ -140,13 +140,15 @@ def update_game(game_id: int, game: GameUpdate, db: Session = Depends(get_db), a
 @router.delete("/{game_id}")
 def delete_game(game_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     logger.info(f"🎮 Deleting game {game_id} by admin {admin.id}")
-    db_game = db.query(Game).filter(Game.id == game_id).first()
+    db_game = db.query(Game).filter(Game.id == game_id, Game.is_deleted == False).first()
     if not db_game:
         logger.warning(f"🎮 Game {game_id} not found for deletion")
         raise HTTPException(status_code=404, detail="Game not found")
-    db.delete(db_game)
+
+    # Мягкое удаление
+    db_game.is_deleted = True
     db.commit()
-    logger.info(f"🎮 Game {game_id} deleted successfully")
+    logger.info(f"🎮 Game {game_id} soft deleted successfully")
     return {"detail": "Game deleted"}
 
 

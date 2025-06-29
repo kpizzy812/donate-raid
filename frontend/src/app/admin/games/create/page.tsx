@@ -70,10 +70,22 @@ export default function CreateGamePage() {
 
   const updateInputField = (index: number, field: keyof InputField, value: any) => {
   const updated = [...inputFields]
-  updated[index] = { ...updated[index], [field]: value }
-  setInputFields(updated)
-}
 
+  // ИСПРАВЛЕНО: правильная обработка subcategory_id
+  if (field === 'subcategory_id') {
+    updated[index] = {
+      ...updated[index],
+      [field]: value === '' || value === null || value === undefined ? null : Number(value)
+    }
+  } else {
+    updated[index] = { ...updated[index], [field]: value }
+  }
+
+  setInputFields(updated)
+
+  // ДОБАВЛЕНО: отладочный вывод
+  console.log(`🔧 Поле ${index} - ${field}:`, value, 'Результат:', updated[index])
+}
   // Функции управления подкатегориями (без изменений)
   const addSubcategory = () => {
     setSubcategories([...subcategories, {
@@ -537,25 +549,28 @@ export default function CreateGamePage() {
             placeholder="Player ID"
           />
         </div>
-        {/* ДОБАВЛЕНО: Выбор подкатегории */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Подкатегория</label>
-          <select
-            className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
-            value={field.subcategory_id || ''}
-            onChange={e => updateInputField(index, 'subcategory_id', e.target.value ? Number(e.target.value) : null)}
-          >
-            <option value="">Для всех подкатегорий</option>
-            {subcategories.map((sub, subIndex) => (
-              <option key={subIndex} value={subIndex}>
-              {sub.name || `Подкатегория ${subIndex + 1}`}
-            </option>
-            ))}
-          </select>
-          <p className="text-xs text-zinc-500 mt-1">
-            Если не выбрано - поле будет показываться для всех подкатегорий
-          </p>
-        </div>
+        {/* ЗАМЕНИ ЭТО: Выбор подкатегории */}
+<div>
+  <label className="block text-sm font-medium mb-1">Подкатегория</label>
+  <select
+    className="w-full p-2 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800"
+    value={field.subcategory_id === null || field.subcategory_id === undefined ? '' : field.subcategory_id}
+    onChange={e => {
+      const selectedValue = e.target.value
+      updateInputField(index, 'subcategory_id', selectedValue === '' ? null : Number(selectedValue))
+    }}
+  >
+    <option value="">Для всех подкатегорий</option>
+    {subcategories.map((sub, subIndex) => (
+      <option key={subIndex} value={subIndex}>
+        {sub.name || `Подкатегория ${subIndex + 1}`}
+      </option>
+    ))}
+  </select>
+  <p className="text-xs text-zinc-500 mt-1">
+    Если не выбрано - поле будет показываться для всех подкатегорий
+  </p>
+</div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">

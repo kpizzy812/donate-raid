@@ -30,6 +30,7 @@ class Product(Base):
     instructions = Column(Text, nullable=True)
 
     enabled = Column(Boolean, default=True)
+    is_deleted = Column(Boolean, default=False, nullable=False)
     delivery = Column(String(20), default="auto")  # auto / manual
     sort_order = Column(Integer, default=0, nullable=False)
 

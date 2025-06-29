@@ -13,6 +13,7 @@ class Game(Base):
     auto_support = Column(Boolean, default=True, nullable=False)
     instructions = Column(Text, nullable=True)
     sort_order = Column(Integer, default=0, nullable=False)
+    is_deleted = Column(Boolean, default=False, nullable=False)
 
     # Поля для расширенного отображения
     description = Column(Text, nullable=True)

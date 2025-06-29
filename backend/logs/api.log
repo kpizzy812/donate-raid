@@ -27805,3 +27805,1473 @@ DETAIL:  Key (id)=(6) is still referenced from table "orders".
 [SQL: DELETE FROM products WHERE products.id = %(id)s]
 [parameters: {'id': 6}]
 (Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-06-29 at 16:02:14 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:05:00 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:05:36 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:11:10 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:18:09 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:18:45 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:21:37 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:21:59 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:22:55 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:23:14 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/products/6
+2025-06-29 at 16:23:14 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products/6
+2025-06-29 at 16:23:14 | INFO | main:43 - 📥 DELETE http://localhost:8001/api/admin/products/6
+2025-06-29 at 16:23:14 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/products/6
+2025-06-29 at 16:23:17 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-29 at 16:23:17 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-29 at 16:23:17 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 16:23:17 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 16:23:17 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-29 at 16:23:17 | INFO | games:19 - 🎮 Admin games list called
+2025-06-29 at 16:23:17 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 16:23:17 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-29 at 16:23:17 | INFO | games:19 - 🎮 Admin games list called
+2025-06-29 at 16:23:17 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 16:23:20 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games/14
+2025-06-29 at 16:23:20 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-29 at 16:23:20 | INFO | main:43 - 📥 DELETE http://localhost:8001/api/admin/games/14
+2025-06-29 at 16:23:20 | INFO | games:142 - 🎮 Deleting game 14 by admin 2
+2025-06-29 at 16:23:21 | ERROR | main:47 - ❌ Exception during request: (psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+[SQL: DELETE FROM products WHERE products.id = %(id)s]
+[parameters: {'id': 6}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7f3c0ef0a700>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f3c0eb1d790>
+    └ <sqlalchemy.engine.base.Connection object at 0x7f3c08a0dc50>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'id': 6}
+    │      │       └ 'DELETE FROM products WHERE products.id = %(id)s'
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7f3c09d86a70; closed: -1>
+
+psycopg2.errors.ForeignKeyViolation: update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+
+
+The above exception was the direct cause of the following exception:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7f3c11d5e200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7f3c11e2f7e0>
+           └ <SpawnProcess name='SpawnProcess-10' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7f3c11e2ed40>
+    └ <SpawnProcess name='SpawnProcess-10' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7f3c11161590>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-10' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-10' parent=8 started>
+    │    └ <function subprocess_started at 0x7f3c10fcede0>
+    └ <SpawnProcess name='SpawnProcess-10' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7f3c10f02650>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7f3c10fcdbc0>
+           │       │   └ <uvicorn.server.Server object at 0x7f3c10f02650>
+           │       └ <function run at 0x7f3c1133bc40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7f3c10e6fd30>
+           │      └ <function Runner.run at 0x7f3c113931a0>
+           └ <asyncio.runners.Runner object at 0x7f3c10f015d0>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7f3c10a8c1e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7f3c10f015d0>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f3c10a87a50>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3c08be67...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3c08b...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7f3c10994a50>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f3c10a87a50>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3c08be67...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3c08b...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3c08be67...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3c08b...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f3c09cf3150>
+          └ <fastapi.applications.FastAPI object at 0x7f3c10994a50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7f3c09577560>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f3c08b...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3c09cb80d0>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f3c09cf3150>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f3c095772e0>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7f3c08be67d0>
+                     │    └ <function log_requests at 0x7f3c097a6de0>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3c09cb80d0>
+
+> File "/app/app/main.py", line 45, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7f3c08be67d0>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f3c095772e0>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f3c095777e0>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3c09577c40>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3c0a09ff10>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f3c09cb80d0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8001', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"macOS"', 'authorization': 'Bearer eyJh...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f3c095777e0>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3c09577c40>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7f3c09b23ba0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3c0a09ff10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f3c0a09ff10>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3c09577c40>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f3c097c0890>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f3c0a09ff10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f3c0a09ff10>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3c09577c40>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7f3c08a0ca10>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7f3c09a45e90>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f3c097c0890>
+          └ <function wrap_app_handling_exceptions at 0x7f3c0fb611c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3c08b9fd80>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3c09577c40>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7f3c09a45e90>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3c08b9fd80>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3c09577c40>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7f3c09a45e90>>
+          └ <fastapi.routing.APIRouter object at 0x7f3c09a45e90>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3c08b9fd80>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3c09577c40>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7f3c0fb627a0>
+          └ APIRoute(path='/api/admin/games/{game_id}', name='delete_game', methods=['DELETE'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3c08b9fd80>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3c09577c40>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7f3c0964cae0>
+          └ APIRoute(path='/api/admin/games/{game_id}', name='delete_game', methods=['DELETE'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3c08b9fd80>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3c09577c40>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7f3c08a0c850>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7f3c08bb6980>
+          └ <function wrap_app_handling_exceptions at 0x7f3c0fb611c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3c08bb40e0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3c09577c40>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7f3c08bb6980>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7f3c08a0c850>
+                     └ <function get_request_handler.<locals>.app at 0x7f3c0964c400>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7f3c0fb7c5e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7f3c08be75d0>, 'admin': <app.models.user.User object at 0x7f3c08a0e590>, '...
+                 │                 │         └ <function delete_game at 0x7f3c09b4ac00>
+                 │                 └ Dependant(path_params=[ModelField(field_info=Path(PydanticUndefined), name='game_id', mode='validation')], query_params=[], h...
+                 └ <function run_in_threadpool at 0x7f3c10089800>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function delete_game at 0x7f3c09b4ac00>, db=<sqlalchemy.orm.session.Session object at 0x7f3c08be75d0>, adm...
+                 │     │         └ <function run_sync at 0x7f3c11062520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7f3c1102b6a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violate...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/admin/games.py", line 148, in delete_game
+    db.commit()
+    │  └ <function Session.commit at 0x7f3c0edd6de0>
+    └ <sqlalchemy.orm.session.Session object at 0x7f3c08be75d0>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+    │     └ <function SessionTransaction.commit at 0x7f3c0edd5da0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f3c08b942d0>
+  File "<string>", line 2, in commit
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {'_to_root': True}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f3c08b942d0>
+                └ <function SessionTransaction.commit at 0x7f3c0edd5d00>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
+    self._prepare_impl()
+    │    └ <function SessionTransaction._prepare_impl at 0x7f3c0edd5bc0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f3c08b942d0>
+  File "<string>", line 2, in _prepare_impl
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f3c08b942d0>
+                └ <function SessionTransaction._prepare_impl at 0x7f3c0edd5b20>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
+    self.session.flush()
+    │    │       └ <function Session.flush at 0x7f3c0edddd00>
+    │    └ <sqlalchemy.orm.session.Session object at 0x7f3c08be75d0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f3c08b942d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4345, in flush
+    self._flush(objects)
+    │    │      └ None
+    │    └ <function Session._flush at 0x7f3c0edddee0>
+    └ <sqlalchemy.orm.session.Session object at 0x7f3c08be75d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4480, in _flush
+    with util.safe_reraise():
+         │    └ <class 'sqlalchemy.util.langhelpers.safe_reraise'>
+         └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+          │         │              └ <traceback object at 0x7f3c09c7f500>
+          │         └ <method 'with_traceback' of 'BaseException' objects>
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4441, in _flush
+    flush_context.execute()
+    │             └ <function UOWTransaction.execute at 0x7f3c0edc27a0>
+    └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7f3c08be7750>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+    │   │       └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7f3c08be7750>
+    │   └ <function DeleteAll.execute at 0x7f3c0edc3560>
+    └ DeleteAll(Mapper[Product(products)])
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 679, in execute
+    util.preloaded.orm_persistence.delete_obj(
+    │    │         │               └ <function delete_obj at 0x7f3c0edb1120>
+    │    │         └ <module 'sqlalchemy.orm.persistence' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py'>
+    │    └ <module 'sqlalchemy.util.preloaded' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/preloaded.py'>
+    └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 193, in delete_obj
+    _emit_delete_statements(
+    └ <function _emit_delete_statements at 0x7f3c0edb1800>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 1465, in _emit_delete_statements
+    c = connection.execute(
+        │          └ <function Connection.execute at 0x7f3c0f03ed40>
+        └ <sqlalchemy.engine.base.Connection object at 0x7f3c08a0dc50>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1415, in execute
+    return meth(
+           └ <bound method ClauseElement._execute_on_connection of <sqlalchemy.sql.dml.Delete object at 0x7f3c0a5379d0>>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           │          └ <function Connection._execute_clauseelement at 0x7f3c0f03f060>
+           └ <sqlalchemy.engine.base.Connection object at 0x7f3c08a0dc50>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1637, in _execute_clauseelement
+    ret = self._execute_context(
+          │    └ <function Connection._execute_context at 0x7f3c0f03f240>
+          └ <sqlalchemy.engine.base.Connection object at 0x7f3c08a0dc50>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1842, in _execute_context
+    return self._exec_single_context(
+           │    └ <function Connection._exec_single_context at 0x7f3c0f03f2e0>
+           └ <sqlalchemy.engine.base.Connection object at 0x7f3c08a0dc50>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1982, in _exec_single_context
+    self._handle_dbapi_exception(
+    │    └ <function Connection._handle_dbapi_exception at 0x7f3c0f03f560>
+    └ <sqlalchemy.engine.base.Connection object at 0x7f3c08a0dc50>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2351, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+          │                    │              │                 └ ForeignKeyViolation('update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "...
+          │                    │              └ (<class 'psycopg2.errors.ForeignKeyViolation'>, ForeignKeyViolation('update or delete on table "products" violates foreign ke...
+          │                    └ <method 'with_traceback' of 'BaseException' objects>
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7f3c0ef0a700>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f3c0eb1d790>
+    └ <sqlalchemy.engine.base.Connection object at 0x7f3c08a0dc50>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'id': 6}
+    │      │       └ 'DELETE FROM products WHERE products.id = %(id)s'
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7f3c09d86a70; closed: -1>
+
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+[SQL: DELETE FROM products WHERE products.id = %(id)s]
+[parameters: {'id': 6}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-06-29 at 16:25:23 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:25:31 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:26:26 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:26:36 | INFO | main:43 - 📥 DELETE http://localhost:8001/api/admin/games/14
+2025-06-29 at 16:26:36 | INFO | games:142 - 🎮 Deleting game 14 by admin 2
+2025-06-29 at 16:26:36 | ERROR | main:47 - ❌ Exception during request: (psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+[SQL: DELETE FROM products WHERE products.id = %(id)s]
+[parameters: {'id': 6}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7fe6c2b2a700>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7fe6c273ccd0>
+    └ <sqlalchemy.engine.base.Connection object at 0x7fe6bd7b7750>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'id': 6}
+    │      │       └ 'DELETE FROM products WHERE products.id = %(id)s'
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7fe6bcfd5d50; closed: -1>
+
+psycopg2.errors.ForeignKeyViolation: update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+
+
+The above exception was the direct cause of the following exception:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7fe6c58da200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7fe6c59ab7e0>
+           └ <SpawnProcess name='SpawnProcess-13' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7fe6c59aad40>
+    └ <SpawnProcess name='SpawnProcess-13' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7fe6c4cd1190>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-13' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-13' parent=8 started>
+    │    └ <function subprocess_started at 0x7fe6c4b3ede0>
+    └ <SpawnProcess name='SpawnProcess-13' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7fe6c4a72490>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7fe6c4b3dbc0>
+           │       │   └ <uvicorn.server.Server object at 0x7fe6c4a72490>
+           │       └ <function run at 0x7fe6c5357c40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7fe6c49dbd30>
+           │      └ <function Runner.run at 0x7fe6c53af1a0>
+           └ <asyncio.runners.Runner object at 0x7fe6c4a71a90>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7fe6c45fc1e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7fe6c4a71a90>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fe6bd25b410>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fe6bd0419...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fe6bd0...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7fe6c4504c90>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7fe6bd25b410>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fe6bd0419...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fe6bd0...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fe6bd0419...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fe6bd0...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fe6c0fe7c10>
+          └ <fastapi.applications.FastAPI object at 0x7fe6c4504c90>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7fe6bd1aa660>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7fe6bd0...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fe6be057dd0>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7fe6c0fe7c10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fe6bd1aaac0>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7fe6bd041a10>
+                     │    └ <function log_requests at 0x7fe6bd2c2fc0>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fe6be057dd0>
+
+> File "/app/app/main.py", line 45, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7fe6bd041a10>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7fe6bd1aaac0>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fe6bd1aab60>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fe6bd1aba60>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7fe6bd103fd0>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7fe6be057dd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8001', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"macOS"', 'authorization': 'Bearer eyJh...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7fe6bd1aab60>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fe6bd1aba60>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7fe6bd217880>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fe6bd103fd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fe6bd103fd0>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fe6bd1aba60>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fe6bd117990>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7fe6bd103fd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7fe6bd103fd0>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fe6bd1aba60>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7fe6bd042710>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7fe6bd640bd0>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7fe6bd117990>
+          └ <function wrap_app_handling_exceptions at 0x7fe6c36f51c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fe6bd093600>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fe6bd1aba60>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7fe6bd640bd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fe6bd093600>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fe6bd1aba60>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7fe6bd640bd0>>
+          └ <fastapi.routing.APIRouter object at 0x7fe6bd640bd0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fe6bd093600>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fe6bd1aba60>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7fe6c36f67a0>
+          └ APIRoute(path='/api/admin/games/{game_id}', name='delete_game', methods=['DELETE'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fe6bd093600>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fe6bd1aba60>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7fe6bd165da0>
+          └ APIRoute(path='/api/admin/games/{game_id}', name='delete_game', methods=['DELETE'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fe6bd093600>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fe6bd1aba60>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7fe6bd81b410>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7fe6bd0936a0>
+          └ <function wrap_app_handling_exceptions at 0x7fe6c36f51c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7fe6bd0937e0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7fe6bd1aba60>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7fe6bd0936a0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7fe6bd81b410>
+                     └ <function get_request_handler.<locals>.app at 0x7fe6bd165580>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7fe6c37105e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7fe6be065890>, 'admin': <app.models.user.User object at 0x7fe6bd7d1f90>, '...
+                 │                 │         └ <function delete_game at 0x7fe6bd666de0>
+                 │                 └ Dependant(path_params=[ModelField(field_info=Path(PydanticUndefined), name='game_id', mode='validation')], query_params=[], h...
+                 └ <function run_in_threadpool at 0x7fe6c3c4d800>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function delete_game at 0x7fe6bd666de0>, db=<sqlalchemy.orm.session.Session object at 0x7fe6be065890>, adm...
+                 │     │         └ <function run_sync at 0x7fe6c4bd2520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7fe6c4b9b6a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violate...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/admin/games.py", line 148, in delete_game
+    db.commit()
+    │  └ <function Session.commit at 0x7fe6c29f6de0>
+    └ <sqlalchemy.orm.session.Session object at 0x7fe6be065890>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+    │     └ <function SessionTransaction.commit at 0x7fe6c29f5da0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7fe6bcf83660>
+  File "<string>", line 2, in commit
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {'_to_root': True}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7fe6bcf83660>
+                └ <function SessionTransaction.commit at 0x7fe6c29f5d00>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
+    self._prepare_impl()
+    │    └ <function SessionTransaction._prepare_impl at 0x7fe6c29f5bc0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7fe6bcf83660>
+  File "<string>", line 2, in _prepare_impl
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7fe6bcf83660>
+                └ <function SessionTransaction._prepare_impl at 0x7fe6c29f5b20>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
+    self.session.flush()
+    │    │       └ <function Session.flush at 0x7fe6c29fdd00>
+    │    └ <sqlalchemy.orm.session.Session object at 0x7fe6be065890>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7fe6bcf83660>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4345, in flush
+    self._flush(objects)
+    │    │      └ None
+    │    └ <function Session._flush at 0x7fe6c29fdee0>
+    └ <sqlalchemy.orm.session.Session object at 0x7fe6be065890>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4480, in _flush
+    with util.safe_reraise():
+         │    └ <class 'sqlalchemy.util.langhelpers.safe_reraise'>
+         └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+          │         │              └ <traceback object at 0x7fe6bc574380>
+          │         └ <method 'with_traceback' of 'BaseException' objects>
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4441, in _flush
+    flush_context.execute()
+    │             └ <function UOWTransaction.execute at 0x7fe6c29e27a0>
+    └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7fe6bc541050>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+    │   │       └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7fe6bc541050>
+    │   └ <function DeleteAll.execute at 0x7fe6c29e3560>
+    └ DeleteAll(Mapper[Product(products)])
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 679, in execute
+    util.preloaded.orm_persistence.delete_obj(
+    │    │         │               └ <function delete_obj at 0x7fe6c29d1120>
+    │    │         └ <module 'sqlalchemy.orm.persistence' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py'>
+    │    └ <module 'sqlalchemy.util.preloaded' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/preloaded.py'>
+    └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 193, in delete_obj
+    _emit_delete_statements(
+    └ <function _emit_delete_statements at 0x7fe6c29d1800>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 1465, in _emit_delete_statements
+    c = connection.execute(
+        │          └ <function Connection.execute at 0x7fe6c2c5ed40>
+        └ <sqlalchemy.engine.base.Connection object at 0x7fe6bd7b7750>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1415, in execute
+    return meth(
+           └ <bound method ClauseElement._execute_on_connection of <sqlalchemy.sql.dml.Delete object at 0x7fe6bd918310>>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           │          └ <function Connection._execute_clauseelement at 0x7fe6c2c5f060>
+           └ <sqlalchemy.engine.base.Connection object at 0x7fe6bd7b7750>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1637, in _execute_clauseelement
+    ret = self._execute_context(
+          │    └ <function Connection._execute_context at 0x7fe6c2c5f240>
+          └ <sqlalchemy.engine.base.Connection object at 0x7fe6bd7b7750>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1842, in _execute_context
+    return self._exec_single_context(
+           │    └ <function Connection._exec_single_context at 0x7fe6c2c5f2e0>
+           └ <sqlalchemy.engine.base.Connection object at 0x7fe6bd7b7750>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1982, in _exec_single_context
+    self._handle_dbapi_exception(
+    │    └ <function Connection._handle_dbapi_exception at 0x7fe6c2c5f560>
+    └ <sqlalchemy.engine.base.Connection object at 0x7fe6bd7b7750>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2351, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+          │                    │              │                 └ ForeignKeyViolation('update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "...
+          │                    │              └ (<class 'psycopg2.errors.ForeignKeyViolation'>, ForeignKeyViolation('update or delete on table "products" violates foreign ke...
+          │                    └ <method 'with_traceback' of 'BaseException' objects>
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7fe6c2b2a700>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7fe6c273ccd0>
+    └ <sqlalchemy.engine.base.Connection object at 0x7fe6bd7b7750>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'id': 6}
+    │      │       └ 'DELETE FROM products WHERE products.id = %(id)s'
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7fe6bcfd5d50; closed: -1>
+
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+[SQL: DELETE FROM products WHERE products.id = %(id)s]
+[parameters: {'id': 6}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-06-29 at 16:26:52 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:26:55 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:26:57 | INFO | main:43 - 📥 DELETE http://localhost:8001/api/admin/games/14
+2025-06-29 at 16:26:57 | INFO | games:142 - 🎮 Deleting game 14 by admin 2
+2025-06-29 at 16:26:57 | ERROR | main:47 - ❌ Exception during request: (psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+[SQL: DELETE FROM products WHERE products.id = %(id)s]
+[parameters: {'id': 6}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7ff29142a700>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7ff29103cad0>
+    └ <sqlalchemy.engine.base.Connection object at 0x7ff28c0b63d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'id': 6}
+    │      │       └ 'DELETE FROM products WHERE products.id = %(id)s'
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7ff28afd9d50; closed: -1>
+
+psycopg2.errors.ForeignKeyViolation: update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+
+
+The above exception was the direct cause of the following exception:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7ff29425e200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7ff29432f7e0>
+           └ <SpawnProcess name='SpawnProcess-15' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7ff29432ed40>
+    └ <SpawnProcess name='SpawnProcess-15' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7ff294018d90>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-15' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-15' parent=8 started>
+    │    └ <function subprocess_started at 0x7ff2934c6de0>
+    └ <SpawnProcess name='SpawnProcess-15' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7ff2934de590>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7ff2934c5bc0>
+           │       │   └ <uvicorn.server.Server object at 0x7ff2934de590>
+           │       └ <function run at 0x7ff293cd7c40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7ff29336bd30>
+           │      └ <function Runner.run at 0x7ff293d2f1a0>
+           └ <asyncio.runners.Runner object at 0x7ff2933fdbd0>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7ff292f841e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7ff2933fdbd0>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7ff28c4cb690>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7ff28b9466...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7ff28b9...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7ff29248a090>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7ff28c4cb690>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7ff28b9466...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7ff28b9...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7ff28b9466...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7ff28b9...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7ff28c935990>
+          └ <fastapi.applications.FastAPI object at 0x7ff29248a090>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7ff28baae660>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7ff28b9...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7ff28c9378d0>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7ff28c935990>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7ff28baaeac0>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7ff28c935f10>
+                     │    └ <function log_requests at 0x7ff28bbc6fc0>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7ff28c9378d0>
+
+> File "/app/app/main.py", line 45, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7ff28c935f10>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7ff28baaeac0>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7ff28baaeb60>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7ff28baafa60>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7ff28c000b10>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7ff28c9378d0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8001', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"macOS"', 'authorization': 'Bearer eyJh...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7ff28baaeb60>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7ff28baafa60>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7ff28bb1b880>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7ff28c000b10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7ff28c000b10>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7ff28baafa60>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7ff28fbeaa90>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7ff28c000b10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7ff28c000b10>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7ff28baafa60>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7ff28bf58690>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7ff28e949890>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7ff28fbeaa90>
+          └ <function wrap_app_handling_exceptions at 0x7ff29200d1c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7ff28b997600>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7ff28baafa60>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7ff28e949890>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7ff28b997600>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7ff28baafa60>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7ff28e949890>>
+          └ <fastapi.routing.APIRouter object at 0x7ff28e949890>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7ff28b997600>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7ff28baafa60>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7ff29200e7a0>
+          └ APIRoute(path='/api/admin/games/{game_id}', name='delete_game', methods=['DELETE'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7ff28b997600>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7ff28baafa60>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7ff28ba69da0>
+          └ APIRoute(path='/api/admin/games/{game_id}', name='delete_game', methods=['DELETE'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7ff28b997600>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7ff28baafa60>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7ff28c1be290>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7ff28b9976a0>
+          └ <function wrap_app_handling_exceptions at 0x7ff29200d1c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7ff28b9977e0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7ff28baafa60>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7ff28b9976a0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7ff28c1be290>
+                     └ <function get_request_handler.<locals>.app at 0x7ff28ba69580>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7ff2920285e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7ff28cd59b50>, 'admin': <app.models.user.User object at 0x7ff28c05dd10>, '...
+                 │                 │         └ <function delete_game at 0x7ff28bf6ade0>
+                 │                 └ Dependant(path_params=[ModelField(field_info=Path(PydanticUndefined), name='game_id', mode='validation')], query_params=[], h...
+                 └ <function run_in_threadpool at 0x7ff2925a1800>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function delete_game at 0x7ff28bf6ade0>, db=<sqlalchemy.orm.session.Session object at 0x7ff28cd59b50>, adm...
+                 │     │         └ <function run_sync at 0x7ff29355a520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7ff2935236a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violate...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/admin/games.py", line 148, in delete_game
+    db.commit()
+    │  └ <function Session.commit at 0x7ff2912f6de0>
+    └ <sqlalchemy.orm.session.Session object at 0x7ff28cd59b50>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+    │     └ <function SessionTransaction.commit at 0x7ff2912f5da0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7ff28b9e7110>
+  File "<string>", line 2, in commit
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {'_to_root': True}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7ff28b9e7110>
+                └ <function SessionTransaction.commit at 0x7ff2912f5d00>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
+    self._prepare_impl()
+    │    └ <function SessionTransaction._prepare_impl at 0x7ff2912f5bc0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7ff28b9e7110>
+  File "<string>", line 2, in _prepare_impl
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7ff28b9e7110>
+                └ <function SessionTransaction._prepare_impl at 0x7ff2912f5b20>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
+    self.session.flush()
+    │    │       └ <function Session.flush at 0x7ff2912f9d00>
+    │    └ <sqlalchemy.orm.session.Session object at 0x7ff28cd59b50>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7ff28b9e7110>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4345, in flush
+    self._flush(objects)
+    │    │      └ None
+    │    └ <function Session._flush at 0x7ff2912f9ee0>
+    └ <sqlalchemy.orm.session.Session object at 0x7ff28cd59b50>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4480, in _flush
+    with util.safe_reraise():
+         │    └ <class 'sqlalchemy.util.langhelpers.safe_reraise'>
+         └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+          │         │              └ <traceback object at 0x7ff28ae78c40>
+          │         └ <method 'with_traceback' of 'BaseException' objects>
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4441, in _flush
+    flush_context.execute()
+    │             └ <function UOWTransaction.execute at 0x7ff2912e27a0>
+    └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7ff28ae45850>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+    │   │       └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7ff28ae45850>
+    │   └ <function DeleteAll.execute at 0x7ff2912e3560>
+    └ DeleteAll(Mapper[Product(products)])
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 679, in execute
+    util.preloaded.orm_persistence.delete_obj(
+    │    │         │               └ <function delete_obj at 0x7ff2912d1120>
+    │    │         └ <module 'sqlalchemy.orm.persistence' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py'>
+    │    └ <module 'sqlalchemy.util.preloaded' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/preloaded.py'>
+    └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 193, in delete_obj
+    _emit_delete_statements(
+    └ <function _emit_delete_statements at 0x7ff2912d1800>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 1465, in _emit_delete_statements
+    c = connection.execute(
+        │          └ <function Connection.execute at 0x7ff29155ed40>
+        └ <sqlalchemy.engine.base.Connection object at 0x7ff28c0b63d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1415, in execute
+    return meth(
+           └ <bound method ClauseElement._execute_on_connection of <sqlalchemy.sql.dml.Delete object at 0x7ff28ae77ed0>>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           │          └ <function Connection._execute_clauseelement at 0x7ff29155f060>
+           └ <sqlalchemy.engine.base.Connection object at 0x7ff28c0b63d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1637, in _execute_clauseelement
+    ret = self._execute_context(
+          │    └ <function Connection._execute_context at 0x7ff29155f240>
+          └ <sqlalchemy.engine.base.Connection object at 0x7ff28c0b63d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1842, in _execute_context
+    return self._exec_single_context(
+           │    └ <function Connection._exec_single_context at 0x7ff29155f2e0>
+           └ <sqlalchemy.engine.base.Connection object at 0x7ff28c0b63d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1982, in _exec_single_context
+    self._handle_dbapi_exception(
+    │    └ <function Connection._handle_dbapi_exception at 0x7ff29155f560>
+    └ <sqlalchemy.engine.base.Connection object at 0x7ff28c0b63d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2351, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+          │                    │              │                 └ ForeignKeyViolation('update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "...
+          │                    │              └ (<class 'psycopg2.errors.ForeignKeyViolation'>, ForeignKeyViolation('update or delete on table "products" violates foreign ke...
+          │                    └ <method 'with_traceback' of 'BaseException' objects>
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7ff29142a700>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7ff29103cad0>
+    └ <sqlalchemy.engine.base.Connection object at 0x7ff28c0b63d0>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'id': 6}
+    │      │       └ 'DELETE FROM products WHERE products.id = %(id)s'
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7ff28afd9d50; closed: -1>
+
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+[SQL: DELETE FROM products WHERE products.id = %(id)s]
+[parameters: {'id': 6}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-06-29 at 16:28:04 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:28:08 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:28:11 | INFO | main:43 - 📥 DELETE http://localhost:8001/api/admin/games/14
+2025-06-29 at 16:28:11 | INFO | games:142 - 🎮 Deleting game 14 by admin 2
+2025-06-29 at 16:28:11 | ERROR | main:47 - ❌ Exception during request: (psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+[SQL: DELETE FROM products WHERE products.id = %(id)s]
+[parameters: {'id': 6}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7f321680e700>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f3216441790>
+    └ <sqlalchemy.engine.base.Connection object at 0x7f3210dd2510>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'id': 6}
+    │      │       └ 'DELETE FROM products WHERE products.id = %(id)s'
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7f32103b9d50; closed: -1>
+
+psycopg2.errors.ForeignKeyViolation: update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+
+
+The above exception was the direct cause of the following exception:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 10
+               └ <function _main at 0x7f3219662200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7f32197337e0>
+           └ <SpawnProcess name='SpawnProcess-17' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7f3219732d40>
+    └ <SpawnProcess name='SpawnProcess-17' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7f3218a59290>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-17' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-17' parent=8 started>
+    │    └ <function subprocess_started at 0x7f32188c6de0>
+    └ <SpawnProcess name='SpawnProcess-17' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7f32187fa4d0>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7f32188c5bc0>
+           │       │   └ <uvicorn.server.Server object at 0x7f32187fa4d0>
+           │       └ <function run at 0x7f32190dfc40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7f3218767d30>
+           │      └ <function Runner.run at 0x7f32191371a0>
+           └ <asyncio.runners.Runner object at 0x7f32187f9ad0>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:70> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7f32183841e0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7f32187f9ad0>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f32115a0c50>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f32118b7d...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f32118...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7f321828c850>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f32115a0c50>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f32118b7d...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f32118...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f32118b7d...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f32118...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f3211804850>
+          └ <fastapi.applications.FastAPI object at 0x7f321828c850>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7f3210e92660>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f32118...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f32132ae990>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f3211804850>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f3210e92ac0>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7f32115fca10>
+                     │    └ <function log_requests at 0x7f3210faafc0>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f32132ae990>
+
+> File "/app/app/main.py", line 45, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7f32115fca10>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f3210e92ac0>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f3210e92b60>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3210e93a60>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7f32115eee90>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f32132ae990>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8001', 'connection': 'keep-alive', 'sec-ch-ua-platform': '"macOS"', 'authorization': 'Bearer eyJh...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f3210e92b60>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3210e93a60>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7f3211327880>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f32115eee90>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f32115eee90>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3210e93a60>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f32132ac750>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f32115eee90>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f32115eee90>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3210e93a60>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7f3210d32210>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7f32114ffd50>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f32132ac750>
+          └ <function wrap_app_handling_exceptions at 0x7f32174691c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3210d7b600>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3210e93a60>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7f32114ffd50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3210d7b600>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3210e93a60>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7f32114ffd50>>
+          └ <fastapi.routing.APIRouter object at 0x7f32114ffd50>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3210d7b600>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3210e93a60>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7f321746a7a0>
+          └ APIRoute(path='/api/admin/games/{game_id}', name='delete_game', methods=['DELETE'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3210d7b600>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3210e93a60>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7f3210e4dda0>
+          └ APIRoute(path='/api/admin/games/{game_id}', name='delete_game', methods=['DELETE'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3210d7b600>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3210e93a60>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7f32118b6d50>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7f3210d7b6a0>
+          └ <function wrap_app_handling_exceptions at 0x7f32174691c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f3210d7b7e0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f3210e93a60>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7f3210d7b6a0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7f32118b6d50>
+                     └ <function get_request_handler.<locals>.app at 0x7f3210e4d580>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7f32174845e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7f32114b9e10>, 'admin': <app.models.user.User object at 0x7f32115fd090>, '...
+                 │                 │         └ <function delete_game at 0x7f321134ade0>
+                 │                 └ Dependant(path_params=[ModelField(field_info=Path(PydanticUndefined), name='game_id', mode='validation')], query_params=[], h...
+                 └ <function run_in_threadpool at 0x7f3217991800>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function delete_game at 0x7f321134ade0>, db=<sqlalchemy.orm.session.Session object at 0x7f32114b9e10>, adm...
+                 │     │         └ <function run_sync at 0x7f321895a520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7f32189236a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violate...
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/admin/games.py", line 148, in delete_game
+    db.commit()
+    │  └ <function Session.commit at 0x7f32166dade0>
+    └ <sqlalchemy.orm.session.Session object at 0x7f32114b9e10>
+
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+    │     └ <function SessionTransaction.commit at 0x7f32166d9da0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f3210df8690>
+  File "<string>", line 2, in commit
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {'_to_root': True}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f3210df8690>
+                └ <function SessionTransaction.commit at 0x7f32166d9d00>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1313, in commit
+    self._prepare_impl()
+    │    └ <function SessionTransaction._prepare_impl at 0x7f32166d9bc0>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f3210df8690>
+  File "<string>", line 2, in _prepare_impl
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                │  │      │      └ {}
+                │  │      └ ()
+                │  └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f3210df8690>
+                └ <function SessionTransaction._prepare_impl at 0x7f32166d9b20>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1288, in _prepare_impl
+    self.session.flush()
+    │    │       └ <function Session.flush at 0x7f32166e1d00>
+    │    └ <sqlalchemy.orm.session.Session object at 0x7f32114b9e10>
+    └ <sqlalchemy.orm.session.SessionTransaction object at 0x7f3210df8690>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4345, in flush
+    self._flush(objects)
+    │    │      └ None
+    │    └ <function Session._flush at 0x7f32166e1ee0>
+    └ <sqlalchemy.orm.session.Session object at 0x7f32114b9e10>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4480, in _flush
+    with util.safe_reraise():
+         │    └ <class 'sqlalchemy.util.langhelpers.safe_reraise'>
+         └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+          │         │              └ <traceback object at 0x7f321025d500>
+          │         └ <method 'with_traceback' of 'BaseException' objects>
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 4441, in _flush
+    flush_context.execute()
+    │             └ <function UOWTransaction.execute at 0x7f32166c67a0>
+    └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7f32114b9810>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+    │   │       └ <sqlalchemy.orm.unitofwork.UOWTransaction object at 0x7f32114b9810>
+    │   └ <function DeleteAll.execute at 0x7f32166c7560>
+    └ DeleteAll(Mapper[Product(products)])
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py", line 679, in execute
+    util.preloaded.orm_persistence.delete_obj(
+    │    │         │               └ <function delete_obj at 0x7f32166b5120>
+    │    │         └ <module 'sqlalchemy.orm.persistence' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py'>
+    │    └ <module 'sqlalchemy.util.preloaded' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/preloaded.py'>
+    └ <module 'sqlalchemy.util' from '/usr/local/lib/python3.11/site-packages/sqlalchemy/util/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 193, in delete_obj
+    _emit_delete_statements(
+    └ <function _emit_delete_statements at 0x7f32166b5800>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py", line 1465, in _emit_delete_statements
+    c = connection.execute(
+        │          └ <function Connection.execute at 0x7f3216942d40>
+        └ <sqlalchemy.engine.base.Connection object at 0x7f3210dd2510>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1415, in execute
+    return meth(
+           └ <bound method ClauseElement._execute_on_connection of <sqlalchemy.sql.dml.Delete object at 0x7f321025c410>>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           │          └ <function Connection._execute_clauseelement at 0x7f3216943060>
+           └ <sqlalchemy.engine.base.Connection object at 0x7f3210dd2510>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1637, in _execute_clauseelement
+    ret = self._execute_context(
+          │    └ <function Connection._execute_context at 0x7f3216943240>
+          └ <sqlalchemy.engine.base.Connection object at 0x7f3210dd2510>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1842, in _execute_context
+    return self._exec_single_context(
+           │    └ <function Connection._exec_single_context at 0x7f32169432e0>
+           └ <sqlalchemy.engine.base.Connection object at 0x7f3210dd2510>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1982, in _exec_single_context
+    self._handle_dbapi_exception(
+    │    └ <function Connection._handle_dbapi_exception at 0x7f3216943560>
+    └ <sqlalchemy.engine.base.Connection object at 0x7f3210dd2510>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2351, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+          │                    │              │                 └ ForeignKeyViolation('update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "...
+          │                    │              └ (<class 'psycopg2.errors.ForeignKeyViolation'>, ForeignKeyViolation('update or delete on table "products" violates foreign ke...
+          │                    └ <method 'with_traceback' of 'BaseException' objects>
+          └ IntegrityError('(psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "o...
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1963, in _exec_single_context
+    self.dialect.do_execute(
+    │    │       └ <function DefaultDialect.do_execute at 0x7f321680e700>
+    │    └ <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f3216441790>
+    └ <sqlalchemy.engine.base.Connection object at 0x7f3210dd2510>
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 943, in do_execute
+    cursor.execute(statement, parameters)
+    │      │       │          └ {'id': 6}
+    │      │       └ 'DELETE FROM products WHERE products.id = %(id)s'
+    │      └ <method 'execute' of 'psycopg2.extensions.cursor' objects>
+    └ <cursor object at 0x7f32103b9d50; closed: -1>
+
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.ForeignKeyViolation) update or delete on table "products" violates foreign key constraint "orders_product_id_fkey" on table "orders"
+DETAIL:  Key (id)=(6) is still referenced from table "orders".
+
+[SQL: DELETE FROM products WHERE products.id = %(id)s]
+[parameters: {'id': 6}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-06-29 at 16:30:56 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 16:31:22 | INFO | main:43 - 📥 DELETE http://localhost:8001/api/admin/games/14
+2025-06-29 at 16:31:22 | INFO | games:142 - 🎮 Deleting game 14 by admin 2
+2025-06-29 at 16:31:22 | INFO | games:151 - 🎮 Game 14 soft deleted successfully
+2025-06-29 at 16:31:22 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/14
+2025-06-29 at 17:13:05 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-29 at 17:13:05 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-29 at 17:13:05 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-29 at 17:13:05 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-29 at 17:13:05 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-06-29 at 17:13:05 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-29 at 17:13:05 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-29 at 17:13:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-29 at 17:13:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-29 at 17:13:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-29 at 17:13:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-29 at 17:13:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-29 at 17:13:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-29 at 17:13:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-29 at 17:13:06 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-06-29 at 17:13:06 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-06-29 at 17:13:28 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-29 at 17:13:28 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-29 at 17:13:28 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 17:13:28 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 17:13:28 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-29 at 17:13:28 | INFO | games:19 - 🎮 Admin games list called
+2025-06-29 at 17:13:28 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 17:13:28 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-29 at 17:13:28 | INFO | games:19 - 🎮 Admin games list called
+2025-06-29 at 17:13:28 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 17:14:39 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/upload/admin/image
+2025-06-29 at 17:14:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/upload/admin/image
+2025-06-29 at 17:14:39 | INFO | main:43 - 📥 POST http://localhost:8001/api/upload/admin/image
+2025-06-29 at 17:14:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/upload/admin/image
+2025-06-29 at 17:14:39 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/3ae64b983af34be39d45e767609b2604.png
+2025-06-29 at 17:14:39 | INFO | main:49 - 📤 200 http://localhost:8001/uploads/admin/3ae64b983af34be39d45e767609b2604.png
+2025-06-29 at 17:14:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games
+2025-06-29 at 17:14:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 17:14:43 | INFO | main:43 - 📥 POST http://localhost:8001/api/admin/games
+2025-06-29 at 17:14:43 | INFO | games:25 - 🎮 Creating game: 1 by admin 2
+2025-06-29 at 17:14:43 | INFO | games:26 - 🎮 Game data: {'name': '1', 'banner_url': None, 'auto_support': True, 'instructions': '1', 'description': '1', 'logo_url': '/uploads/admin/3ae64b983af34be39d45e767609b2604.png', 'sort_order': 0, 'enabled': True, 'subcategory_description': '1', 'faq_content': None, 'input_fields': []}
+2025-06-29 at 17:14:43 | INFO | games:78 - 🎮 Game created successfully: 15
+2025-06-29 at 17:14:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 17:14:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/subcategories/game/15
+2025-06-29 at 17:14:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/subcategories/game/15
+2025-06-29 at 17:14:43 | INFO | main:43 - 📥 POST http://localhost:8001/api/admin/subcategories/game/15
+2025-06-29 at 17:14:43 | INFO | subcategories:45 - 🏷️ Создаем подкатегорию '1' для игры 15
+2025-06-29 at 17:14:43 | INFO | subcategories:71 - 🏷️ Подкатегория создана с ID: 2
+2025-06-29 at 17:14:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/subcategories/game/15
+2025-06-29 at 17:14:43 | INFO | main:43 - 📥 POST http://localhost:8001/api/admin/subcategories/game/15
+2025-06-29 at 17:14:43 | INFO | subcategories:45 - 🏷️ Создаем подкатегорию '2' для игры 15
+2025-06-29 at 17:14:43 | INFO | subcategories:71 - 🏷️ Подкатегория создана с ID: 3
+2025-06-29 at 17:14:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/subcategories/game/15
+2025-06-29 at 17:14:43 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/admin/games/15
+2025-06-29 at 17:14:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/15
+2025-06-29 at 17:14:43 | INFO | main:43 - 📥 PUT http://localhost:8001/api/admin/games/15
+2025-06-29 at 17:14:43 | INFO | games:84 - 🎮 Updating game 15 by admin 2
+2025-06-29 at 17:14:43 | INFO | games:101 - 🎮 Updating input fields for game 15
+2025-06-29 at 17:14:43 | INFO | games:136 - 🎮 Game 15 updated successfully
+2025-06-29 at 17:14:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games/15
+2025-06-29 at 17:14:45 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-29 at 17:14:45 | INFO | games:19 - 🎮 Admin games list called
+2025-06-29 at 17:14:45 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 17:14:45 | INFO | main:43 - 📥 GET http://localhost:8001/api/admin/games
+2025-06-29 at 17:14:45 | INFO | games:19 - 🎮 Admin games list called
+2025-06-29 at 17:14:45 | INFO | main:49 - 📤 200 http://localhost:8001/api/admin/games
+2025-06-29 at 17:14:50 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-29 at 17:14:50 | INFO | games:37 - 🎮 Возвращаем 2 игр
+2025-06-29 at 17:14:50 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-29 at 17:14:50 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-29 at 17:14:50 | INFO | games:37 - 🎮 Возвращаем 2 игр
+2025-06-29 at 17:14:50 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-29 at 17:14:50 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/ed593425c146414dae4cf3c038f073c9.png
+2025-06-29 at 17:14:50 | INFO | main:49 - 📤 304 http://localhost:8001/uploads/admin/ed593425c146414dae4cf3c038f073c9.png
+2025-06-29 at 17:14:50 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-29 at 17:14:50 | INFO | games:37 - 🎮 Возвращаем 2 игр
+2025-06-29 at 17:14:50 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-29 at 17:14:53 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/15
+2025-06-29 at 17:14:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/15
+2025-06-29 at 17:14:53 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/15
+2025-06-29 at 17:14:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/15
+2025-06-29 at 17:14:53 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/15
+2025-06-29 at 17:14:53 | INFO | games:56 - 🎮 Возвращаем игру: 1
+2025-06-29 at 17:14:53 | INFO | games:57 - 🎮 Товаров: 0, Подкатегорий: 2
+2025-06-29 at 17:14:53 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-29 at 17:14:53 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-29 at 17:14:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/15
+2025-06-29 at 17:14:53 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/15
+2025-06-29 at 17:14:53 | INFO | games:56 - 🎮 Возвращаем игру: 1
+2025-06-29 at 17:14:53 | INFO | games:57 - 🎮 Товаров: 0, Подкатегорий: 2
+2025-06-29 at 17:14:53 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-29 at 17:14:53 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-29 at 17:14:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/15

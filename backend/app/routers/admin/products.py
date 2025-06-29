@@ -12,16 +12,19 @@ router = APIRouter()
 
 @router.get("", response_model=list[ProductRead])
 def list_products(db: Session = Depends(get_db), admin: User = Depends(admin_required)):
-    return db.query(Product).order_by(Product.sort_order.asc()).all()
+    return db.query(Product).filter(Product.is_deleted == False).order_by(Product.sort_order.asc()).all()
 
 
-# ДОБАВЛЕНО: недостающий endpoint для получения одного товара
-@router.get("/{product_id}", response_model=ProductRead)
-def get_product(product_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
-    db_product = db.query(Product).filter(Product.id == product_id).first()
+@router.delete("/{product_id}")
+def delete_product(product_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
+    db_product = db.query(Product).filter(Product.id == product_id, Product.is_deleted == False).first()
     if not db_product:
         raise HTTPException(status_code=404, detail="Product not found")
-    return db_product
+
+    # Мягкое удаление
+    db_product.is_deleted = True
+    db.commit()
+    return {"detail": "Product deleted"}
 
 
 @router.post("", response_model=ProductRead)
@@ -55,6 +58,17 @@ def delete_product(product_id: int, db: Session = Depends(get_db), admin: User =
     db_product = db.query(Product).filter(Product.id == product_id).first()
     if not db_product:
         raise HTTPException(status_code=404, detail="Product not found")
+
+    # Проверяем, что нет заказов с этим товаром
+    from app.models.order import Order
+    orders_count = db.query(Order).filter(Order.product_id == product_id).count()
+
+    if orders_count > 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete product: {orders_count} orders are still using it"
+        )
+
     db.delete(db_product)
     db.commit()
     return {"detail": "Product deleted"}
