@@ -60,5 +60,6 @@ class GameInputField(Base):
             "options": self.options,
             "min_length": self.min_length,
             "max_length": self.max_length,
-            "validation_regex": self.validation_regex
+            "validation_regex": self.validation_regex,
+            "subcategory_id": self.subcategory_id  # ⭐ ДОБАВЬТЕ ЭТУ СТРОКУ!
         }

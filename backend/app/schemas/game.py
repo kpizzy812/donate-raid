@@ -18,6 +18,7 @@ class InputField(BaseModel):
     validation_regex: Optional[str] = None
     min_length: Optional[int] = None
     max_length: Optional[int] = None
+    subcategory_id: Optional[int] = None  # ДОБАВЬТЕ ЭТО ПОЛЕ!
 
 # Схемы для избежания циклического импорта
 class ProductReadForGame(BaseModel):
