@@ -11,7 +11,7 @@ router = APIRouter()
 
 @router.get("", response_model=List[ProductRead])
 def list_products(db: Session = Depends(get_db)):
-    return db.query(Product).all()
+    return db.query(Product).filter(Product.is_deleted == False).all()
 
 
 @router.post("", response_model=ProductRead)
@@ -28,7 +28,10 @@ def create_product(product_data: ProductCreate, db: Session = Depends(get_db)):
 
 @router.get("/{product_id}", response_model=ProductRead)
 def get_product(product_id: int, db: Session = Depends(get_db)):
-    product = db.query(Product).filter(Product.id == product_id).first()
+    product = db.query(Product).filter(
+        Product.id == product_id,
+        Product.is_deleted == False
+    ).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
@@ -36,5 +39,9 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
 
 @router.get("/game/{game_id}", response_model=List[ProductRead])
 def get_products_for_game(game_id: int, db: Session = Depends(get_db)):
-    products = db.query(Product).filter(Product.game_id == game_id, Product.enabled == True).all()
+    products = db.query(Product).filter(
+        Product.game_id == game_id,
+        Product.enabled == True,
+        Product.is_deleted == False
+    ).all()
     return products

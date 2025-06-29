@@ -23,7 +23,12 @@ class Game(Base):
     enabled = Column(Boolean, default=True)
 
     # Relationships
-    products = relationship("Product", back_populates="game", cascade="all, delete-orphan")
+    products = relationship(
+        "Product",
+        back_populates="game",
+        cascade="all, delete-orphan",
+        primaryjoin="and_(Game.id == Product.game_id, Product.is_deleted == False)"
+    )
     subcategories = relationship("GameSubcategory", back_populates="game", cascade="all, delete-orphan", order_by="GameSubcategory.sort_order")
     input_fields = relationship("GameInputField", back_populates="game", cascade="all, delete-orphan", order_by="GameInputField.sort_order")  # ДОБАВЛЕНО
     faqs = relationship("GameFAQ", back_populates="game", cascade="all, delete-orphan")

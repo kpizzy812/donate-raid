@@ -29275,3 +29275,57 @@ DETAIL:  Key (id)=(6) is still referenced from table "orders".
 2025-06-29 at 17:14:53 | INFO | games:58 - 🎮 Полей ввода: 1
 2025-06-29 at 17:14:53 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
 2025-06-29 at 17:14:53 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/15
+2025-06-29 at 17:16:40 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:40 | INFO | games:37 - 🎮 Возвращаем 2 игр
+2025-06-29 at 17:16:40 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:40 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:40 | INFO | games:37 - 🎮 Возвращаем 2 игр
+2025-06-29 at 17:16:40 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:40 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:40 | INFO | games:37 - 🎮 Возвращаем 2 игр
+2025-06-29 at 17:16:40 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:41 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-29 at 17:16:41 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/games/14
+2025-06-29 at 17:16:41 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-29 at 17:16:41 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-29 at 17:16:41 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-29 at 17:16:41 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-29 at 17:16:41 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-29 at 17:16:41 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-29 at 17:16:41 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-29 at 17:16:41 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-29 at 17:16:41 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/14
+2025-06-29 at 17:16:41 | INFO | games:56 - 🎮 Возвращаем игру: Игра 113232
+2025-06-29 at 17:16:41 | INFO | games:57 - 🎮 Товаров: 1, Подкатегорий: 1
+2025-06-29 at 17:16:41 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-29 at 17:16:41 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-29 at 17:16:41 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/14
+2025-06-29 at 17:16:41 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/7b58709a962145a3bb5781dd2192478e.png
+2025-06-29 at 17:16:41 | INFO | main:49 - 📤 304 http://localhost:8001/uploads/admin/7b58709a962145a3bb5781dd2192478e.png
+2025-06-29 at 17:16:42 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:42 | INFO | games:37 - 🎮 Возвращаем 2 игр
+2025-06-29 at 17:16:42 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:42 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:42 | INFO | games:37 - 🎮 Возвращаем 2 игр
+2025-06-29 at 17:16:42 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:43 | INFO | games:37 - 🎮 Возвращаем 2 игр
+2025-06-29 at 17:16:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-06-29 at 17:16:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/15
+2025-06-29 at 17:16:43 | INFO | games:56 - 🎮 Возвращаем игру: 1
+2025-06-29 at 17:16:43 | INFO | games:57 - 🎮 Товаров: 0, Подкатегорий: 2
+2025-06-29 at 17:16:43 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-29 at 17:16:43 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-29 at 17:16:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/15
+2025-06-29 at 17:16:43 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/15
+2025-06-29 at 17:16:43 | INFO | games:56 - 🎮 Возвращаем игру: 1
+2025-06-29 at 17:16:43 | INFO | games:57 - 🎮 Товаров: 0, Подкатегорий: 2
+2025-06-29 at 17:16:43 | INFO | games:58 - 🎮 Полей ввода: 1
+2025-06-29 at 17:16:43 | INFO | games:59 - 🎮 FAQ: False, Инструкции: True
+2025-06-29 at 17:16:43 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/15
+2025-06-29 at 17:18:22 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 17:19:11 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 17:19:23 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 17:19:30 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 17:19:43 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-06-29 at 17:20:14 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support

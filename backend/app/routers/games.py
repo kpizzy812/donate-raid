@@ -26,8 +26,11 @@ def list_games(q: str = Query("", alias="q"), db: Session = Depends(get_db)):
     query = db.query(Game).options(
         joinedload(Game.products),
         joinedload(Game.subcategories),
-        joinedload(Game.input_fields)  # ДОБАВЛЕНО: загружаем поля ввода
-    ).filter(Game.enabled == True)
+        joinedload(Game.input_fields)
+    ).filter(
+        Game.enabled == True,
+        Game.is_deleted == False  # ДОБАВЛЕНО: исключаем удаленные игры
+    )
 
     if q:
         query = query.filter(Game.name.ilike(f"%{q}%"))
@@ -44,10 +47,11 @@ def get_game(game_id: int, db: Session = Depends(get_db)):
     game = db.query(Game).options(
         joinedload(Game.products),
         joinedload(Game.subcategories),
-        joinedload(Game.input_fields)  # ДОБАВЛЕНО: загружаем поля ввода
+        joinedload(Game.input_fields)
     ).filter(
         Game.id == game_id,
-        Game.enabled == True
+        Game.enabled == True,
+        Game.is_deleted == False  # ДОБАВЛЕНО: исключаем удаленные игры
     ).first()
 
     if not game:
@@ -55,7 +59,7 @@ def get_game(game_id: int, db: Session = Depends(get_db)):
 
     logger.info(f"🎮 Возвращаем игру: {game.name}")
     logger.info(f"🎮 Товаров: {len(game.products)}, Подкатегорий: {len(game.subcategories)}")
-    logger.info(f"🎮 Полей ввода: {len(game.input_fields)}")  # ДОБАВЛЕНО
+    logger.info(f"🎮 Полей ввода: {len(game.input_fields)}")
     logger.info(f"🎮 FAQ: {bool(game.faq_content)}, Инструкции: {bool(game.instructions)}")
 
     return game
