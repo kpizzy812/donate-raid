@@ -35,6 +35,9 @@ interface InputField {
   placeholder?: string
   help_text?: string
   options?: string[]
+  validation_regex?: string
+  min_length?: number
+  max_length?: number
   subcategory_id?: number
 }
 
@@ -85,6 +88,23 @@ export default function GamePage() {
   useEffect(() => {
     loadGame()
   }, [id])
+
+  useEffect(() => {
+  if (game?.input_fields) {
+    const relevantFields = game.input_fields.filter(field =>
+      !field.subcategory_id || field.subcategory_id === activeSubcategory
+    )
+
+    // Создаем новый объект значений только с полями текущей подкатегории
+    const newInputValues: Record<string, string> = {}
+    relevantFields.forEach(field => {
+      // Сохраняем старое значение, если оно есть
+      newInputValues[field.name] = inputValues[field.name] || ''
+    })
+
+    setInputValues(newInputValues)
+  }
+}, [activeSubcategory, game?.input_fields])
 
   const loadGame = async () => {
     try {
@@ -155,86 +175,10 @@ const handleBuySelected = () => {
 
   const filteredProducts = getFilteredProducts()
 
-  // Очищаем значения полей при переключении подкатегорий
-useEffect(() => {
-  if (game?.input_fields) {
-    const relevantFields = game.input_fields.filter(field =>
-      !field.subcategory_id || field.subcategory_id === activeSubcategory
-    )
-
-    // Создаем новый объект значений только с полями текущей подкатегории
-    const newInputValues = {}
-    relevantFields.forEach(field => {
-      // Сохраняем старое значение, если оно есть
-      newInputValues[field.name] = inputValues[field.name] || ''
-    })
-
-    setInputValues(newInputValues)
-  }
-}, [activeSubcategory, game?.input_fields])
-
-  // Получаем поля ввода для активной подкатегории или общие поля
-  {(() => {
   const relevantFields = game?.input_fields?.filter(field =>
-    !field.subcategory_id || field.subcategory_id === activeSubcategory
-  ) || []
+  !field.subcategory_id || field.subcategory_id === activeSubcategory
+) || []
 
-  return relevantFields.length > 0 && (
-    <div className="border-t border-zinc-200 dark:border-zinc-800 p-4">
-      <h4 className="font-semibold mb-3">Данные для доставки</h4>
-      <div className="grid gap-3">
-        {relevantFields.map((field) => (
-          <div key={`${field.name}-${activeSubcategory || 'all'}`}>
-            <label className="block text-sm font-medium mb-1">
-              {field.label} {field.required && <span className="text-red-500">*</span>}
-            </label>
-
-            {field.type === 'select' ? (
-              <select
-                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
-                value={inputValues[field.name] || ''}
-                onChange={(e) => handleInputChange(field.name, e.target.value)}
-                required={field.required}
-              >
-                <option value="">Выберите...</option>
-                {field.options?.map((option, i) => (
-                  <option key={i} value={option}>{option}</option>
-                ))}
-              </select>
-            ) : field.type === 'textarea' ? (
-              <textarea
-                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
-                rows={3}
-                placeholder={field.placeholder}
-                value={inputValues[field.name] || ''}
-                onChange={(e) => handleInputChange(field.name, e.target.value)}
-                required={field.required}
-                minLength={field.min_length}
-                maxLength={field.max_length}
-              />
-            ) : (
-              <input
-                type={field.type}
-                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
-                placeholder={field.placeholder}
-                value={inputValues[field.name] || ''}
-                onChange={(e) => handleInputChange(field.name, e.target.value)}
-                required={field.required}
-                minLength={field.min_length}
-                maxLength={field.max_length}
-                pattern={field.validation_regex}
-              />
-            )}
-
-            {field.help_text && (
-              <p className="text-xs text-zinc-500 mt-1">{field.help_text}</p>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-})()}
 
   // Проверяем заполненность обязательных полей
   const missingFields = relevantFields.filter(field =>
@@ -595,7 +539,7 @@ useEffect(() => {
                     {field.required && <span className="text-red-500 ml-1">*</span>}
                   </label>
 
-                  field.type === 'select' ? (
+                  {field.type === 'select' ? (
   <select
     className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
     value={inputValues[field.name] || ''}
@@ -615,8 +559,6 @@ useEffect(() => {
     value={inputValues[field.name] || ''}
     onChange={(e) => handleInputChange(field.name, e.target.value)}
     required={field.required}
-    minLength={field.min_length}
-    maxLength={field.max_length}
   />
 ) : (
   <input
@@ -626,9 +568,6 @@ useEffect(() => {
     value={inputValues[field.name] || ''}
     onChange={(e) => handleInputChange(field.name, e.target.value)}
     required={field.required}
-    minLength={field.min_length}
-    maxLength={field.max_length}
-    pattern={field.validation_regex}
   />
 )}
 
