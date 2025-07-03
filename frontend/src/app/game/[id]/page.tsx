@@ -89,11 +89,16 @@ export default function GamePage() {
     loadGame()
   }, [id])
 
-  useEffect(() => {
+  // ЗАМЕНИТЬ ЭТОТ useEffect:
+useEffect(() => {
+  console.log('🔄 Переключение подкатегории:', activeSubcategory)
+
   if (game?.input_fields) {
     const relevantFields = game.input_fields.filter(field =>
       !field.subcategory_id || field.subcategory_id === activeSubcategory
     )
+
+    console.log('📋 Актуальные поля для подкатегории:', relevantFields)
 
     // Создаем новый объект значений только с полями текущей подкатегории
     const newInputValues: Record<string, string> = {}
@@ -102,36 +107,41 @@ export default function GamePage() {
       newInputValues[field.name] = inputValues[field.name] || ''
     })
 
+    console.log('💾 Обновляем значения полей:', newInputValues)
     setInputValues(newInputValues)
   }
-}, [activeSubcategory, game?.input_fields])
+}, [activeSubcategory, game?.input_fields]) // Убираем inputValues из зависимостей!
 
   const loadGame = async () => {
-    try {
-      setLoading(true)
-      const response = await api.get(`/games/${id}`)
+  try {
+    setLoading(true)
+    const response = await api.get(`/games/${id}`)
 
-      const gameData = {
-        ...response.data,
-        products: response.data.products?.map((product: Product) => ({
-          ...product,
-          game_id: parseInt(id as string)
-        })) || []
-      }
-
-      setGame(gameData)
-
-      // Устанавливаем первую активную подкатегорию
-      if (gameData.subcategories && gameData.subcategories.length > 0) {
-        setActiveSubcategory(gameData.subcategories[0].id)
-      }
-    } catch (error) {
-      console.error('Ошибка загрузки игры:', error)
-      toast.error('Ошибка загрузки игры')
-    } finally {
-      setLoading(false)
+    const gameData = {
+      ...response.data,
+      products: response.data.products?.map((product: Product) => ({
+        ...product,
+        game_id: parseInt(id as string)
+      })) || []
     }
+
+    // ДОБАВИТЬ ЭТУ ОТЛАДКУ:
+    console.log('🎮 Загруженная игра:', gameData)
+    console.log('📝 Поля ввода:', gameData.input_fields)
+
+    setGame(gameData)
+
+    // Устанавливаем первую активную подкатегорию
+    if (gameData.subcategories && gameData.subcategories.length > 0) {
+      setActiveSubcategory(gameData.subcategories[0].id)
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки игры:', error)
+    toast.error('Ошибка загрузки игры')
+  } finally {
+    setLoading(false)
   }
+}
 
   // Парсим FAQ из JSON строки
   const getFAQList = (): FAQItem[] => {
