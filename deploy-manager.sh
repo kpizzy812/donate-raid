@@ -282,7 +282,7 @@ apply_migrations() {
         docker-compose exec -T backend alembic current || true
         echo ""
         echo "🔄 Применяем миграции..."
-        docker-compose exec -T backend alembic upgrade head
+        docker-compose -f docker-compose.prod.yml exec -T backend alembic upgrade head
         echo "✅ Миграции применены!"
 EOF
 }
