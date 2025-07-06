@@ -92,6 +92,21 @@ def update_game(game_id: int, game: GameUpdate, db: Session = Depends(get_db), a
     game_data = game.dict(exclude_unset=True)
     input_fields_data = game_data.pop('input_fields', None)
 
+    # ДОБАВЛЕНО: Проверяем уникальность имени среди активных игр
+    if 'name' in game_data and game_data['name'] != db_game.name:
+        existing_game = db.query(Game).filter(
+            Game.name == game_data['name'],
+            Game.is_deleted == False,
+            Game.id != game_id  # Исключаем текущую игру
+        ).first()
+
+        if existing_game:
+            logger.warning(f"🎮 Game name '{game_data['name']}' already exists for active game {existing_game.id}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Game with name '{game_data['name']}' already exists"
+            )
+
     # Обновляем основные поля игры
     for field, value in game_data.items():
         setattr(db_game, field, value)

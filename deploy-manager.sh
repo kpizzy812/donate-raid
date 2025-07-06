@@ -165,6 +165,7 @@ quick_sync() {
         --exclude=".next/" \
         --exclude="backend/logs/" \
         --exclude="backend/.venv/" \
+        --exclude="uploads/" \
         "${LOCAL_DIR}/" "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
 
     echo -e "${GREEN}✅ Синхронизация завершена!${NC}"

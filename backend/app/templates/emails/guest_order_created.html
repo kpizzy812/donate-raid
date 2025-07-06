@@ -1,0 +1,110 @@
+<!-- backend/app/templates/emails/guest_order_created.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Заказ создан | Donate Raid</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #3b82f6;
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+        .content {
+            background-color: #f8fafc;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .order-info {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        .order-details {
+            margin: 15px 0;
+        }
+        .order-details strong {
+            color: #1e40af;
+        }
+        .button {
+            display: inline-block;
+            background-color: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 14px;
+        }
+        .warning {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✅ Заказ успешно создан!</h1>
+    </div>
+
+    <div class="content">
+        <div class="order-info">
+            <h2>Информация о заказе</h2>
+            <div class="order-details">
+                <strong>Номер заказа:</strong> #{{ order_id }}<br>
+                <strong>Сумма:</strong> {{ amount }} {{ currency }}<br>
+                <strong>Способ оплаты:</strong> {{ payment_method }}<br>
+                <strong>Дата создания:</strong> {{ created_at }}<br>
+                {% if guest_name %}
+                <strong>Имя покупателя:</strong> {{ guest_name }}<br>
+                {% endif %}
+                <strong>Email:</strong> {{ guest_email }}
+            </div>
+        </div>
+
+        <div class="warning">
+            <strong>📋 Сохраните эту информацию!</strong><br>
+            Поскольку вы оформили заказ как гость, рекомендуем сохранить номер заказа для отслеживания статуса.
+        </div>
+
+        <p>Ваш заказ принят в обработку. Мы свяжемся с вами по указанному email для уточнения деталей.</p>
+
+        <a href="https://donateraid.ru/order/{{ order_id }}" class="button">
+            Посмотреть заказ
+        </a>
+
+        <div class="footer">
+            <p>
+                <strong>Рекомендация:</strong> Зарегистрируйтесь на нашем сайте для более удобного управления заказами, получения бонусов и скидок!
+            </p>
+            <p>
+                Если у вас есть вопросы, обратитесь в нашу службу поддержки.<br>
+                Email: support@donateraid.ru<br>
+                Сайт: <a href="https://donateraid.ru">donateraid.ru</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

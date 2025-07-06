@@ -27,6 +27,19 @@ def delete_product(product_id: int, db: Session = Depends(get_db), admin: User =
     return {"detail": "Product deleted"}
 
 
+@router.get("/{product_id}", response_model=ProductRead)
+def get_product(product_id: int, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
+    """Получить продукт по ID для редактирования в админке"""
+    product = db.query(Product).filter(
+        Product.id == product_id,
+        Product.is_deleted == False
+    ).first()
+
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    return product
+
 @router.post("", response_model=ProductRead)
 def create_product(product: ProductCreate, db: Session = Depends(get_db), admin: User = Depends(admin_required)):
     # ИСПРАВЛЕНО: используем model_dump() вместо dict() для Pydantic v2

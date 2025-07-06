@@ -1,5 +1,6 @@
-# app/api/orders.py
+# backend/app/routers/orders.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОДДЕРЖКОЙ ГОСТЕЙ
 
+import json
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from app.core.database import get_db
@@ -12,8 +13,8 @@ from app.models.referral import ReferralEarning
 from app.schemas.order import OrderCreate, OrderRead
 from app.services.mailer import send_email, render_template
 from bot.notify import notify_manual_order_sync
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, EmailStr
+from typing import List, Optional
 from decimal import Decimal
 from app.services.robokassa import robokassa_service
 
@@ -21,39 +22,57 @@ router = APIRouter()
 
 
 # ------------------------------------------------------------
-# 1) Endpoints для “мои заказы” (GET /me) — логируем при входе
+# НОВЫЕ СХЕМЫ ДЛЯ ГОСТЕВЫХ ЗАКАЗОВ
+# ------------------------------------------------------------
+class GuestOrderItem(BaseModel):
+    game_id: int
+    product_id: int
+    amount: Decimal
+    currency: str
+    payment_method: PaymentMethod
+    comment: str | None = None
+
+
+class GuestOrderBulkCreate(BaseModel):
+    items: List[GuestOrderItem]
+    guest_email: EmailStr
+    guest_name: Optional[str] = None
+
+
+# ------------------------------------------------------------
+# 1) Endpoints для "мои заказы" (GET /me) — только для авторизованных
 # ------------------------------------------------------------
 @router.get("/me", response_model=list[OrderRead])
 def get_my_orders(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
 ):
     print("▶▶▶ Вызван get_my_orders для user_id =", current_user.id)
     orders = (
         db.query(Order)
-          .filter_by(user_id=current_user.id)
-          .options(joinedload(Order.game), joinedload(Order.product))
-          .order_by(Order.created_at.desc())
-          .all()
+        .filter_by(user_id=current_user.id)
+        .options(joinedload(Order.game), joinedload(Order.product))
+        .order_by(Order.created_at.desc())
+        .all()
     )
     print(f"    → Вернулось {len(orders)} заказов для user_id={current_user.id}")
     return orders
 
 
 # ------------------------------------------------------------
-# 2) Endpoint для одного заказа (GET /{order_id}) — логируем param
+# 2) Endpoint для одного заказа (GET /{order_id}) — доступно всем
 # ------------------------------------------------------------
 @router.get("/{order_id}", response_model=OrderRead)
 def get_order(
-    order_id: int,
-    db: Session = Depends(get_db)
+        order_id: int,
+        db: Session = Depends(get_db)
 ):
     print(f"▶▶▶ Вызван get_order, пытаемся найти заказ с order_id = {order_id}")
     order = (
         db.query(Order)
-          .options(joinedload(Order.game), joinedload(Order.product))
-          .filter(Order.id == order_id)
-          .first()
+        .options(joinedload(Order.game), joinedload(Order.product))
+        .filter(Order.id == order_id)
+        .first()
     )
     if not order:
         print(f"    → Заказ с id={order_id} не найден, верну 404")
@@ -63,13 +82,13 @@ def get_order(
 
 
 # ------------------------------------------------------------
-# 3) Endpoint для создания заказа (POST /)
+# 3) Endpoint для создания заказа авторизованным пользователем (POST /)
 # ------------------------------------------------------------
 @router.post("", response_model=OrderRead)
 def create_order(
-    order_data: OrderCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+        order_data: OrderCreate,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)
 ):
     print(f"▶▶▶ Вызван create_order для user_id={current_user.id} c данными: {order_data.dict()}")
     new_order = Order(**order_data.dict())
@@ -81,7 +100,7 @@ def create_order(
 
     print(f"    → Новый заказ создан, id={new_order.id}, статус={new_order.status}")
 
-    # # Если заказ сразу помечается как оплаченный (например, для автоматических платежей)
+    # Если заказ сразу помечается как оплаченный (например, для автоматических платежей)
     if new_order.status == OrderStatus.paid:
         try:
             ReferralService.process_referral_earning(db, new_order)
@@ -110,9 +129,9 @@ def create_order(
 # ------------------------------------------------------------
 @router.post("/{order_id}/cancel")
 def cancel_order(
-    order_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        order_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ):
     print(f"▶▶▶ Вызван cancel_order: order_id={order_id}, user_id={current_user.id}")
     order = db.query(Order).filter_by(id=order_id, user_id=current_user.id).first()
@@ -167,7 +186,7 @@ def create_manual_order(
         print("    → manual_game_name не передан, верну 400")
         raise HTTPException(status_code=400, detail="manual_game_name is required for manual orders")
 
-    # 🆕 Автоматически получаем или создаем фиктивные записи для manual заказов
+    # Автоматически получаем или создаем фиктивные записи для manual заказов
     from app.models.game import Game
     from app.models.product import Product, ProductType
 
@@ -178,11 +197,11 @@ def create_manual_order(
             name="Manual Orders",
             banner_url="",
             auto_support=False,
-            sort_order=999999,  # В самый конец
-            enabled=False  # Скрываем от пользователей
+            sort_order=999999,
+            enabled=False
         )
         db.add(dummy_game)
-        db.flush()  # Получаем ID
+        db.flush()
         print(f"    → Создана системная игра для manual заказов с ID: {dummy_game.id}")
 
     # Ищем или создаем системный продукт
@@ -191,14 +210,13 @@ def create_manual_order(
         name="Manual Order Service"
     ).first()
     if not dummy_product:
-        from decimal import Decimal
         dummy_product = Product(
             game_id=dummy_game.id,
             name="Manual Order Service",
             price_rub=Decimal("0.00"),
             type=ProductType.service,
             description="Системный продукт для ручных заказов",
-            enabled=False,  # Скрываем от пользователей
+            enabled=False,
             delivery="manual",
             sort_order=999999
         )
@@ -206,7 +224,7 @@ def create_manual_order(
         db.flush()
         print(f"    → Создан системный продукт для manual заказов с ID: {dummy_product.id}")
 
-    # 🆕 Создаем заказ с автоматически подставленными ID
+    # Создаем заказ с автоматически подставленными ID
     order_data_dict = data.dict()
     if not order_data_dict.get('game_id'):
         order_data_dict['game_id'] = dummy_game.id
@@ -223,7 +241,7 @@ def create_manual_order(
 
     print(f"    → Новый ручной заказ создан, id={new_order.id}, игра={data.manual_game_name}")
 
-    # 🔔 Telegram уведомление с order_id
+    # Telegram уведомление с order_id
     notify_manual_order_sync(
         f"📥 <b>Новая ручная заявка #{new_order.id}</b>\n"
         f"👤 <b>{current_user.username or 'No username'}</b> (ID: {current_user.id})\n"
@@ -236,27 +254,28 @@ def create_manual_order(
 
     return new_order
 
+
 # ------------------------------------------------------------
 # 6) Endpoint для просмотра только ручных заказов (GET /manual/me)
 # ------------------------------------------------------------
 @router.get("/manual/me", response_model=list[OrderRead])
 def get_my_manual_orders(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
 ):
     print(f"▶▶▶ Вызван get_my_manual_orders для user_id={current_user.id}")
     orders = (
         db.query(Order)
-          .filter_by(user_id=current_user.id, payment_method=PaymentMethod.manual)
-          .order_by(Order.created_at.desc())
-          .all()
+        .filter_by(user_id=current_user.id, payment_method=PaymentMethod.manual)
+        .order_by(Order.created_at.desc())
+        .all()
     )
     print(f"    → Вернулось {len(orders)} ручных заказов")
     return orders
 
 
 # ------------------------------------------------------------
-# 7) Endpoint для массового создания (POST /bulk)
+# 7) Endpoint для массового создания заказов авторизованными (POST /bulk)
 # ------------------------------------------------------------
 class OrderItem(BaseModel):
     game_id: int
@@ -265,6 +284,7 @@ class OrderItem(BaseModel):
     currency: str
     payment_method: PaymentMethod
     comment: str | None = None
+
 
 class OrderBulkCreate(BaseModel):
     items: List[OrderItem]
@@ -276,7 +296,7 @@ def create_bulk_order(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ):
-    print(f"▶▶▶ Вызван create_bulk_order для user_id={current_user.id} c items={data.items}")
+    print(f"▶▶▶ Вызван create_bulk_order для user_id={current_user.id} c items={len(data.items)}")
     if not data.items:
         print("    → items пустой, верну 400")
         raise HTTPException(status_code=400, detail="No items provided")
@@ -290,7 +310,7 @@ def create_bulk_order(
         product_id=first_item.product_id,
         amount=total_amount,
         currency=first_item.currency,
-        payment_method=first_item.payment_method,  # 🆕 Теперь получаем реальное значение
+        payment_method=first_item.payment_method,
         comment="\n".join([f"[{i.product_id}] {i.comment or ''}" for i in data.items])
     )
 
@@ -300,14 +320,13 @@ def create_bulk_order(
 
     print(f"    → Новый bulk-заказ создан, id={new_order.id}, сумма={total_amount}, метод={first_item.payment_method}")
 
-    # 🆕 Генерируем payment_url для RoboKassa методов
-    payment_url_generated = True
+    # Генерируем payment_url для RoboKassa методов
+    payment_url = None
     if first_item.payment_method in [PaymentMethod.sberbank, PaymentMethod.sbp]:
         try:
             # Создаем описание товара
             product_names = []
             for item in data.items:
-                # Пытаемся получить информацию о продукте
                 product = db.query(Product).filter(Product.id == item.product_id).first()
                 if product:
                     product_names.append(product.name)
@@ -318,141 +337,199 @@ def create_bulk_order(
             if len(product_names) > 3:
                 description += f" и еще {len(product_names) - 3} товар(ов)"
 
-            # Генерируем URL для оплаты
             payment_url = robokassa_service.create_payment_url(
                 order_id=new_order.id,
                 amount=total_amount,
                 currency=first_item.currency,
                 description=description
             )
-
-            # Сохраняем URL в заказ
-            new_order.payment_url = payment_url
-            db.commit()
-            db.refresh(new_order)
-
-            print(f"    → Сгенерирован payment_url для RoboKassa: {payment_url}")
-
+            print(f"    → Создан URL для оплаты: {payment_url}")
         except Exception as e:
-            print(f"    → Ошибка генерации payment_url: {e}")
-            payment_url_generated = False
-            # Удаляем заказ если не удалось сгенерировать URL оплаты
-            db.delete(new_order)
-            db.commit()
-            raise HTTPException(
-                status_code=500,
-                detail=f"Ошибка создания ссылки на оплату: {str(e)}"
-            )
+            print(f"    → Ошибка создания URL для оплаты: {e}")
 
-    # Отправка email уведомления ТОЛЬКО если заказ успешно создан
-    if payment_url_generated and current_user.email:
-        try:
-            html = render_template("order_created.html", {
-                "order_id": new_order.id,
-                "amount": new_order.amount,
-                "currency": new_order.currency,
-                "username": current_user.username,
-            })
-            send_email(
-                to=current_user.email,
-                subject="✅ Заказ создан | Donate Raid",
-                body=html
-            )
-            print(f"    → Отправлено письмо пользователю {current_user.email}")
-        except Exception as e:
-            print(f"    → Ошибка отправки письма: {e}")
-            # Письмо не критично, не прерываем создание заказа
+    # Возвращаем результат с payment_url если есть
+    result_dict = {
+        "id": new_order.id,
+        "user_id": new_order.user_id,
+        "game_id": new_order.game_id,
+        "product_id": new_order.product_id,
+        "amount": new_order.amount,
+        "currency": new_order.currency,
+        "payment_method": new_order.payment_method,
+        "status": new_order.status,
+        "comment": new_order.comment,
+        "created_at": new_order.created_at,
+    }
 
-    return new_order
+    if payment_url:
+        result_dict["payment_url"] = payment_url
+
+    return result_dict
 
 
-@router.post("/{order_id}/mark-paid")
-def mark_order_as_paid(
-        order_id: int,
-        db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+# ------------------------------------------------------------
+# 8) НОВЫЙ Endpoint для гостевых bulk заказов (POST /guest/bulk)
+# ------------------------------------------------------------
+@router.post("/guest/bulk", response_model=OrderRead)
+def create_guest_bulk_order(
+        data: GuestOrderBulkCreate,
+        db: Session = Depends(get_db)
 ):
-    """
-    Помечает заказ как оплаченный и обрабатывает реферальную выплату
-    Этот endpoint должен вызываться платежной системой или администратором
-    """
-    print(f"▶▶▶ Помечаем заказ {order_id} как оплаченный")
+    """Создание bulk заказа для неавторизованного пользователя"""
+    print(f"▶▶▶ Вызван create_guest_bulk_order для гостя {data.guest_email} c items={len(data.items)}")
 
-    order = db.query(Order).filter_by(id=order_id).first()
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+    if not data.items:
+        print("    → items пустой, верну 400")
+        raise HTTPException(status_code=400, detail="No items provided")
 
-    if order.status != OrderStatus.pending:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Заказ уже имеет статус {order.status.value}"
-        )
+    total_amount = sum([item.amount for item in data.items])
+    first_item = data.items[0]
 
-    # Обновляем статус заказа
-    order.status = OrderStatus.paid
-    db.commit()
+    # Создаем гостевую информацию для хранения в comment
+    guest_info = {
+        "guest_email": data.guest_email,
+        "guest_name": data.guest_name,
+        "items": []
+    }
 
-    print(f"    → Заказ {order_id} помечен как оплаченный")
-
-    # Обрабатываем реферальную выплату
-    try:
-        referral_earning = ReferralService.process_referral_earning(db, order)
-        if referral_earning:
-            print(
-                f"    → Реферальная выплата {referral_earning.amount} произведена пользователю {referral_earning.referrer_id}")
-        else:
-            print(f"    → Реферальная выплата не требуется для заказа {order_id}")
-    except Exception as e:
-        print(f"    → Ошибка при обработке реферальной выплаты: {e}")
-        # Не прерываем выполнение, если реферальная система дала сбой
-
-    # Отправляем email об успешной оплате
-    if order.user and order.user.email:
-        html = render_template("order_success.html", {
-            "order_id": order.id,
-            "product_name": order.product.name if order.product else "Товар",
-            "amount": order.amount,
-            "currency": order.currency,
-            "username": order.user.username,
+    # Добавляем информацию о каждом товаре
+    for item in data.items:
+        product = db.query(Product).filter(Product.id == item.product_id).first()
+        guest_info["items"].append({
+            "product_id": item.product_id,
+            "product_name": product.name if product else f"Товар #{item.product_id}",
+            "amount": float(item.amount),
+            "comment": item.comment
         })
+
+    # Объединяем пользовательские данные с гостевой информацией
+    items_comments = []
+    for item in data.items:
+        if item.comment:
+            try:
+                # Парсим JSON из комментария (данные из формы)
+                user_data = json.loads(item.comment)
+                items_comments.append(f"[Товар #{item.product_id}] {json.dumps(user_data, ensure_ascii=False)}")
+            except:
+                # Если не JSON, просто добавляем как есть
+                items_comments.append(f"[Товар #{item.product_id}] {item.comment}")
+
+    # Формируем итоговый комментарий
+    final_comment = json.dumps(guest_info, ensure_ascii=False)
+    if items_comments:
+        final_comment += "\n\nДанные форм:\n" + "\n".join(items_comments)
+
+    # Создаем заказ БЕЗ user_id (гостевой заказ)
+    new_order = Order(
+        user_id=None,  # Гостевой заказ
+        game_id=first_item.game_id,
+        product_id=first_item.product_id,
+        amount=total_amount,
+        currency=first_item.currency,
+        payment_method=first_item.payment_method,
+        comment=final_comment,
+        status=OrderStatus.pending
+    )
+
+    db.add(new_order)
+    db.commit()
+    db.refresh(new_order)
+
+    print(f"    → Новый гостевой bulk-заказ создан, id={new_order.id}, сумма={total_amount}, email={data.guest_email}")
+
+    # Генерируем payment_url для RoboKassa методов
+    payment_url = None
+    if first_item.payment_method in [PaymentMethod.sberbank, PaymentMethod.sbp]:
+        try:
+            # Создаем описание товара для гостя
+            product_names = []
+            for item in data.items:
+                product = db.query(Product).filter(Product.id == item.product_id).first()
+                if product:
+                    product_names.append(product.name)
+                else:
+                    product_names.append(f"Товар #{item.product_id}")
+
+            description = f"Заказ #{new_order.id}: " + ", ".join(product_names[:3])
+            if len(product_names) > 3:
+                description += f" и еще {len(product_names) - 3} товар(ов)"
+
+            payment_url = robokassa_service.create_payment_url(
+                order_id=new_order.id,
+                amount=total_amount,
+                currency=first_item.currency,
+                description=description
+            )
+            print(f"    → Создан URL для оплаты: {payment_url}")
+        except Exception as e:
+            print(f"    → Ошибка создания URL для оплаты: {e}")
+
+    # Отправляем email гостю
+    try:
+        payment_method_names = {
+            PaymentMethod.sberbank: "Банковская карта",
+            PaymentMethod.sbp: "СБП",
+            PaymentMethod.ton: "TON",
+            PaymentMethod.usdt: "USDT TON",
+            PaymentMethod.manual: "Ручная оплата"
+        }
+
+        html = render_template("guest_order_created.html", {
+            "order_id": new_order.id,
+            "amount": total_amount,
+            "currency": first_item.currency,
+            "payment_method": payment_method_names.get(first_item.payment_method, first_item.payment_method.value),
+            "guest_email": data.guest_email,
+            "guest_name": data.guest_name,
+            "created_at": new_order.created_at.strftime("%d.%m.%Y %H:%M")
+        })
+
         send_email(
-            to=order.user.email,
-            subject="✅ Заказ оплачен | Donate Raid",
+            to=data.guest_email,
+            subject=f"✅ Заказ #{new_order.id} создан | Donate Raid",
             body=html
         )
-        print(f"    → Отправлено письмо об успешной оплате пользователю {order.user.email}")
+        print(f"    → Отправлено email гостю {data.guest_email}")
+    except Exception as e:
+        print(f"    → Ошибка отправки email: {e}")
 
-    return {
-        "status": "paid",
-        "order_id": order.id,
-        "referral_bonus": float(referral_earning.amount) if referral_earning else 0
+    # Отправляем уведомление в Telegram
+    try:
+        items_info = []
+        for item in data.items:
+            product = db.query(Product).filter(Product.id == item.product_id).first()
+            product_name = product.name if product else f"Товар #{item.product_id}"
+            items_info.append(f"• {product_name} - {item.amount} {item.currency}")
+
+        telegram_message = (
+                f"🛒 <b>Новый гостевой заказ #{new_order.id}</b>\n\n"
+                f"📧 Email: <code>{data.guest_email}</code>\n"
+                f"👤 Имя: {data.guest_name or 'Не указано'}\n"
+                f"💳 Способ оплаты: {first_item.payment_method.value}\n"
+                f"💵 Общая сумма: <b>{total_amount} {first_item.currency}</b>\n\n"
+                f"📦 Товары:\n" + "\n".join(items_info)
+        )
+
+        notify_manual_order_sync(telegram_message, order_id=new_order.id)
+        print(f"    → Отправлено Telegram-уведомление о гостевом заказе #{new_order.id}")
+    except Exception as e:
+        print(f"    → Ошибка отправки Telegram-уведомления: {e}")
+
+    # Возвращаем заказ с payment_url если есть
+    result_dict = {
+        "id": new_order.id,
+        "user_id": new_order.user_id,
+        "game_id": new_order.game_id,
+        "product_id": new_order.product_id,
+        "amount": new_order.amount,
+        "currency": new_order.currency,
+        "payment_method": new_order.payment_method,
+        "status": new_order.status,
+        "comment": new_order.comment,
+        "created_at": new_order.created_at,
     }
 
-@router.get("/referral-stats")
-def get_order_referral_stats(
-        db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
-):
-    """Получить статистику заказов, связанных с рефералами"""
+    if payment_url:
+        result_dict["payment_url"] = payment_url
 
-    # Заказы, по которым пользователь получил реферальные выплаты
-    referral_orders = db.query(Order).join(ReferralEarning).filter(
-        ReferralEarning.referrer_id == current_user.id
-    ).all()
-
-    total_referral_orders = len(referral_orders)
-    total_referral_amount = sum(order.amount for order in referral_orders)
-
-    return {
-        "total_referral_orders": total_referral_orders,
-        "total_referral_amount": float(total_referral_amount),
-        "recent_referral_orders": [
-            {
-                "id": order.id,
-                "amount": float(order.amount),
-                "currency": order.currency,
-                "created_at": order.created_at.isoformat()
-            }
-            for order in referral_orders[-10:]  # Последние 10 заказов
-        ]
-    }
+    return result_dict
