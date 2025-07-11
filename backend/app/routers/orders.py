@@ -82,7 +82,7 @@ def get_order(
 
 
 # ------------------------------------------------------------
-# 3) Endpoint для создания заказа авторизованным пользователем (POST /)
+# 3) Endpoint для создания заказа авторизованным пользователем (POST /) - ИСПРАВЛЕНО
 # ------------------------------------------------------------
 @router.post("", response_model=OrderRead)
 def create_order(
@@ -99,6 +99,14 @@ def create_order(
     db.refresh(new_order)
 
     print(f"    → Новый заказ создан, id={new_order.id}, статус={new_order.status}")
+
+    # ИСПРАВЛЕНО: Перезагружаем заказ с связанными объектами для OrderRead
+    order_with_relations = (
+        db.query(Order)
+        .options(joinedload(Order.game), joinedload(Order.product))
+        .filter(Order.id == new_order.id)
+        .first()
+    )
 
     # Если заказ сразу помечается как оплаченный (например, для автоматических платежей)
     if new_order.status == OrderStatus.paid:
@@ -121,7 +129,7 @@ def create_order(
         )
         print(f"    → Отправлено письмо пользователю {current_user.email}")
 
-    return new_order
+    return order_with_relations
 
 
 # ------------------------------------------------------------
@@ -173,7 +181,7 @@ def cancel_order(
 
 
 # ------------------------------------------------------------
-# 5) Endpoint для ручного заказа (POST /manual)
+# 5) Endpoint для ручного заказа (POST /manual) - ИСПРАВЛЕНО
 # ------------------------------------------------------------
 @router.post("/manual", response_model=OrderRead)
 def create_manual_order(
@@ -241,6 +249,14 @@ def create_manual_order(
 
     print(f"    → Новый ручной заказ создан, id={new_order.id}, игра={data.manual_game_name}")
 
+    # ИСПРАВЛЕНО: Перезагружаем заказ с связанными объектами для OrderRead
+    order_with_relations = (
+        db.query(Order)
+        .options(joinedload(Order.game), joinedload(Order.product))
+        .filter(Order.id == new_order.id)
+        .first()
+    )
+
     # Telegram уведомление с order_id
     notify_manual_order_sync(
         f"📥 <b>Новая ручная заявка #{new_order.id}</b>\n"
@@ -252,7 +268,7 @@ def create_manual_order(
     )
     print(f"    → Отправлено Telegram-уведомление о новом ручном заказе #{new_order.id}")
 
-    return new_order
+    return order_with_relations
 
 
 # ------------------------------------------------------------
@@ -343,28 +359,24 @@ def create_bulk_order(
                 currency=first_item.currency,
                 description=description
             )
+
+            # ИСПРАВЛЕНО: Сохраняем payment_url в базе данных
+            new_order.payment_url = payment_url
+            db.commit()
+
             print(f"    → Создан URL для оплаты: {payment_url}")
         except Exception as e:
             print(f"    → Ошибка создания URL для оплаты: {e}")
 
-    # Возвращаем результат с payment_url если есть
-    result_dict = {
-        "id": new_order.id,
-        "user_id": new_order.user_id,
-        "game_id": new_order.game_id,
-        "product_id": new_order.product_id,
-        "amount": new_order.amount,
-        "currency": new_order.currency,
-        "payment_method": new_order.payment_method,
-        "status": new_order.status,
-        "comment": new_order.comment,
-        "created_at": new_order.created_at,
-    }
+    # ИСПРАВЛЕНО: Перезагружаем заказ с связанными объектами для OrderRead
+    order_with_relations = (
+        db.query(Order)
+        .options(joinedload(Order.game), joinedload(Order.product))
+        .filter(Order.id == new_order.id)
+        .first()
+    )
 
-    if payment_url:
-        result_dict["payment_url"] = payment_url
-
-    return result_dict
+    return order_with_relations
 
 
 # ------------------------------------------------------------
@@ -460,6 +472,11 @@ def create_guest_bulk_order(
                 currency=first_item.currency,
                 description=description
             )
+
+            # ИСПРАВЛЕНО: Сохраняем payment_url в базе данных
+            new_order.payment_url = payment_url
+            db.commit()
+
             print(f"    → Создан URL для оплаты: {payment_url}")
         except Exception as e:
             print(f"    → Ошибка создания URL для оплаты: {e}")
@@ -515,21 +532,12 @@ def create_guest_bulk_order(
     except Exception as e:
         print(f"    → Ошибка отправки Telegram-уведомления: {e}")
 
-    # Возвращаем заказ с payment_url если есть
-    result_dict = {
-        "id": new_order.id,
-        "user_id": new_order.user_id,
-        "game_id": new_order.game_id,
-        "product_id": new_order.product_id,
-        "amount": new_order.amount,
-        "currency": new_order.currency,
-        "payment_method": new_order.payment_method,
-        "status": new_order.status,
-        "comment": new_order.comment,
-        "created_at": new_order.created_at,
-    }
+    # ИСПРАВЛЕНО: Перезагружаем заказ с связанными объектами для OrderRead
+    order_with_relations = (
+        db.query(Order)
+        .options(joinedload(Order.game), joinedload(Order.product))
+        .filter(Order.id == new_order.id)
+        .first()
+    )
 
-    if payment_url:
-        result_dict["payment_url"] = payment_url
-
-    return result_dict
+    return order_with_relations

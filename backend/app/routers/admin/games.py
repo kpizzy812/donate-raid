@@ -175,3 +175,4 @@ def get_game(game_id: int, db: Session = Depends(get_db), admin: User = Depends(
         logger.warning(f"🎮 Game {game_id} not found")
         raise HTTPException(status_code=404, detail="Game not found")
     return game
+

@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from app.routers import router as api_router
 from app.core.logger import logger
 from fastapi.middleware.cors import CORSMiddleware
+
 import os
 
 app = FastAPI()

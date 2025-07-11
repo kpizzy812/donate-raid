@@ -73,14 +73,18 @@ class OrderRead(BaseModel):
     payment_method: PaymentMethod
     transaction_id: Optional[str] = None
     payment_url: Optional[str] = None
-    comment: Optional[str]
+    comment: Optional[str] = None
     created_at: datetime
-    game: Optional[GameShort]
-    product: Optional[ProductShort]
+    updated_at: datetime
+    game: Optional[GameShort] = None
+    product: Optional[ProductShort] = None
 
-    class Config:
-        from_attributes = True
-        use_enum_values = True
+    # ИСПРАВЛЕНО: используем только model_config для Pydantic v2
+    model_config = {
+        'from_attributes': True,
+        'use_enum_values': True,
+        'arbitrary_types_allowed': True
+    }
 
 
 class OrderUpdate(BaseModel):

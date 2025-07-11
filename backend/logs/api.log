@@ -29999,3 +29999,461 @@ fastapi.exceptions.ResponseValidationError: 2 validation errors:
   {'type': 'missing', 'loc': ('response', 'game'), 'msg': 'Field required', 'input': {'id': 18, 'user_id': 2, 'game_id': 15, 'product_id': 7, 'amount': Decimal('100.00'), 'currency': 'RUB', 'payment_method': <PaymentMethod.sbp: 'sbp'>, 'status': <OrderStatus.pending: 'pending'>, 'comment': '[7] {"server":"1"}', 'created_at': datetime.datetime(2025, 7, 6, 8, 32, 31, 908363), 'payment_url': 'https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=DonateRaidru&OutSum=100&InvId=18&Description=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%20%2318%3A%201&SignatureValue=9bd83a12ed6ad04e57406ba0a4374555&Culture=ru&IsTest=1&SuccessURL=https%3A//donateraid.ru/api/robokassa/success&FailURL=https%3A//donateraid.ru/api/robokassa/fail'}}
   {'type': 'missing', 'loc': ('response', 'product'), 'msg': 'Field required', 'input': {'id': 18, 'user_id': 2, 'game_id': 15, 'product_id': 7, 'amount': Decimal('100.00'), 'currency': 'RUB', 'payment_method': <PaymentMethod.sbp: 'sbp'>, 'status': <OrderStatus.pending: 'pending'>, 'comment': '[7] {"server":"1"}', 'created_at': datetime.datetime(2025, 7, 6, 8, 32, 31, 908363), 'payment_url': 'https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=DonateRaidru&OutSum=100&InvId=18&Description=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%20%2318%3A%201&SignatureValue=9bd83a12ed6ad04e57406ba0a4374555&Culture=ru&IsTest=1&SuccessURL=https%3A//donateraid.ru/api/robokassa/success&FailURL=https%3A//donateraid.ru/api/robokassa/fail'}}
 
+2025-07-06 at 08:38:02 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-06 at 08:38:19 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-06 at 08:39:50 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-06 at 08:42:04 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-06 at 08:42:30 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-06 at 08:43:14 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-06 at 08:43:38 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-06 at 08:43:44 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/bulk
+2025-07-06 at 08:43:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/bulk
+2025-07-06 at 08:43:44 | INFO | main:43 - 📥 POST http://localhost:8001/api/orders/bulk
+2025-07-06 at 08:43:44 | INFO | robokassa:36 - 🔑 Строка для подписи: DonateRaidru:100:19:rtU2R6AUMus4nZOjw7d0
+2025-07-06 at 08:43:44 | INFO | robokassa:38 - 🔑 Подпись: d0a2769fc12314b043792180da0f3d18
+2025-07-06 at 08:43:44 | INFO | robokassa:80 - 💳 Создан URL для оплаты заказа #19: https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=DonateRaidru&OutSum=100&InvId=19&Description=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%20%2319%3A%201&SignatureValue=d0a2769fc12314b043792180da0f3d18&Culture=ru&IsTest=1&SuccessURL=https%3A//donateraid.ru/api/robokassa/success&FailURL=https%3A//donateraid.ru/api/robokassa/fail
+2025-07-06 at 08:43:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/bulk
+2025-07-06 at 08:46:39 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-07-06 at 08:46:39 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 08:46:39 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-07-06 at 08:46:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 08:46:39 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 08:46:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:39 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:39 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 08:46:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:39 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-07-06 at 08:46:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 08:46:39 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-07-06 at 08:46:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 08:46:39 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:39 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 08:46:39 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:44 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:44 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 08:46:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:44 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:44 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 08:46:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:44 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/ddd3cfb3c27a4348a64c217fa32a731d.png
+2025-07-06 at 08:46:44 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/3ae64b983af34be39d45e767609b2604.png
+2025-07-06 at 08:46:44 | INFO | main:49 - 📤 200 http://localhost:8001/uploads/admin/3ae64b983af34be39d45e767609b2604.png
+2025-07-06 at 08:46:44 | INFO | main:49 - 📤 200 http://localhost:8001/uploads/admin/ddd3cfb3c27a4348a64c217fa32a731d.png
+2025-07-06 at 08:46:45 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:45 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 08:46:45 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 08:46:47 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/15
+2025-07-06 at 08:46:47 | INFO | games:60 - 🎮 Возвращаем игру: 1
+2025-07-06 at 08:46:47 | INFO | games:61 - 🎮 Товаров: 1, Подкатегорий: 2
+2025-07-06 at 08:46:47 | INFO | games:62 - 🎮 Полей ввода: 1
+2025-07-06 at 08:46:47 | INFO | games:63 - 🎮 FAQ: False, Инструкции: True
+2025-07-06 at 08:46:47 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/15
+2025-07-06 at 08:46:47 | INFO | main:43 - 📥 GET http://localhost:8001/api/games/15
+2025-07-06 at 08:46:47 | INFO | games:60 - 🎮 Возвращаем игру: 1
+2025-07-06 at 08:46:47 | INFO | games:61 - 🎮 Товаров: 1, Подкатегорий: 2
+2025-07-06 at 08:46:47 | INFO | games:62 - 🎮 Полей ввода: 1
+2025-07-06 at 08:46:47 | INFO | games:63 - 🎮 FAQ: False, Инструкции: True
+2025-07-06 at 08:46:47 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/admin/4952be5b2bad4555ba714e8ed9eb84d1.png
+2025-07-06 at 08:46:47 | INFO | main:49 - 📤 200 http://localhost:8001/uploads/admin/4952be5b2bad4555ba714e8ed9eb84d1.png
+2025-07-06 at 08:46:47 | INFO | main:49 - 📤 200 http://localhost:8001/api/games/15
+2025-07-06 at 08:46:51 | INFO | main:43 - 📥 GET http://localhost:8001/api/payment-terms
+2025-07-06 at 08:46:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/payment-terms
+2025-07-06 at 08:46:51 | INFO | main:43 - 📥 GET http://localhost:8001/api/payment-terms
+2025-07-06 at 08:46:51 | INFO | main:49 - 📤 200 http://localhost:8001/api/payment-terms
+2025-07-06 at 08:47:05 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/guest/bulk
+2025-07-06 at 08:47:05 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/guest/bulk
+2025-07-06 at 08:47:05 | INFO | main:43 - 📥 POST http://localhost:8001/api/orders/guest/bulk
+2025-07-06 at 08:47:05 | INFO | robokassa:36 - 🔑 Строка для подписи: DonateRaidru:100:20:rtU2R6AUMus4nZOjw7d0
+2025-07-06 at 08:47:05 | INFO | robokassa:38 - 🔑 Подпись: 9f3e6bd19e33e92de117c5cfeba714ad
+2025-07-06 at 08:47:05 | INFO | robokassa:80 - 💳 Создан URL для оплаты заказа #20: https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=DonateRaidru&OutSum=100&InvId=20&Description=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%20%2320%3A%201&SignatureValue=9f3e6bd19e33e92de117c5cfeba714ad&Culture=ru&IsTest=1&SuccessURL=https%3A//donateraid.ru/api/robokassa/success&FailURL=https%3A//donateraid.ru/api/robokassa/fail
+2025-07-06 at 08:47:07 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/guest/bulk
+2025-07-06 at 12:37:04 | INFO | main:24 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-06 at 13:23:44 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-07-06 at 13:23:44 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 13:23:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 13:23:44 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/users/me
+2025-07-06 at 13:23:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 13:23:44 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-07-06 at 13:23:44 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 13:23:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 13:23:44 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 13:23:44 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 13:23:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 13:23:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 13:23:44 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 13:23:44 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-07-06 at 13:23:44 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 13:23:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 13:23:44 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 13:24:21 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/support/my
+2025-07-06 at 13:24:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/support/my
+2025-07-06 at 13:24:21 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/support/my
+2025-07-06 at 13:24:21 | INFO | main:43 - 📥 GET http://localhost:8001/api/support/my
+2025-07-06 at 13:24:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/support/my
+2025-07-06 at 13:24:21 | INFO | support:124 - 📨 Загружаем сообщения для авторизованного пользователя ID=2
+2025-07-06 at 13:24:21 | INFO | support:134 - 📨 Найдено 8 сообщений для пользователя ID=2
+2025-07-06 at 13:24:21 | INFO | support:156 - 📤 Возвращаем 8 сообщений
+2025-07-06 at 13:24:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/support/my
+2025-07-06 at 13:24:21 | INFO | main:43 - 📥 GET http://localhost:8001/api/support/my
+2025-07-06 at 13:24:21 | INFO | support:124 - 📨 Загружаем сообщения для авторизованного пользователя ID=2
+2025-07-06 at 13:24:21 | INFO | support:134 - 📨 Найдено 8 сообщений для пользователя ID=2
+2025-07-06 at 13:24:21 | INFO | support:156 - 📤 Возвращаем 8 сообщений
+2025-07-06 at 13:24:21 | INFO | main:49 - 📤 200 http://localhost:8001/api/support/my
+2025-07-06 at 13:24:24 | INFO | main:43 - 📥 GET http://localhost:8001/api/support/my
+2025-07-06 at 13:24:24 | INFO | support:124 - 📨 Загружаем сообщения для авторизованного пользователя ID=2
+2025-07-06 at 13:24:24 | INFO | support:134 - 📨 Найдено 8 сообщений для пользователя ID=2
+2025-07-06 at 13:24:24 | INFO | support:156 - 📤 Возвращаем 8 сообщений
+2025-07-06 at 13:24:24 | INFO | main:49 - 📤 200 http://localhost:8001/api/support/my
+2025-07-06 at 13:24:27 | INFO | main:43 - 📥 GET http://localhost:8001/api/support/my
+2025-07-06 at 13:24:27 | INFO | support:124 - 📨 Загружаем сообщения для авторизованного пользователя ID=2
+2025-07-06 at 13:24:27 | INFO | support:134 - 📨 Найдено 8 сообщений для пользователя ID=2
+2025-07-06 at 13:24:27 | INFO | support:156 - 📤 Возвращаем 8 сообщений
+2025-07-06 at 13:24:27 | INFO | main:49 - 📤 200 http://localhost:8001/api/support/my
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/categories
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/tags
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/categories
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles/tags
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/articles
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/categories
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 GET http://localhost:8001/api/articles/tags
+2025-07-06 at 13:30:59 | INFO | main:43 - 📥 GET http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/categories
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/api/articles/tags
+2025-07-06 at 13:30:59 | INFO | main:49 - 📤 200 http://localhost:8001/uploads/blog/c0bddced57954588bb266768b9673a3e.png
+2025-07-06 at 13:31:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-07-06 at 13:31:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 13:31:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-07-06 at 13:31:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 13:31:02 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:02 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:02 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:02 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:14 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-07-06 at 13:31:14 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:14 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/manual/me
+2025-07-06 at 13:31:14 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/manual/me
+2025-07-06 at 13:31:14 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-07-06 at 13:31:14 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-07-06 at 13:31:14 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:14 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 13:31:14 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:14 | INFO | main:43 - 📥 GET http://localhost:8001/api/users/me
+2025-07-06 at 13:31:14 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-07-06 at 13:31:14 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/me
+2025-07-06 at 13:31:14 | INFO | main:49 - 📤 200 http://localhost:8001/api/users/me
+2025-07-06 at 13:31:14 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-07-06 at 13:31:14 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/manual/me
+2025-07-06 at 13:31:14 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/manual/me
+2025-07-06 at 13:31:19 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/19
+2025-07-06 at 13:31:19 | INFO | main:43 - 📥 OPTIONS http://localhost:8001/api/orders/19
+2025-07-06 at 13:31:19 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/19
+2025-07-06 at 13:31:19 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/19
+2025-07-06 at 13:31:19 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/19
+2025-07-06 at 13:31:19 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/19
+2025-07-06 at 13:31:19 | INFO | main:43 - 📥 GET http://localhost:8001/api/orders/19
+2025-07-06 at 13:31:19 | INFO | main:49 - 📤 200 http://localhost:8001/api/orders/19
+2025-07-06 at 13:31:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 13:31:32 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 13:31:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 13:31:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 13:31:32 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 13:31:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-06 at 13:31:32 | INFO | main:43 - 📥 GET http://localhost:8001/api/games?q=
+2025-07-06 at 13:31:32 | INFO | games:40 - 🎮 Возвращаем 2 игр
+2025-07-06 at 13:31:32 | INFO | main:49 - 📤 200 http://localhost:8001/api/games?q=
+2025-07-11 at 10:54:12 | INFO | main:25 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-11 at 12:58:45 | INFO | main:25 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-11 at 13:01:02 | INFO | main:44 - 📥 OPTIONS http://localhost:8001/api/auth/request-link
+2025-07-11 at 13:01:02 | INFO | main:50 - 📤 200 http://localhost:8001/api/auth/request-link
+2025-07-11 at 13:01:02 | INFO | main:44 - 📥 POST http://localhost:8001/api/auth/request-link
+2025-07-11 at 13:01:13 | ERROR | main:48 - ❌ Exception during request: [SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1016)
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 148, in call_next
+    message = await recv_stream.receive()
+                    │           └ <function MemoryObjectReceiveStream.receive at 0x7f8df24f5940>
+                    └ MemoryObjectReceiveStream(_state=MemoryObjectStreamState(max_buffer_size=0, buffer=deque([]), open_send_channels=0, open_rece...
+  File "/usr/local/lib/python3.11/site-packages/anyio/streams/memory.py", line 126, in receive
+    raise EndOfStream from None
+          └ <class 'anyio.EndOfStream'>
+
+anyio.EndOfStream
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+               │     │   └ 4
+               │     └ 7
+               └ <function _main at 0x7f8df336e200>
+  File "/usr/local/lib/python3.11/multiprocessing/spawn.py", line 135, in _main
+    return self._bootstrap(parent_sentinel)
+           │    │          └ 4
+           │    └ <function BaseProcess._bootstrap at 0x7f8df344b7e0>
+           └ <SpawnProcess name='SpawnProcess-1' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+    │    └ <function BaseProcess.run at 0x7f8df344ad40>
+    └ <SpawnProcess name='SpawnProcess-1' parent=8 started>
+  File "/usr/local/lib/python3.11/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+    │    │        │    │        │    └ {'config': <uvicorn.config.Config object at 0x7f8df2769750>, 'target': <bound method Server.run of <uvicorn.server.Server obj...
+    │    │        │    │        └ <SpawnProcess name='SpawnProcess-1' parent=8 started>
+    │    │        │    └ ()
+    │    │        └ <SpawnProcess name='SpawnProcess-1' parent=8 started>
+    │    └ <function subprocess_started at 0x7f8df25dade0>
+    └ <SpawnProcess name='SpawnProcess-1' parent=8 started>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+    │              └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+    └ <bound method Server.run of <uvicorn.server.Server object at 0x7f8df251ab50>>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio.run(self.serve(sockets=sockets))
+           │       │   │    │             └ [<socket.socket fd=3, family=2, type=1, proto=0, laddr=('0.0.0.0', 8000)>]
+           │       │   │    └ <function Server.serve at 0x7f8df25d9bc0>
+           │       │   └ <uvicorn.server.Server object at 0x7f8df251ab50>
+           │       └ <function run at 0x7f8df293bc40>
+           └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7f8df247fd30>
+           │      └ <function Runner.run at 0x7f8df29931a0>
+           └ <asyncio.runners.Runner object at 0x7f8df251a210>
+  File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:71> wai...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7f8df209c2b0>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7f8df251a210>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f8deadcbd90>
+  File "/usr/local/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8deb37b2...
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8deb3...
+                 │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+                 │    └ <fastapi.applications.FastAPI object at 0x7f8df1fa5090>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7f8deadcbd90>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8deb37b2...
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8deb3...
+                           └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+  File "/usr/local/lib/python3.11/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8deb37b2...
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8deb3...
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f8deb4b0050>
+          └ <fastapi.applications.FastAPI object at 0x7f8df1fa5090>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7f8deac88d60>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.httptools_impl.RequestResponseCycle object at 0x7f8deb3...
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f8dee364e10>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7f8deb4b0050>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 178, in __call__
+    response = await self.dispatch_func(request, call_next)
+                     │    │             │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f8deac89120>
+                     │    │             └ <starlette.middleware.base._CachedRequest object at 0x7f8deb12fe90>
+                     │    └ <function log_requests at 0x7f8deb1231a0>
+                     └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f8dee364e10>
+
+> File "/app/app/main.py", line 46, in log_requests
+    response = await call_next(request)
+                     │         └ <starlette.middleware.base._CachedRequest object at 0x7f8deb12fe90>
+                     └ <function BaseHTTPMiddleware.__call__.<locals>.call_next at 0x7f8deac89120>
+
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 156, in call_next
+    raise app_exc
+          └ SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1016)')
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+          │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f8deaba1260>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8df2514220>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7f8deb208950>
+          └ <starlette.middleware.base.BaseHTTPMiddleware object at 0x7f8dee364e10>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+          │    │               │      │        │                     └ Headers({'host': 'localhost:8001', 'connection': 'keep-alive', 'content-length': '30', 'sec-ch-ua-platform': '"macOS"', 'user...
+          │    │               │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7f8deaba1260>
+          │    │               │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8df2514220>
+          │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function CORSMiddleware.simple_response at 0x7f8dead940e0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f8deb208950>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f8deb208950>>, ...
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8df2514220>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f8deb04af10>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7f8deb208950>
+  File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7f8deb208950>>, ...
+          │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8df2514220>
+          │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    │    └ <starlette.requests.Request object at 0x7f8deb31fb90>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7f8df1f95550>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7f8deb04af10>
+          └ <function wrap_app_handling_exceptions at 0x7f8df11391c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8deaba13a0>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8df2514220>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <fastapi.routing.APIRouter object at 0x7f8df1f95550>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8deaba13a0>
+          │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8df2514220>
+          │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7f8df1f95550>>
+          └ <fastapi.routing.APIRouter object at 0x7f8df1f95550>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8deaba13a0>
+          │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8df2514220>
+          │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │     └ <function Route.handle at 0x7f8df113a7a0>
+          └ APIRoute(path='/api/auth/request-link', name='request_login_link', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8deaba13a0>
+          │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8df2514220>
+          │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │    └ <function request_response.<locals>.app at 0x7f8deac41e40>
+          └ APIRoute(path='/api/auth/request-link', name='request_login_link', methods=['POST'])
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8deaba13a0>
+          │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8df2514220>
+          │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          │                            │    └ <starlette.requests.Request object at 0x7f8deb31c290>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7f8deaba1440>
+          └ <function wrap_app_handling_exceptions at 0x7f8df11391c0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7f8deaba1580>
+          │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7f8df2514220>
+          │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.18.0.3', 8000), 'c...
+          └ <function request_response.<locals>.app.<locals>.app at 0x7f8deaba1440>
+  File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+                     │ └ <starlette.requests.Request object at 0x7f8deb31c290>
+                     └ <function get_request_handler.<locals>.app at 0x7f8deac41ee0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                         └ <function run_endpoint_function at 0x7f8df11585e0>
+  File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 214, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+                 │                 │         │       └ {'db': <sqlalchemy.orm.session.Session object at 0x7f8deb251850>, 'data': EmailRequest(email='kvpelvne@gmail.com', referral_c...
+                 │                 │         └ <function request_login_link at 0x7f8deb465300>
+                 │                 └ Dependant(path_params=[], query_params=[], header_params=[], cookie_params=[], body_params=[ModelField(field_info=Body(Pydant...
+                 └ <function run_in_threadpool at 0x7f8df16b58a0>
+  File "/usr/local/lib/python3.11/site-packages/starlette/concurrency.py", line 37, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+                 │     │         │        └ functools.partial(<function request_login_link at 0x7f8deb465300>, db=<sqlalchemy.orm.session.Session object at 0x7f8deb25185...
+                 │     │         └ <function run_sync at 0x7f8df266e520>
+                 │     └ <module 'anyio.to_thread' from '/usr/local/lib/python3.11/site-packages/anyio/to_thread.py'>
+                 └ <module 'anyio' from '/usr/local/lib/python3.11/site-packages/anyio/__init__.py'>
+  File "/usr/local/lib/python3.11/site-packages/anyio/to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+                 └ <function get_async_backend at 0x7f8df26376a0>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 2470, in run_sync_in_worker_thread
+    return await future
+                 └ <Future finished exception=SSLError(1, '[SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1016)')>
+  File "/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 967, in run
+    result = context.run(func, *args)
+
+  File "/app/app/routers/auth.py", line 77, in request_login_link
+    send_email(
+    └ <function send_email at 0x7f8def5327a0>
+
+  File "/app/app/services/mailer.py", line 20, in send_email
+    with smtplib.SMTP_SSL(settings.MAIL_SERVER, settings.MAIL_PORT) as smtp:
+         │       │        │        │            │        └ 587
+         │       │        │        │            └ Settings(DATABASE_URL='postgresql://user:password@postgres:5432/donate_raid', JWT_SECRET='df2f3bb92a9054f54dbb5980ad7b381b745...
+         │       │        │        └ 'mail.donateraid.ru'
+         │       │        └ Settings(DATABASE_URL='postgresql://user:password@postgres:5432/donate_raid', JWT_SECRET='df2f3bb92a9054f54dbb5980ad7b381b745...
+         │       └ <class 'smtplib.SMTP_SSL'>
+         └ <module 'smtplib' from '/usr/local/lib/python3.11/smtplib.py'>
+
+  File "/usr/local/lib/python3.11/smtplib.py", line 1050, in __init__
+    SMTP.__init__(self, host, port, local_hostname, timeout,
+    │    │        │     │     │     │               └ <object object at 0x7f8df354c390>
+    │    │        │     │     │     └ None
+    │    │        │     │     └ 587
+    │    │        │     └ 'mail.donateraid.ru'
+    │    │        └ <smtplib.SMTP_SSL object at 0x7f8deb4ef9d0>
+    │    └ <function SMTP.__init__ at 0x7f8def534900>
+    └ <class 'smtplib.SMTP'>
+  File "/usr/local/lib/python3.11/smtplib.py", line 255, in __init__
+    (code, msg) = self.connect(host, port)
+                  │    │       │     └ 587
+                  │    │       └ 'mail.donateraid.ru'
+                  │    └ <function SMTP.connect at 0x7f8def534cc0>
+                  └ <smtplib.SMTP_SSL object at 0x7f8deb4ef9d0>
+  File "/usr/local/lib/python3.11/smtplib.py", line 341, in connect
+    self.sock = self._get_socket(host, port, self.timeout)
+    │    │      │    │           │     │     │    └ <object object at 0x7f8df354c390>
+    │    │      │    │           │     │     └ <smtplib.SMTP_SSL object at 0x7f8deb4ef9d0>
+    │    │      │    │           │     └ 587
+    │    │      │    │           └ 'mail.donateraid.ru'
+    │    │      │    └ <function SMTP_SSL._get_socket at 0x7f8def535ee0>
+    │    │      └ <smtplib.SMTP_SSL object at 0x7f8deb4ef9d0>
+    │    └ None
+    └ <smtplib.SMTP_SSL object at 0x7f8deb4ef9d0>
+  File "/usr/local/lib/python3.11/smtplib.py", line 1057, in _get_socket
+    new_socket = self.context.wrap_socket(new_socket,
+                 │    │       │           └ <socket.socket [closed] fd=-1, family=2, type=1, proto=6>
+                 │    │       └ <function SSLContext.wrap_socket at 0x7f8df2fe2fc0>
+                 │    └ <ssl.SSLContext object at 0x7f8dea0976e0>
+                 └ <smtplib.SMTP_SSL object at 0x7f8deb4ef9d0>
+  File "/usr/local/lib/python3.11/ssl.py", line 517, in wrap_socket
+    return self.sslsocket_class._create(
+           │    │               └ <classmethod(<function SSLSocket._create at 0x7f8df3064f40>)>
+           │    └ <class 'ssl.SSLSocket'>
+           └ <ssl.SSLContext object at 0x7f8dea0976e0>
+  File "/usr/local/lib/python3.11/ssl.py", line 1104, in _create
+    self.do_handshake()
+    │    └ <function SSLSocket.do_handshake at 0x7f8df30663e0>
+    └ <ssl.SSLSocket [closed] fd=-1, family=2, type=1, proto=6>
+  File "/usr/local/lib/python3.11/ssl.py", line 1382, in do_handshake
+    self._sslobj.do_handshake()
+    │    └ None
+    └ <ssl.SSLSocket [closed] fd=-1, family=2, type=1, proto=6>
+
+ssl.SSLError: [SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1016)

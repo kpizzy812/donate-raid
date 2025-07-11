@@ -188,7 +188,8 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
             )
             logger.info(f"📧 Отправлено уведомление на {order.user.email}")
 
-        return {"status": "OK"}
+        from fastapi.responses import PlainTextResponse
+        return PlainTextResponse("OK", status_code=200)
 
     except Exception as e:
         logger.error(f"❌ Ошибка обновления заказа #{order.id}: {e}")
