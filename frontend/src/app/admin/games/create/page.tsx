@@ -1,9 +1,11 @@
 // frontend/src/app/admin/games/create/page.tsx - ДОБАВЛЯЕМ ПОЛЯ ВВОДА
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, X, Upload, ImageIcon, Trash2 } from 'lucide-react'
+import { SmartSortSelector } from '@/components/admin/SmartSortSelector'
+import { useGamesForSorting, getNextSortOrder } from '@/hooks/useSortableItems'
 
 interface Subcategory {
   name: string
@@ -39,6 +41,7 @@ export default function CreateGamePage() {
   const [autoSupport, setAutoSupport] = useState(true)
   const [enabled, setEnabled] = useState(true)
   const [sortOrder, setSortOrder] = useState(0)
+  const { games: existingGames, loading: gamesLoading } = useGamesForSorting()
 
   // Изображения
   const [bannerUrl, setBannerUrl] = useState('')
@@ -51,6 +54,15 @@ export default function CreateGamePage() {
 
   // ДОБАВЛЕНО: Поля ввода
   const [inputFields, setInputFields] = useState<InputField[]>([])
+
+  // ← ЗДЕСЬ ВСТАВИТЬ useEffect (после inputFields, перед addInputField)
+useEffect(() => {
+  if (!gamesLoading && existingGames.length > 0 && sortOrder === 0) {
+    setSortOrder(getNextSortOrder(existingGames))
+  }
+}, [gamesLoading, existingGames, sortOrder])
+
+
 
   // ДОБАВЛЕНО: Функции управления полями ввода
   const addInputField = () => {
@@ -360,13 +372,13 @@ export default function CreateGamePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Порядок сортировки</label>
-              <input
-                type="number"
-                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
-                value={sortOrder}
-                onChange={e => setSortOrder(Number(e.target.value))}
-              />
+              <SmartSortSelector
+              label="Позиция в списке игр"
+              items={existingGames}
+              value={sortOrder}
+              onChange={setSortOrder}
+              placeholder="Выберите где разместить игру"
+            />
             </div>
           </div>
 

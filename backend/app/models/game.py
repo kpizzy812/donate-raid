@@ -27,7 +27,8 @@ class Game(Base):
         "Product",
         back_populates="game",
         cascade="all, delete-orphan",
-        primaryjoin="and_(Game.id == Product.game_id, Product.is_deleted == False)"
+        primaryjoin="and_(Game.id == Product.game_id, Product.is_deleted == False)",
+        order_by="Product.sort_order.asc()"
     )
     subcategories = relationship("GameSubcategory", back_populates="game", cascade="all, delete-orphan", order_by="GameSubcategory.sort_order")
     input_fields = relationship("GameInputField", back_populates="game", cascade="all, delete-orphan", order_by="GameInputField.sort_order")  # ДОБАВЛЕНО

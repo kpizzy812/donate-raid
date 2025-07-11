@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
 import { Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
+import { SmartSortSelector } from '@/components/admin/SmartSortSelector'
+import { useProductsForSorting, getNextSortOrder } from '@/hooks/useSortableItems'
 
 interface Game {
   id: number
@@ -50,6 +52,7 @@ export default function CreateProductPage() {
   const [instructions, setInstructions] = useState('')
   const [delivery, setDelivery] = useState('auto')
   const [sortOrder, setSortOrder] = useState<number>(0)
+  const { products: existingProducts, loading: productsLoading } = useProductsForSorting(gameId)
   const [enabled, setEnabled] = useState(true)
 
   // ИСПРАВЛЕНО: Используем subcategory_id вместо subcategory
@@ -75,6 +78,12 @@ export default function CreateProductPage() {
       setSubcategoryId(null)
     }
   }, [gameId])
+
+  useEffect(() => {
+  if (!productsLoading && gameId && sortOrder === 0) {
+    setSortOrder(getNextSortOrder(existingProducts))
+  }
+}, [productsLoading, existingProducts, gameId, sortOrder])
 
   const loadGames = async () => {
     try {
@@ -373,6 +382,15 @@ export default function CreateProductPage() {
                 className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
                 value={minAmount}
                 onChange={e => setMinAmount(Number(e.target.value))}
+              />
+            </div>
+            <div className="mb-4">
+              <SmartSortSelector
+                label="Позиция среди товаров игры"
+                items={existingProducts}
+                value={sortOrder}
+                onChange={setSortOrder}
+                placeholder="Выберите где разместить товар"
               />
             </div>
             <div>

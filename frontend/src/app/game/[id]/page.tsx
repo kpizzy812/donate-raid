@@ -155,10 +155,18 @@ useEffect(() => {
 
   // Фильтруем товары по активной подкатегории
   const getFilteredProducts = () => {
-    if (!game?.products) return []
-    if (activeSubcategory === null) return game.products
-    return game.products.filter(product => product.subcategory_id === activeSubcategory)
+  if (!game?.products) return []
+
+  let filteredProducts = game.products
+
+  // Фильтруем по подкатегории
+  if (activeSubcategory !== null) {
+    filteredProducts = filteredProducts.filter(product => product.subcategory_id === activeSubcategory)
   }
+
+  // ДОБАВЛЕНО: Сортируем по sort_order
+  return filteredProducts.sort((a, b) => a.sort_order - b.sort_order)
+}
 
   // Обработка выбора товара
   const handleProductSelect = (productId: number, checked: boolean) => {

@@ -6,13 +6,27 @@ from app.schemas.admin.products import ProductCreate, ProductUpdate, ProductRead
 from app.services.auth import get_current_user
 from app.models.user import User
 from app.services.auth import admin_required
+from fastapi import Query
+from typing import Optional
+
 
 router = APIRouter()
 
 
 @router.get("", response_model=list[ProductRead])
-def list_products(db: Session = Depends(get_db), admin: User = Depends(admin_required)):
-    return db.query(Product).filter(Product.is_deleted == False).order_by(Product.sort_order.asc()).all()
+def list_products(
+        game_id: Optional[int] = Query(None, description="Фильтр по игре"),
+        db: Session = Depends(get_db),
+        admin: User = Depends(admin_required)
+):
+    """Получить список товаров с возможностью фильтрации по игре"""
+    query = db.query(Product).filter(Product.is_deleted == False)
+
+    # Фильтрация по игре
+    if game_id:
+        query = query.filter(Product.game_id == game_id)
+
+    return query.order_by(Product.sort_order.asc()).all()
 
 
 @router.delete("/{product_id}")
