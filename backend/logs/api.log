@@ -30457,3 +30457,4 @@ Traceback (most recent call last):
     └ <ssl.SSLSocket [closed] fd=-1, family=2, type=1, proto=6>
 
 ssl.SSLError: [SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1016)
+2025-07-11 at 20:59:36 | INFO | main:25 - ✅ WebSocket роутер подключен на /ws/support

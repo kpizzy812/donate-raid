@@ -25,6 +25,7 @@ interface Product {
   min_amount: number
   max_amount: number
   game_id: number
+  sort_order: number  // ДОБАВЛЕНО: отсутствующее поле для сортировки
 }
 
 interface InputField {
