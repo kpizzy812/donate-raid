@@ -168,7 +168,29 @@ def create_review(
 
     print(f"    → Отзыв создан: id={new_review.id}, ожидает модерации")
 
-    # TODO: Отправить уведомление в Telegram админу о новом отзыве
+    # Отправляем уведомление в Telegram админам о новом отзыве
+    try:
+        from bot.notify import notify_new_review_sync
+
+        # Определяем информацию о пользователе для уведомления
+        user_info = "👻 Анонимный пользователь"
+        if current_user:
+            user_info = f"👤 {current_user.username or 'Без имени'} (ID: {current_user.id})"
+
+        review_notification_data = {
+            'review_id': new_review.id,
+            'rating': new_review.rating,
+            'text': new_review.text,
+            'game_name': new_review.game_name,
+            'masked_email': new_review.get_masked_email(),
+            'user_info': user_info
+        }
+
+        notify_new_review_sync(review_notification_data)
+        print(f"    → Уведомление о новом отзыве #{new_review.id} отправлено в Telegram")
+
+    except Exception as e:
+        print(f"    → Ошибка отправки уведомления в Telegram: {e}")
 
     return ReviewRead.from_model(new_review)
 

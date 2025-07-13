@@ -1,86 +1,12 @@
-// frontend/src/app/reviews/page.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Star, User, Calendar, MessageSquare } from 'lucide-react'
-
-const reviewsData = [
-  {
-    id: 1,
-    username: 'PlayerOne',
-    game: 'Genshin Impact',
-    rating: 5,
-    date: '2024-06-10',
-    text: 'Очень быстрая доставка! Заказал 3000 примогемов, получил за 10 минут. Отличный сервис, буду пользоваться еще!',
-    verified: true
-  },
-  {
-    id: 2,
-    username: 'GamerPro2024',
-    game: 'Honkai: Star Rail',
-    rating: 5,
-    date: '2024-06-09',
-    text: 'Все супер! Поддержка отвечает быстро, цены адекватные. Пополнял звездную валюту несколько раз — всегда все четко.',
-    verified: true
-  },
-  {
-    id: 3,
-    username: 'MobileGamer',
-    game: 'PUBG Mobile',
-    rating: 4,
-    date: '2024-06-08',
-    text: 'Хороший сервис, но хотелось бы больше способов оплаты. В остальном все отлично — UC пришли моментально.',
-    verified: false
-  },
-  {
-    id: 4,
-    username: 'РыцарьСвета',
-    game: 'Lost Ark',
-    rating: 5,
-    date: '2024-06-07',
-    text: 'Пополнял кристаллы уже раз 5. Всегда все быстро и без проблем. Цены лучше чем в Steam!',
-    verified: true
-  },
-  {
-    id: 5,
-    username: 'CasualPlayer',
-    game: 'Clash of Clans',
-    rating: 5,
-    date: '2024-06-06',
-    text: 'Первый раз пользовался подобным сервисом, было страшновато. Но все прошло отлично! Гемы получил быстро, аккаунт в порядке.',
-    verified: true
-  },
-  {
-    id: 6,
-    username: 'ProGamer777',
-    game: 'Free Fire',
-    rating: 4,
-    date: '2024-06-05',
-    text: 'Нормальный сервис. Диаманты пришли через 20 минут. Поддержка вежливая, но хотелось бы еще быстрее.',
-    verified: false
-  },
-  {
-    id: 7,
-    username: 'Animelover',
-    game: 'Blue Archive',
-    rating: 5,
-    date: '2024-06-04',
-    text: 'Долго искал где можно пополнить баланс в этой игре. Тут сделали все быстро и качественно! Рекомендую.',
-    verified: true
-  },
-  {
-    id: 8,
-    username: 'FPSMaster',
-    game: 'Valorant',
-    rating: 5,
-    date: '2024-06-03',
-    text: 'Покупал Valorant Points для покупки скинов. Все пришло моментально, цена приемлемая. Спасибо!',
-    verified: true
-  }
-]
+import { fetchReviews, fetchReviewsStats } from '@/lib/api'
+import type { Review, ReviewStats } from '@/types/reviews'
 
 interface ReviewCardProps {
-  review: typeof reviewsData[0]
+  review: Review
 }
 
 function ReviewCard({ review }: ReviewCardProps) {
@@ -94,14 +20,16 @@ function ReviewCard({ review }: ReviewCardProps) {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-medium text-sm sm:text-base truncate">{review.username}</span>
-              {review.verified && (
+              <span className="font-medium text-sm sm:text-base truncate">
+                {review.masked_email}
+              </span>
+              {!review.is_anonymous && (
                 <span className="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 text-xs px-2 py-1 rounded-full whitespace-nowrap">
                   Проверен
                 </span>
               )}
             </div>
-            <div className="text-sm text-zinc-500 dark:text-zinc-400 truncate">{review.game}</div>
+            <div className="text-sm text-zinc-500 dark:text-zinc-400 truncate">{review.game_name}</div>
           </div>
         </div>
 
@@ -131,7 +59,7 @@ function ReviewCard({ review }: ReviewCardProps) {
         <div className="flex items-center gap-1">
           <Calendar size={14} />
           <span className="text-xs sm:text-sm">
-            {new Date(review.date).toLocaleDateString('ru-RU')}
+            {new Date(review.created_at).toLocaleDateString('ru-RU')}
           </span>
         </div>
       </div>
@@ -141,14 +69,72 @@ function ReviewCard({ review }: ReviewCardProps) {
 
 export default function ReviewsPage() {
   const [filter, setFilter] = useState<'all' | '5' | '4' | '3'>('all')
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [stats, setStats] = useState<ReviewStats | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const filteredReviews = reviewsData.filter(review => {
-    if (filter === 'all') return true
-    return review.rating === parseInt(filter)
-  })
+  // Загрузка отзывов
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        setLoading(true)
+        setError(null)
 
-  const averageRating = reviewsData.reduce((sum, review) => sum + review.rating, 0) / reviewsData.length
-  const totalReviews = reviewsData.length
+        // Параметры фильтрации
+        const params: any = {}
+        if (filter !== 'all') {
+          params.rating = parseInt(filter)
+        }
+
+        // Загружаем отзывы и статистику параллельно
+        const [reviewsData, statsData] = await Promise.all([
+          fetchReviews(params),
+          fetchReviewsStats()
+        ])
+
+        setReviews(reviewsData)
+        setStats(statsData)
+
+      } catch (err) {
+        console.error('Ошибка загрузки отзывов:', err)
+        setError('Ошибка загрузки отзывов')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadReviews()
+  }, [filter])
+
+  // Если загрузка
+  if (loading) {
+    return (
+      <main className="max-w-5xl mx-auto px-4 py-8 pb-20 md:pb-8">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-zinc-600 dark:text-zinc-400">Загрузка отзывов...</p>
+        </div>
+      </main>
+    )
+  }
+
+  // Если ошибка
+  if (error) {
+    return (
+      <main className="max-w-5xl mx-auto px-4 py-8 pb-20 md:pb-8">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition"
+          >
+            Попробовать снова
+          </button>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-8 pb-20 md:pb-8">
@@ -160,31 +146,35 @@ export default function ReviewsPage() {
         </p>
 
         {/* Stats */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-6">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={20}
-                  className={i < Math.round(averageRating) ? 'text-yellow-400 fill-current' : 'text-zinc-300'}
-                />
-              ))}
+        {stats && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    size={20}
+                    className={i < Math.round(stats.average_rating) ? 'text-yellow-400 fill-current' : 'text-zinc-300'}
+                  />
+                ))}
+              </div>
+              <div className="text-lg font-semibold">{stats.average_rating.toFixed(1)} из 5</div>
+              <div className="text-sm text-zinc-500">{stats.total_reviews} отзывов</div>
             </div>
-            <div className="text-lg font-semibold">{averageRating.toFixed(1)} из 5</div>
-            <div className="text-sm text-zinc-500">{totalReviews} отзывов</div>
-          </div>
 
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">98%</div>
-            <div className="text-sm text-zinc-500">Довольных клиентов</div>
-          </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {stats.total_reviews > 0 ? Math.round((stats.rating_distribution[4] + stats.rating_distribution[5]) / stats.total_reviews * 100) : 0}%
+              </div>
+              <div className="text-sm text-zinc-500">Довольных клиентов</div>
+            </div>
 
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">15 мин</div>
-            <div className="text-sm text-zinc-500">Среднее время доставки</div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">15 мин</div>
+              <div className="text-sm text-zinc-500">Среднее время доставки</div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Filters */}
@@ -232,11 +222,26 @@ export default function ReviewsPage() {
       </div>
 
       {/* Reviews Grid */}
-      <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-        {filteredReviews.map((review) => (
-          <ReviewCard key={review.id} review={review} />
-        ))}
-      </div>
+      {reviews.length > 0 ? (
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+          {reviews.map((review) => (
+            <ReviewCard key={review.id} review={review} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <MessageSquare className="w-16 h-16 text-zinc-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-zinc-600 dark:text-zinc-400 mb-2">
+            {filter === 'all' ? 'Пока нет отзывов' : `Нет отзывов с рейтингом ${filter}`}
+          </h3>
+          <p className="text-zinc-500 dark:text-zinc-500">
+            {filter === 'all'
+              ? 'Станьте первым, кто оставит отзыв о нашем сервисе!'
+              : 'Попробуйте изменить фильтр или оставьте первый отзыв'
+            }
+          </p>
+        </div>
+      )}
 
       {/* Call to action */}
       <div className="text-center bg-blue-50 dark:bg-blue-950 rounded-xl p-6 sm:p-8">
@@ -246,10 +251,10 @@ export default function ReviewsPage() {
           Ваше мнение важно для нас и поможет другим пользователям
         </p>
         <a
-          href="/support"
+          href="/orders"
           className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-md transition text-sm sm:text-base"
         >
-          Оставить отзыв
+          Мои заказы
         </a>
       </div>
     </main>

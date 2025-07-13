@@ -3,7 +3,7 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, desc
+from sqlalchemy import and_, desc, func
 from app.core.database import SessionLocal
 from app.models.order import Order, OrderStatus, PaymentMethod
 from app.models.user import User
@@ -32,10 +32,11 @@ async def admin_menu(msg: Message):
     kb = InlineKeyboardBuilder()
     kb.button(text="📋 Ручные заявки", callback_data="admin_manual_orders")
     kb.button(text="💬 Поддержка", callback_data="admin_support")
+    kb.button(text="📝 Отзывы", callback_data="admin_reviews")  # ДОБАВЛЕНО
     kb.button(text="👥 Пользователи", callback_data="admin_users")
     kb.button(text="📈 Статистика", callback_data="admin_stats")
     kb.button(text="🔄 Все заказы", callback_data="admin_all_orders")
-    kb.adjust(2, 2, 1)
+    kb.adjust(2, 2, 2)
 
     await msg.answer(
         "🔧 <b>Панель администратора</b>\n\n"
@@ -292,7 +293,7 @@ async def admin_users_menu(call: CallbackQuery):
         ).count()
 
         # Топ пользователей по заказам
-        top_users = db.query(User, db.func.count(Order.id).label('order_count')).join(
+        top_users = db.query(User, func.count(Order.id).label('order_count')).join(
             Order, User.id == Order.user_id
         ).group_by(User.id).order_by(desc('order_count')).limit(5).all()
 
@@ -339,4 +340,58 @@ async def admin_back(call: CallbackQuery):
         reply_markup=kb.as_markup(),
         parse_mode="HTML"
     )
+    await call.answer()
+
+
+# 🔄 Все заказы
+@router.callback_query(F.data == "admin_all_orders")
+async def admin_all_orders(call: CallbackQuery):
+    if not is_admin(call.from_user.id):
+        return await call.answer("❌ Нет прав", show_alert=True)
+
+    db = get_db()
+    try:
+        # Получаем последние 10 заказов
+        orders = (
+            db.query(Order)
+            .order_by(desc(Order.created_at))
+            .limit(10)
+            .all()
+        )
+
+        if not orders:
+            text = "📦 <b>Все заказы</b>\n\n❌ Заказы не найдены"
+        else:
+            text = f"📦 <b>Последние {len(orders)} заказов</b>\n\n"
+
+            for order in orders:
+                user = db.query(User).get(order.user_id) if order.user_id else None
+                username = user.username or user.email or f"ID:{user.id}" if user else "Гость"
+
+                status_emoji = {
+                    "pending": "⏳",
+                    "paid": "💰",
+                    "processing": "⚙️",
+                    "done": "✅",
+                    "canceled": "❌"
+                }.get(order.status.value, "❓")
+
+                game_name = order.manual_game_name or (order.game.name if order.game else "Неизвестно")
+
+                text += (
+                    f"{status_emoji} <b>#{order.id}</b> - {game_name}\n"
+                    f"👤 {username}\n"
+                    f"💰 {order.amount} {order.currency}\n"
+                    f"📅 {order.created_at.strftime('%d.%m %H:%M')}\n\n"
+                )
+
+    except Exception as e:
+        text = f"❌ Ошибка загрузки заказов: {e}"
+    finally:
+        db.close()
+
+    kb = InlineKeyboardBuilder()
+    kb.button(text="🔙 Назад", callback_data="admin_back")
+
+    await call.message.edit_text(text, reply_markup=kb.as_markup(), parse_mode="HTML")
     await call.answer()

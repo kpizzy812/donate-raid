@@ -189,8 +189,8 @@ export default function CheckoutPage() {
     switch (method) {
       case 'sberbank': return <CreditCard className="w-6 h-6 text-green-600" />
       case 'sbp': return <Smartphone className="w-6 h-6 text-blue-600" />
-      case 'ton': return <Bitcoin className="w-6 h-6 text-blue-500" />
-      case 'usdt': return <DollarSign className="w-6 h-6 text-green-500" />
+//       case 'ton': return <Bitcoin className="w-6 h-6 text-blue-500" />
+//       case 'usdt': return <DollarSign className="w-6 h-6 text-green-500" />
       default: return <CreditCard className="w-6 h-6" />
     }
   }
@@ -199,8 +199,8 @@ export default function CheckoutPage() {
     switch (method) {
       case 'sberbank': return 'Банковская карта'
       case 'sbp': return 'СБП'
-      case 'ton': return 'TON'
-      case 'usdt': return 'USDT TON'
+//       case 'ton': return 'TON'
+//       case 'usdt': return 'USDT TON'
       default: return method
     }
   }
@@ -209,8 +209,8 @@ export default function CheckoutPage() {
     switch (method) {
       case 'sberbank': return 'Visa, MasterCard, МИР'
       case 'sbp': return 'Система быстрых платежей'
-      case 'ton': return 'Ручная оплата криптовалютой'
-      case 'usdt': return 'Ручная оплата стейблкоином'
+//       case 'ton': return 'Ручная оплата криптовалютой'
+//       case 'usdt': return 'Ручная оплата стейблкоином'
       default: return ''
     }
   }
@@ -315,7 +315,7 @@ export default function CheckoutPage() {
             <h2 className="text-lg font-semibold mb-4">Способ оплаты</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {(['sberbank', 'sbp', 'ton', 'usdt'] as PaymentMethod[]).map((paymentMethod) => (
+              {(['sberbank', 'sbp'/* , 'ton', 'usdt' */] as PaymentMethod[]).map((paymentMethod) => (
                 <button
                   key={paymentMethod}
                   onClick={() => setMethod(paymentMethod)}
