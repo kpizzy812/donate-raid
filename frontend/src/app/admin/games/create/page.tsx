@@ -55,12 +55,16 @@ export default function CreateGamePage() {
   // ДОБАВЛЕНО: Поля ввода
   const [inputFields, setInputFields] = useState<InputField[]>([])
 
-  // ← ЗДЕСЬ ВСТАВИТЬ useEffect (после inputFields, перед addInputField)
+
 useEffect(() => {
+  // Устанавливаем автоматическое значение только при первой загрузке
+  // и только если пользователь еще не выбрал позицию вручную
   if (!gamesLoading && existingGames.length > 0 && sortOrder === 0) {
-    setSortOrder(getNextSortOrder(existingGames))
+    const autoSortOrder = getNextSortOrder(existingGames)
+    console.log('🔄 Автоматическая установка позиции:', autoSortOrder)
+    setSortOrder(autoSortOrder)
   }
-}, [gamesLoading, existingGames, sortOrder])
+}, [gamesLoading, existingGames])
 
 
 
@@ -83,7 +87,6 @@ useEffect(() => {
   const updateInputField = (index: number, field: keyof InputField, value: any) => {
   const updated = [...inputFields]
 
-  // ИСПРАВЛЕНО: правильная обработка subcategory_id
   if (field === 'subcategory_id') {
     updated[index] = {
       ...updated[index],
@@ -95,7 +98,6 @@ useEffect(() => {
 
   setInputFields(updated)
 
-  // ДОБАВЛЕНО: отладочный вывод
   console.log(`🔧 Поле ${index} - ${field}:`, value, 'Результат:', updated[index])
 }
   // Функции управления подкатегориями (без изменений)
@@ -144,6 +146,8 @@ useEffect(() => {
       }
 
       console.log('📤 Отправляем данные игры:', gameData)
+console.log('📝 ПОЛЯ ВВОДА ПРИ СОЗДАНИИ:', inputFields)
+console.log('📝 КАЖДОЕ ПОЛЕ:', inputFields.map((field, i) => `${i}: type=${field.type}, n
 
       const token = localStorage.getItem('access_token')
       const gameResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/games`, {

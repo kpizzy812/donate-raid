@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
 import { Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
+import { SmartSortSelector } from '@/components/admin/SmartSortSelector'
+import { useProductsForSorting } from '@/hooks/useSortableItems'
 
 interface Game {
   id: number
@@ -85,16 +87,24 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [subcategoryId, setSubcategoryId] = useState<number | null>(null)
   const [imageUrl, setImageUrl] = useState('')
 
-  useEffect(() => {
-    loadGames()
-    loadProduct()
-  }, [productId])
+  // ДОБАВИТЬ хук для сортировки товаров
+const { products: existingProducts, loading: productsLoading } = useProductsForSorting(gameId, subcategoryId)
 
-  useEffect(() => {
-    if (gameId > 0) {
-      loadGameSubcategories(gameId)
-    }
-  }, [gameId])
+useEffect(() => {
+  loadGames()
+  loadProduct()
+}, [productId])
+
+useEffect(() => {
+  if (gameId > 0) {
+    loadGameSubcategories(gameId)
+  }
+}, [gameId])
+
+// ДОБАВИТЬ useEffect для пересчета позиции при смене подкатегории
+useEffect(() => {
+  // При смене подкатегории не меняем позицию автоматически - оставляем на усмотрение админа
+}, [subcategoryId])
 
   const loadGames = async () => {
     try {
@@ -379,12 +389,16 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Порядок сортировки</label>
-              <input
-                type="number"
+              <SmartSortSelector
+                label={subcategoryId ?
+                  `Позиция в подкатегории "${gameSubcategories.find(s => s.id === subcategoryId)?.name}"` :
+                  "Позиция среди товаров игры"
+                }
+                items={existingProducts}
+                currentItemId={productId}  // ВАЖНО: передаем ID текущего товара
                 value={sortOrder}
-                onChange={e => setSortOrder(Number(e.target.value))}
-                className="w-full p-3 border border-zinc-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                onChange={setSortOrder}
+                placeholder="Выберите где разместить товар"
               />
             </div>
           </div>

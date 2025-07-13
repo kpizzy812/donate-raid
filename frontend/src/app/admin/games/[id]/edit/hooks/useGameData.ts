@@ -72,6 +72,7 @@ export function useGameData(id: string | undefined) {
       console.log('🎮 Данные игры получены:', data)
       console.log('🏷️ Подкатегории в ответе:', data.subcategories)
       console.log('📝 Поля ввода в ответе:', data.input_fields)
+      console.log('📥 ТИПЫ ПОЛЕЙ С СЕРВЕРА:', data.input_fields?.map((field, i) => `${i}: type
 
       // Загружаем подкатегории отдельно, так как API игры их не включает
       console.log('🏷️ Загружаем подкатегории отдельным запросом...')
@@ -113,22 +114,24 @@ export function useGameData(id: string | undefined) {
           }
         }),
         inputFields: data.input_fields?.map((field: any) => {
-          console.log('📝 Маппинг поля ввода:', field)
-          return {
-            id: field.id,
-            name: field.name,
-            label: field.label,
-            type: field.field_type || field.type || 'text',
-            required: field.required,
-            placeholder: field.placeholder || '',
-            help_text: field.help_text || '',
-            options: field.options || [],
-            validation_regex: field.validation_regex || '',
-            min_length: field.min_length,
-            max_length: field.max_length,
-            subcategory_id: field.subcategory_id
-          }
-        }) || []
+  console.log('📝 Маппинг поля ввода:', field)
+  const mappedType = field.field_type || field.type || 'text'
+  console.log('📝 ТИП ПОЛЯ - исходный:', field.type, 'field_type:', field.field_type, 'итоговый:', mappedType)
+  return {
+    id: field.id,
+    name: field.name,
+    label: field.label,
+    type: mappedType,
+    required: field.required,
+    placeholder: field.placeholder || '',
+    help_text: field.help_text || '',
+    options: field.options || [],
+    validation_regex: field.validation_regex || '',
+    min_length: field.min_length,
+    max_length: field.max_length,
+    subcategory_id: field.subcategory_id
+  }
+}) || []
       })
 
       console.log('🎮 Загружено подкатегорий:', subcategories.length)
@@ -371,12 +374,16 @@ export function useGameData(id: string | undefined) {
   }
 
   const updateInputField = (index: number, field: keyof InputField, value: any) => {
-    setGameData(prev => {
-      const updated = [...prev.inputFields]
-      updated[index] = { ...updated[index], [field]: value }
-      return { ...prev, inputFields: updated }
-    })
-  }
+  console.log('🔧 РЕДАКТИРОВАНИЕ - Поле', index, '-', field, ':', value)
+
+  setGameData(prev => {
+    const updated = [...prev.inputFields]
+    updated[index] = { ...updated[index], [field]: value }
+
+    console.log('🔧 РЕДАКТИРОВАНИЕ - Результат:', updated[index])
+    return { ...prev, inputFields: updated }
+  })
+}
 
   return {
     loading,

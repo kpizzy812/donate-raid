@@ -52,7 +52,7 @@ export default function CreateProductPage() {
   const [instructions, setInstructions] = useState('')
   const [delivery, setDelivery] = useState('auto')
   const [sortOrder, setSortOrder] = useState<number>(0)
-  const { products: existingProducts, loading: productsLoading } = useProductsForSorting(gameId)
+  const { products: existingProducts, loading: productsLoading } = useProductsForSorting(gameId, subcategoryId)
   const [enabled, setEnabled] = useState(true)
 
   // ИСПРАВЛЕНО: Используем subcategory_id вместо subcategory
@@ -83,7 +83,13 @@ export default function CreateProductPage() {
   if (!productsLoading && gameId && sortOrder === 0) {
     setSortOrder(getNextSortOrder(existingProducts))
   }
-}, [productsLoading, existingProducts, gameId, sortOrder])
+}, [productsLoading, existingProducts, gameId])
+
+useEffect(() => {
+  if (!productsLoading && gameId && subcategoryId !== null) {
+    setSortOrder(getNextSortOrder(existingProducts))
+  }
+}, [subcategoryId])
 
   const loadGames = async () => {
     try {
@@ -386,12 +392,15 @@ export default function CreateProductPage() {
             </div>
             <div className="mb-4">
               <SmartSortSelector
-                label="Позиция среди товаров игры"
-                items={existingProducts}
-                value={sortOrder}
-                onChange={setSortOrder}
-                placeholder="Выберите где разместить товар"
-              />
+              label={subcategoryId ?
+                `Позиция в подкатегории "${gameSubcategories.find(s => s.id === subcategoryId)?.name}"` :
+                "Позиция среди товаров игры"
+              }
+              items={existingProducts}
+              value={sortOrder}
+              onChange={setSortOrder}
+              placeholder="Выберите где разместить товар"
+            />
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Макс. количество</label>

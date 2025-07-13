@@ -37,7 +37,7 @@ export function useGamesForSorting() {
   return { games, loading }
 }
 
-export function useProductsForSorting(gameId?: number) {
+export function useProductsForSorting(gameId?: number, subcategoryId?: number | null) {
   const [products, setProducts] = useState<SortableItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -51,11 +51,18 @@ export function useProductsForSorting(gameId?: number) {
     const fetchProducts = async () => {
       try {
         const response = await api.get(`/admin/products?game_id=${gameId}`)
-        const productsList = response.data.map((product: any) => ({
+        let productsList = response.data.map((product: any) => ({
           id: product.id,
           name: product.name,
-          sort_order: product.sort_order
+          sort_order: product.sort_order,
+          subcategory_id: product.subcategory_id
         }))
+
+        // Фильтруем по подкатегории если указана
+        if (subcategoryId !== undefined) {
+          productsList = productsList.filter(product => product.subcategory_id === subcategoryId)
+        }
+
         setProducts(productsList)
       } catch (error) {
         console.error('Ошибка загрузки товаров для сортировки:', error)
@@ -65,7 +72,7 @@ export function useProductsForSorting(gameId?: number) {
     }
 
     fetchProducts()
-  }, [gameId])
+  }, [gameId, subcategoryId])
 
   return { products, loading }
 }
