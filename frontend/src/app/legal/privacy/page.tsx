@@ -240,7 +240,7 @@ export default function PrivacyPage() {
               <h3 className="font-semibold mb-2">Право отозвать согласие</h3>
               <p className="text-sm">
                 <strong>Способ реализации:</strong> Направить соответствующее уведомление на
-                электронный адрес support@donateraid.ru с пометкой «Отзыв согласия на обработку
+                электронный адрес DonateRaid.Sup@yandex.ru с пометкой «Отзыв согласия на обработку
                 персональных данных». Оператор прекращает обработку в срок до 10 рабочих дней.
               </p>
             </div>
@@ -280,7 +280,7 @@ export default function PrivacyPage() {
             <div><strong>Индивидуальный предприниматель Губайдуллин Родион Азаматович</strong></div>
             <div><strong>ОГРНИП:</strong> 325028000112629</div>
             <div><strong>ИНН:</strong> 860330130390</div>
-            <div><strong>Email:</strong> support@donateraid.ru</div>
+            <div><strong>Email:</strong> DonateRaid.Sup@yandex.ru</div>
             <div><strong>Ответственный за обработку персональных данных:</strong> Губайдуллин Родион Азаматович</div>
           </div>
         </section>

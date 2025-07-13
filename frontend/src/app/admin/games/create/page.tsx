@@ -147,7 +147,7 @@ useEffect(() => {
 
       console.log('📤 Отправляем данные игры:', gameData)
 console.log('📝 ПОЛЯ ВВОДА ПРИ СОЗДАНИИ:', inputFields)
-console.log('📝 КАЖДОЕ ПОЛЕ:', inputFields.map((field, i) => `${i}: type=${field.type}, n
+console.log('📝 КАЖДОЕ ПОЛЕ:', inputFields.map((field, i) => `${i}: type=${field.type}, name=${field.name}`))
 
       const token = localStorage.getItem('access_token')
       const gameResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/games`, {

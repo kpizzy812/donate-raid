@@ -108,8 +108,8 @@ export default function LegalPage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div>
                 <strong>Email:</strong><br/>
-                <a href="mailto:support@donateraid.ru" className="text-blue-600 hover:underline">
-                  support@donateraid.ru
+                <a href="mailto:DonateRaid.Sup@yandex.ru" className="text-blue-600 hover:underline">
+                  DonateRaid.Sup@yandex.ru
                 </a>
               </div>
               <div>

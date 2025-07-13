@@ -52,7 +52,6 @@ export default function CreateProductPage() {
   const [instructions, setInstructions] = useState('')
   const [delivery, setDelivery] = useState('auto')
   const [sortOrder, setSortOrder] = useState<number>(0)
-  const { products: existingProducts, loading: productsLoading } = useProductsForSorting(gameId, subcategoryId)
   const [enabled, setEnabled] = useState(true)
 
   // ИСПРАВЛЕНО: Используем subcategory_id вместо subcategory
@@ -64,6 +63,7 @@ export default function CreateProductPage() {
 
   // Настраиваемые поля
   const [inputFields, setInputFields] = useState<InputField[]>([])
+  const { products: existingProducts, loading: productsLoading } = useProductsForSorting(gameId, subcategoryId)
 
   useEffect(() => {
     loadGames()

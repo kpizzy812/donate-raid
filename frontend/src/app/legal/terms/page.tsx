@@ -188,7 +188,7 @@ export default function TermsPage() {
             <div><strong>ИП Губайдуллин Родион Азаматович</strong></div>
             <div><strong>ОГРНИП:</strong> 325028000112629</div>
             <div><strong>ИНН:</strong> 860330130390</div>
-            <div><strong>Email:</strong> support@donateraid.ru</div>
+            <div><strong>Email:</strong> DonateRaid.Sup@yandex.ru</div>
             <div><strong>Telegram:</strong> @DonateRaid</div>
           </div>
         </section>

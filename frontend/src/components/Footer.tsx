@@ -41,7 +41,7 @@ export default function Footer() {
         <div className="text-center space-y-2 text-xs text-zinc-500 dark:text-zinc-600 border-t border-zinc-200 dark:border-zinc-700 pt-4">
           <div>ИП Губайдуллин Родион Азаматович</div>
           <div>ОГРНИП: 325028000112629 | ИНН: 860330130390</div>
-          <div>Telegram поддержки: @DonateRaid | Email: support@donateraid.ru</div>
+          <div>Telegram поддержки: @DonateRaid | Email: DonateRaid.Sup@yandex.ru</div>
         </div>
 
         {/* Социальные сети и копирайт */}

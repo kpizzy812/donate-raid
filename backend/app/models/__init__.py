@@ -1,4 +1,4 @@
-# backend/app/models/__init__.py - ОБНОВЛЕННАЯ ВЕРСИЯ
+# backend/app/models/__init__.py - ОБНОВЛЕННАЯ ВЕРСИЯ С REVIEW
 from app.models.game import Game
 from app.models.game_subcategory import GameSubcategory
 from app.models.product import Product
@@ -12,6 +12,7 @@ from app.models.payment_terms import PaymentTerm
 from app.models.game_faq import GameFAQ
 from app.models.game_instruction import GameInstruction
 from app.models.game_input_field import GameInputField
+from app.models.review import Review  # ДОБАВЛЕНО
 
 __all__ = [
     "Game",
@@ -28,4 +29,5 @@ __all__ = [
     "PaymentTerm",
     "GameFAQ",
     "GameInstruction",
+    "Review",  # ДОБАВЛЕНО
 ]

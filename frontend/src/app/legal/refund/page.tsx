@@ -140,8 +140,8 @@ export default function RefundPage() {
         <section>
           <h2>Контактная информация</h2>
           <div className="space-y-2">
-            <div><strong>Email для возвратов:</strong> admin@donateraid.ru</div>
-            <div><strong>Общая поддержка:</strong> support@donateraid.ru</div>
+            <div><strong>Email для возвратов:</strong> DonateRaid.Sup@yandex.ru</div>
+            <div><strong>Общая поддержка:</strong> DonateRaid.Sup@yandex.ru</div>
             <div><strong>Telegram:</strong> @DonateRaid</div>
             <div className="text-sm text-zinc-600 dark:text-zinc-400 mt-4">
               ИП Губайдуллин Родион Азаматович<br/>

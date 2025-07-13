@@ -25,6 +25,7 @@ from app.models.blog.article import Article, ArticleTag
 from app.models.support import SupportMessage
 from app.models.referral import ReferralEarning
 from app.models.payment_terms import PaymentTerm
+from app.models.review import Review  # ДОБАВЛЕНО: Импорт модели отзывов
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

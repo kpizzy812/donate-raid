@@ -215,7 +215,7 @@ export default function OfferPage() {
             <div><strong>ОГРНИП:</strong> 325028000112629</div>
             <div><strong>ИНН:</strong> 860330130390</div>
             <div><strong>Адрес места жительства:</strong> Российская Федерация</div>
-            <div><strong>Email:</strong> support@donateraid.ru</div>
+            <div><strong>Email:</strong> DonateRaid.Sup@yandex.ru</div>
             <div><strong>Telegram:</strong> @DonateRaid</div>
             <div><strong>Сайт:</strong> https://donateraid.ru</div>
           </div>
