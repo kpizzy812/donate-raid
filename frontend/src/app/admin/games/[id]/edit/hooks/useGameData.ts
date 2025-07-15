@@ -72,7 +72,7 @@ export function useGameData(id: string | undefined) {
       console.log('🎮 Данные игры получены:', data)
       console.log('🏷️ Подкатегории в ответе:', data.subcategories)
       console.log('📝 Поля ввода в ответе:', data.input_fields)
-      console.log('📥 ТИПЫ ПОЛЕЙ С СЕРВЕРА:', data.input_fields?.map((field, i) => `${i}: type=${field.type}, field_type=${field.field_type}`))
+      console.log('📥 ТИПЫ ПОЛЕЙ С СЕРВЕРА:', data.input_fields?.map((field: { type?: string; field_type?: string }, i: number) => `${i}: type=${field.type}, field_type=${field.field_type}`))
 
       // Загружаем подкатегории отдельно, так как API игры их не включает
       console.log('🏷️ Загружаем подкатегории отдельным запросом...')

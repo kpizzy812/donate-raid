@@ -60,7 +60,7 @@ export function useProductsForSorting(gameId?: number, subcategoryId?: number | 
 
         // Фильтруем по подкатегории если указана
         if (subcategoryId !== undefined) {
-          productsList = productsList.filter(product => product.subcategory_id === subcategoryId)
+          productsList = productsList.filter((product: any) => product.subcategory_id === subcategoryId)
         }
 
         setProducts(productsList)

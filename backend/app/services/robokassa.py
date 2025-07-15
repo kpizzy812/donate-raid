@@ -44,7 +44,7 @@ class RoboKassaService:
 
         out_sum = str(amount)
         inv_id = str(order_id)
-        desc = description or f"Оплата заказа №{order_id} на Donate Raid"
+        desc = description or "Услуга по пополнению игрового аккаунта в игре"
 
         # Генерируем подпись
         signature = self.generate_signature(

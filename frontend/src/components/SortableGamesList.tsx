@@ -173,10 +173,14 @@ export function SortableGamesList({ games: initialGames, onGamesUpdate }: Props)
                         {/* Статус */}
                         <div className="flex items-center gap-2">
                           {game.enabled ? (
-                            <Eye className="w-4 h-4 text-green-500" title="Включена" />
-                          ) : (
-                            <EyeOff className="w-4 h-4 text-red-500" title="Отключена" />
-                          )}
+                          <span title="Включена">
+                            <Eye className="w-4 h-4 text-green-500" />
+                          </span>
+                        ) : (
+                          <span title="Отключена">
+                            <EyeOff className="w-4 h-4 text-red-500" />
+                          </span>
+                        )}
                         </div>
 
                         {/* Кнопки управления порядком */}

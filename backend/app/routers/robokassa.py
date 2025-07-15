@@ -15,6 +15,79 @@ from sqlalchemy.orm import joinedload
 router = APIRouter()
 
 
+def extract_user_data_from_comment(comment: str) -> str:
+    """Извлекает и форматирует пользовательские данные из комментария заказа"""
+    if not comment:
+        return ""
+
+    user_data_text = ""
+
+    try:
+        import json
+        import re
+
+        # Проверяем, есть ли секция "Данные форм" (для гостевых заказов)
+        if "Данные форм:" in comment:
+            # Извлекаем данные форм
+            forms_section = comment.split("Данные форм:\n")[1] if "Данные форм:\n" in comment else ""
+            if forms_section:
+                # Парсим каждую строку с данными
+                form_lines = forms_section.strip().split('\n')
+                user_fields = []
+
+                for line in form_lines:
+                    if '[Товар #' in line and ']' in line:
+                        # Извлекаем JSON данные после ]
+                        json_part = line.split('] ', 1)[1] if '] ' in line else line
+                        try:
+                            form_data = json.loads(json_part)
+                            for key, value in form_data.items():
+                                if value:  # Показываем только заполненные поля
+                                    user_fields.append(f"• {key}: <code>{value}</code>")
+                        except:
+                            # Если не JSON, показываем как есть
+                            clean_line = line.replace('[Товар #', '').split('] ', 1)
+                            if len(clean_line) > 1:
+                                user_fields.append(f"• {clean_line[1]}")
+
+                if user_fields:
+                    user_data_text = "\n\n🔧 <b>Данные пользователя:</b>\n" + "\n".join(user_fields[:8])
+
+        else:
+            # Пытаемся парсить весь комментарий как JSON (для ручных заказов)
+            try:
+                comment_data = json.loads(comment)
+                if isinstance(comment_data, dict):
+                    user_fields = []
+                    for key, value in comment_data.items():
+                        if key not in ['guest_email', 'guest_name', 'items'] and value:
+                            user_fields.append(f"• {key}: <code>{value}</code>")
+
+                    if user_fields:
+                        user_data_text = "\n\n🔧 <b>Данные пользователя:</b>\n" + "\n".join(user_fields[:8])
+            except:
+                # Если комментарий не JSON, проверяем наличие структурированных данных
+                if '=' in comment or ':' in comment:
+                    # Простой парсинг key=value или key: value
+                    lines = comment.replace('\r\n', '\n').split('\n')
+                    user_fields = []
+
+                    for line in lines:
+                        if '=' in line:
+                            key, value = line.split('=', 1)
+                            user_fields.append(f"• {key.strip()}: <code>{value.strip()}</code>")
+                        elif ':' in line and not line.startswith('http'):
+                            key, value = line.split(':', 1)
+                            user_fields.append(f"• {key.strip()}: <code>{value.strip()}</code>")
+
+                    if user_fields:
+                        user_data_text = "\n\n🔧 <b>Данные пользователя:</b>\n" + "\n".join(user_fields[:8])
+
+    except Exception as e:
+        logger.warning(f"Ошибка извлечения данных пользователя: {e}")
+
+    return user_data_text
+
 @router.post("/result")
 async def robokassa_result(request: Request, db: Session = Depends(get_db)):
     """
@@ -137,28 +210,7 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
         product_info = f"📦 {order.product.name}" if order.product else "📦 Неизвестный товар"
 
         # Парсим пользовательские данные из comment
-        user_data_info = ""
-        if order.comment:
-            try:
-                import json
-                import re
-
-                # Ищем JSON в комментарии
-                json_matches = re.findall(r'\{[^}]+\}', order.comment)
-                if json_matches:
-                    parsed_data = json.loads(json_matches[0])
-                    user_data_items = []
-                    for key, value in parsed_data.items():
-                        user_data_items.append(f"  • {key}: {value}")
-
-                    if user_data_items:
-                        user_data_info = f"\n📝 Данные пользователя:\n" + "\n".join(user_data_items)
-            except Exception as e:
-                logger.warning(f"Не удалось парсить данные пользователя: {e}")
-
-        user_info = f"👤 {order.user.username}" if order.user else "👤 Гость"
-        game_info = f"🎮 {order.game.name}" if order.game else "🎮 Неизвестная игра"
-        product_info = f"📦 {order.product.name}" if order.product else "📦 Неизвестный товар"
+        user_data_info = extract_user_data_from_comment(order.comment or "")
 
         notify_payment_sync(
             f"💰 <b>Успешная оплата через RoboKassa!</b>\n\n"
@@ -168,8 +220,9 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
             f"{product_info}\n"
             f"💵 Сумма: <b>{order.amount} {order.currency}</b>\n"
             f"💳 Способ: RoboKassa\n"
-            f"🆔 Транзакция: <code>{order.transaction_id}</code>",
-            order_id=order.id  # ДОБАВЛЕНО: передаем order_id для кнопок
+            f"🆔 Транзакция: <code>{order.transaction_id}</code>"
+            f"{user_data_info}",
+            order_id=order.id
         )
 
         # Отправляем email пользователю если есть

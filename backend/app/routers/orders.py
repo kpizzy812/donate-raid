@@ -1,13 +1,15 @@
 # backend/app/routers/orders.py - ОБНОВЛЕННАЯ ВЕРСИЯ С ПОДДЕРЖКОЙ ГОСТЕЙ
 
 import json
+import re
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from app.core.database import get_db
 from app.services.auth import get_current_user
 from app.models.order import Order, OrderStatus, PaymentMethod
 from app.models.user import User
-from app.models.product import Product
+from app.models.product import Product, ProductType
+from app.models.game import Game
 from app.services.referral import ReferralService
 from app.models.referral import ReferralEarning
 from app.schemas.order import OrderCreate, OrderRead
@@ -183,20 +185,90 @@ def cancel_order(
 # ------------------------------------------------------------
 # 5) Endpoint для ручного заказа (POST /manual) - ИСПРАВЛЕНО
 # ------------------------------------------------------------
+# Функция для извлечения пользовательских данных из комментария заказа
+def extract_user_data_from_comment(comment: str) -> str:
+    """Извлекает и форматирует пользовательские данные из комментария заказа"""
+    if not comment:
+        return ""
+
+    user_data_text = ""
+
+    try:
+        # Проверяем, есть ли секция "Данные форм" (для гостевых заказов)
+        if "Данные форм:" in comment:
+            # Извлекаем данные форм
+            forms_section = comment.split("Данные форм:\n")[1] if "Данные форм:\n" in comment else ""
+            if forms_section:
+                # Парсим каждую строку с данными
+                form_lines = forms_section.strip().split('\n')
+                user_fields = []
+
+                for line in form_lines:
+                    if '[Товар #' in line and ']' in line:
+                        # Извлекаем JSON данные после ]
+                        json_part = line.split('] ', 1)[1] if '] ' in line else line
+                        try:
+                            form_data = json.loads(json_part)
+                            for key, value in form_data.items():
+                                if value:  # Показываем только заполненные поля
+                                    user_fields.append(f"• {key}: <code>{value}</code>")
+                        except:
+                            # Если не JSON, показываем как есть
+                            clean_line = line.replace('[Товар #', '').split('] ', 1)
+                            if len(clean_line) > 1:
+                                user_fields.append(f"• {clean_line[1]}")
+
+                if user_fields:
+                    user_data_text = "\n\n🔧 <b>Данные пользователя:</b>\n" + "\n".join(user_fields[:8])
+
+        else:
+            # Пытаемся парсить весь комментарий как JSON (для ручных заказов)
+            try:
+                comment_data = json.loads(comment)
+                if isinstance(comment_data, dict):
+                    user_fields = []
+                    for key, value in comment_data.items():
+                        if key not in ['guest_email', 'guest_name', 'items'] and value:
+                            user_fields.append(f"• {key}: <code>{value}</code>")
+
+                    if user_fields:
+                        user_data_text = "\n\n🔧 <b>Данные пользователя:</b>\n" + "\n".join(user_fields[:8])
+            except:
+                # Если комментарий не JSON, проверяем наличие структурированных данных
+                if '=' in comment or ':' in comment:
+                    # Простой парсинг key=value или key: value
+                    lines = comment.replace('\r\n', '\n').split('\n')
+                    user_fields = []
+
+                    for line in lines:
+                        if '=' in line:
+                            key, value = line.split('=', 1)
+                            user_fields.append(f"• {key.strip()}: <code>{value.strip()}</code>")
+                        elif ':' in line and not line.startswith('http'):
+                            key, value = line.split(':', 1)
+                            user_fields.append(f"• {key.strip()}: <code>{value.strip()}</code>")
+
+                    if user_fields:
+                        user_data_text = "\n\n🔧 <b>Данные пользователя:</b>\n" + "\n".join(user_fields[:8])
+
+    except Exception as e:
+        print(f"Ошибка извлечения данных пользователя: {e}")
+
+    return user_data_text
+
+
 @router.post("/manual", response_model=OrderRead)
 def create_manual_order(
         data: OrderCreate,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ):
-    print(f"▶▶▶ Вызван create_manual_order для user_id={current_user.id} c данными: {data.dict()}")
+    """Создание ручного заказа"""
+    print(f"▶▶▶ Вызван create_manual_order от пользователя {current_user.id} с данными: {data.dict()}")
+
     if not data.manual_game_name:
         print("    → manual_game_name не передан, верну 400")
         raise HTTPException(status_code=400, detail="manual_game_name is required for manual orders")
-
-    # Автоматически получаем или создаем фиктивные записи для manual заказов
-    from app.models.game import Game
-    from app.models.product import Product, ProductType
 
     # Ищем или создаем системную игру для manual заказов
     dummy_game = db.query(Game).filter_by(name="Manual Orders").first()
@@ -257,18 +329,23 @@ def create_manual_order(
         .first()
     )
 
-    # Telegram уведомление с order_id
+    # ИСПРАВЛЕНО: Извлекаем пользовательские данные из комментария
+    user_data_section = extract_user_data_from_comment(data.comment or "")
+
+    # Telegram уведомление с order_id и пользовательскими данными
     notify_manual_order_sync(
         f"📥 <b>Новая ручная заявка #{new_order.id}</b>\n"
         f"👤 <b>{current_user.username or 'No username'}</b> (ID: {current_user.id})\n"
         f"🎮 Игра: <code>{data.manual_game_name}</code>\n"
         f"💵 Сумма: {data.amount} {data.currency}\n"
-        f"📝 Комментарий: {data.comment or '-'}",
+        f"📝 Комментарий: {data.comment or '-'}"
+        f"{user_data_section}",
         order_id=new_order.id
     )
     print(f"    → Отправлено Telegram-уведомление о новом ручном заказе #{new_order.id}")
 
     return order_with_relations
+
 
 
 # ------------------------------------------------------------
@@ -341,17 +418,7 @@ def create_bulk_order(
     if first_item.payment_method in [PaymentMethod.sberbank, PaymentMethod.sbp]:
         try:
             # Создаем описание товара
-            product_names = []
-            for item in data.items:
-                product = db.query(Product).filter(Product.id == item.product_id).first()
-                if product:
-                    product_names.append(product.name)
-                else:
-                    product_names.append(f"Товар #{item.product_id}")
-
-            description = f"Заказ #{new_order.id}: " + ", ".join(product_names[:3])
-            if len(product_names) > 3:
-                description += f" и еще {len(product_names) - 3} товар(ов)"
+            description = "Услуга по пополнению игрового аккаунта в игре"
 
             payment_url = robokassa_service.create_payment_url(
                 order_id=new_order.id,
@@ -454,17 +521,7 @@ def create_guest_bulk_order(
     if first_item.payment_method in [PaymentMethod.sberbank, PaymentMethod.sbp]:
         try:
             # Создаем описание товара для гостя
-            product_names = []
-            for item in data.items:
-                product = db.query(Product).filter(Product.id == item.product_id).first()
-                if product:
-                    product_names.append(product.name)
-                else:
-                    product_names.append(f"Товар #{item.product_id}")
-
-            description = f"Заказ #{new_order.id}: " + ", ".join(product_names[:3])
-            if len(product_names) > 3:
-                description += f" и еще {len(product_names) - 3} товар(ов)"
+            description = "Услуга по пополнению игрового аккаунта в игре"
 
             payment_url = robokassa_service.create_payment_url(
                 order_id=new_order.id,
@@ -510,7 +567,7 @@ def create_guest_bulk_order(
     except Exception as e:
         print(f"    → Ошибка отправки email: {e}")
 
-    # Отправляем уведомление в Telegram
+    # Отправляем уведомление в Telegram с пользовательскими данными
     try:
         items_info = []
         for item in data.items:
@@ -518,13 +575,18 @@ def create_guest_bulk_order(
             product_name = product.name if product else f"Товар #{item.product_id}"
             items_info.append(f"• {product_name} - {item.amount} {item.currency}")
 
+        # Извлекаем пользовательские данные из комментария
+        user_data_section = extract_user_data_from_comment(final_comment)
+
+        items_text = "\n".join(items_info)
         telegram_message = (
-                f"🛒 <b>Новый гостевой заказ #{new_order.id}</b>\n\n"
-                f"📧 Email: <code>{data.guest_email}</code>\n"
-                f"👤 Имя: {data.guest_name or 'Не указано'}\n"
-                f"💳 Способ оплаты: {first_item.payment_method.value}\n"
-                f"💵 Общая сумма: <b>{total_amount} {first_item.currency}</b>\n\n"
-                f"📦 Товары:\n" + "\n".join(items_info)
+            f"🛒 <b>Новый гостевой заказ #{new_order.id}</b>\n\n"
+            f"📧 Email: <code>{data.guest_email}</code>\n"
+            f"👤 Имя: {data.guest_name or 'Не указано'}\n"
+            f"💳 Способ оплаты: {first_item.payment_method.value}\n"
+            f"💵 Общая сумма: <b>{total_amount} {first_item.currency}</b>\n\n"
+            f"📦 Товары:\n{items_text}"
+            f"{user_data_section}"
         )
 
         notify_manual_order_sync(telegram_message, order_id=new_order.id)

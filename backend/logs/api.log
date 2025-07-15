@@ -32324,3 +32324,4 @@ ssl.SSLError: [SSL: WRONG_VERSION_NUMBER] wrong version number (_ssl.c:1016)
 2025-07-13 at 15:24:10 | INFO | main:25 - ✅ WebSocket роутер подключен на /ws/support
 2025-07-13 at 15:24:31 | INFO | main:25 - ✅ WebSocket роутер подключен на /ws/support
 2025-07-13 at 15:27:05 | INFO | main:25 - ✅ WebSocket роутер подключен на /ws/support
+2025-07-13 at 15:29:18 | INFO | main:25 - ✅ WebSocket роутер подключен на /ws/support
