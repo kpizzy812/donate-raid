@@ -38,7 +38,7 @@ class Order(Base):
     status = Column(Enum(OrderStatus), default=OrderStatus.pending, nullable=False)
     payment_method = Column(Enum(PaymentMethod), nullable=False)
     transaction_id = Column(String(255), nullable=True)  # ID транзакции от платежной системы
-    payment_url = Column(String(500), nullable=True)  # Ссылка для оплаты (для криптовалют)
+    payment_url = Column(String(2000), nullable=True)  # Ссылка для оплаты
     auto_processed = Column(Boolean, default=True)
 
     comment = Column(Text, nullable=True)  # Данные пользователя в JSON

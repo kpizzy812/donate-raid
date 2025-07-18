@@ -397,57 +397,68 @@ def create_bulk_order(
     total_amount = sum([item.amount for item in data.items])
     first_item = data.items[0]
 
-    new_order = Order(
-        user_id=current_user.id,
-        game_id=first_item.game_id,
-        product_id=first_item.product_id,
-        amount=total_amount,
-        currency=first_item.currency,
-        payment_method=first_item.payment_method,
-        comment="\n".join([f"[{i.product_id}] {i.comment or ''}" for i in data.items])
-    )
+    # Создаем заказ в рамках транзакции
+    try:
+        new_order = Order(
+            user_id=current_user.id,
+            game_id=first_item.game_id,
+            product_id=first_item.product_id,
+            amount=total_amount,
+            currency=first_item.currency,
+            payment_method=first_item.payment_method,
+            comment="\n".join([f"[{i.product_id}] {i.comment or ''}" for i in data.items])
+        )
 
-    db.add(new_order)
-    db.commit()
-    db.refresh(new_order)
+        db.add(new_order)
+        db.commit()
+        db.refresh(new_order)
 
-    print(f"    → Новый bulk-заказ создан, id={new_order.id}, сумма={total_amount}, метод={first_item.payment_method}")
+        print(f"    → Новый bulk-заказ создан, id={new_order.id}, сумма={total_amount}, метод={first_item.payment_method}")
 
-    # Генерируем payment_url для RoboKassa методов
-    payment_url = None
-    if first_item.payment_method in [PaymentMethod.sberbank, PaymentMethod.sbp]:
-        try:
-            # Создаем описание товара
-            description = "Услуга по пополнению игрового аккаунта в игре"
+        # Генерируем payment_url для RoboKassa методов
+        if first_item.payment_method in [PaymentMethod.sberbank, PaymentMethod.sbp]:
+            try:
+                # ИСПРАВЛЕНО: Используем стандартное описание по закону
+                description = f"Услуга по пополнению игрового аккаунта в игре #{new_order.id}"
 
-            payment_url = robokassa_service.create_payment_url(
-                order_id=new_order.id,
-                amount=total_amount,
-                currency=first_item.currency,
-                description=description
-            )
+                payment_url = robokassa_service.create_payment_url(
+                    order_id=new_order.id,
+                    amount=total_amount,
+                    currency=first_item.currency,
+                    description=description
+                )
 
-            # ИСПРАВЛЕНО: Сохраняем payment_url в базе данных
-            new_order.payment_url = payment_url
-            db.commit()
+                print(f"    → Создан URL для оплаты (длина: {len(payment_url)})")
 
-            print(f"    → Создан URL для оплаты: {payment_url}")
-        except Exception as e:
-            print(f"    → Ошибка создания URL для оплаты: {e}")
+                # ИСПРАВЛЕНО: Сохраняем payment_url в новой транзакции
+                new_order.payment_url = payment_url
+                db.commit()
+                print(f"    → Payment URL сохранен в БД")
 
-    # ИСПРАВЛЕНО: Перезагружаем заказ с связанными объектами для OrderRead
-    order_with_relations = (
-        db.query(Order)
-        .options(joinedload(Order.game), joinedload(Order.product))
-        .filter(Order.id == new_order.id)
-        .first()
-    )
+            except Exception as e:
+                print(f"    → Ошибка создания/сохранения URL для оплаты: {e}")
+                # Откатываем изменения payment_url, но заказ остается
+                db.rollback()
+                db.refresh(new_order)  # Перезагружаем заказ без payment_url
 
-    return order_with_relations
+        # ИСПРАВЛЕНО: Перезагружаем заказ с связанными объектами для OrderRead
+        order_with_relations = (
+            db.query(Order)
+            .options(joinedload(Order.game), joinedload(Order.product))
+            .filter(Order.id == new_order.id)
+            .first()
+        )
+
+        return order_with_relations
+
+    except Exception as e:
+        print(f"    → Критическая ошибка создания заказа: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to create order: {str(e)}")
 
 
 # ------------------------------------------------------------
-# 8) НОВЫЙ Endpoint для гостевых bulk заказов (POST /guest/bulk)
+# 8) Endpoint для гостевых bulk заказов (POST /guest/bulk)
 # ------------------------------------------------------------
 @router.post("/guest/bulk", response_model=OrderRead)
 def create_guest_bulk_order(
@@ -464,142 +475,144 @@ def create_guest_bulk_order(
     total_amount = sum([item.amount for item in data.items])
     first_item = data.items[0]
 
-    # Создаем гостевую информацию для хранения в comment
-    guest_info = {
-        "guest_email": data.guest_email,
-        "guest_name": data.guest_name,
-        "items": []
-    }
-
-    # Добавляем информацию о каждом товаре
-    for item in data.items:
-        product = db.query(Product).filter(Product.id == item.product_id).first()
-        guest_info["items"].append({
-            "product_id": item.product_id,
-            "product_name": product.name if product else f"Товар #{item.product_id}",
-            "amount": float(item.amount),
-            "comment": item.comment
-        })
-
-    # Объединяем пользовательские данные с гостевой информацией
-    items_comments = []
-    for item in data.items:
-        if item.comment:
-            try:
-                # Парсим JSON из комментария (данные из формы)
-                user_data = json.loads(item.comment)
-                items_comments.append(f"[Товар #{item.product_id}] {json.dumps(user_data, ensure_ascii=False)}")
-            except:
-                # Если не JSON, просто добавляем как есть
-                items_comments.append(f"[Товар #{item.product_id}] {item.comment}")
-
-    # Формируем итоговый комментарий
-    final_comment = json.dumps(guest_info, ensure_ascii=False)
-    if items_comments:
-        final_comment += "\n\nДанные форм:\n" + "\n".join(items_comments)
-
-    # Создаем заказ БЕЗ user_id (гостевой заказ)
-    new_order = Order(
-        user_id=None,  # Гостевой заказ
-        game_id=first_item.game_id,
-        product_id=first_item.product_id,
-        amount=total_amount,
-        currency=first_item.currency,
-        payment_method=first_item.payment_method,
-        comment=final_comment,
-        status=OrderStatus.pending
-    )
-
-    db.add(new_order)
-    db.commit()
-    db.refresh(new_order)
-
-    print(f"    → Новый гостевой bulk-заказ создан, id={new_order.id}, сумма={total_amount}, email={data.guest_email}")
-
-    # Генерируем payment_url для RoboKassa методов
-    payment_url = None
-    if first_item.payment_method in [PaymentMethod.sberbank, PaymentMethod.sbp]:
-        try:
-            # Создаем описание товара для гостя
-            description = "Услуга по пополнению игрового аккаунта в игре"
-
-            payment_url = robokassa_service.create_payment_url(
-                order_id=new_order.id,
-                amount=total_amount,
-                currency=first_item.currency,
-                description=description
-            )
-
-            # ИСПРАВЛЕНО: Сохраняем payment_url в базе данных
-            new_order.payment_url = payment_url
-            db.commit()
-
-            print(f"    → Создан URL для оплаты: {payment_url}")
-        except Exception as e:
-            print(f"    → Ошибка создания URL для оплаты: {e}")
-
-    # Отправляем email гостю
     try:
-        payment_method_names = {
-            PaymentMethod.sberbank: "Банковская карта",
-            PaymentMethod.sbp: "СБП",
-            PaymentMethod.ton: "TON",
-            PaymentMethod.usdt: "USDT TON",
-            PaymentMethod.manual: "Ручная оплата"
-        }
-
-        html = render_template("guest_order_created.html", {
-            "order_id": new_order.id,
-            "amount": total_amount,
-            "currency": first_item.currency,
-            "payment_method": payment_method_names.get(first_item.payment_method, first_item.payment_method.value),
+        # Создаем гостевую информацию для хранения в comment
+        guest_info = {
             "guest_email": data.guest_email,
             "guest_name": data.guest_name,
-            "created_at": new_order.created_at.strftime("%d.%m.%Y %H:%M")
-        })
+            "items": []
+        }
 
-        send_email(
-            to=data.guest_email,
-            subject=f"✅ Заказ #{new_order.id} создан | Donate Raid",
-            body=html
-        )
-        print(f"    → Отправлено email гостю {data.guest_email}")
-    except Exception as e:
-        print(f"    → Ошибка отправки email: {e}")
-
-    # Отправляем уведомление в Telegram с пользовательскими данными
-    try:
-        items_info = []
+        # Добавляем информацию о каждом товаре
         for item in data.items:
             product = db.query(Product).filter(Product.id == item.product_id).first()
-            product_name = product.name if product else f"Товар #{item.product_id}"
-            items_info.append(f"• {product_name} - {item.amount} {item.currency}")
+            guest_info["items"].append({
+                "product_id": item.product_id,
+                "product_name": product.name if product else f"Товар #{item.product_id}",
+                "amount": float(item.amount),
+                "comment": item.comment
+            })
 
-        # Извлекаем пользовательские данные из комментария
-        user_data_section = extract_user_data_from_comment(final_comment)
+        # Объединяем пользовательские данные с гостевой информацией
+        items_comments = []
+        for item in data.items:
+            if item.comment:
+                try:
+                    # Парсим JSON из комментария (данные из формы)
+                    user_data = json.loads(item.comment)
+                    items_comments.append(f"[Товар #{item.product_id}] {json.dumps(user_data, ensure_ascii=False)}")
+                except:
+                    # Если не JSON, просто добавляем как есть
+                    items_comments.append(f"[Товар #{item.product_id}] {item.comment}")
 
-        items_text = "\n".join(items_info)
-        telegram_message = (
-            f"🛒 <b>Новый гостевой заказ #{new_order.id}</b>\n\n"
-            f"📧 Email: <code>{data.guest_email}</code>\n"
-            f"👤 Имя: {data.guest_name or 'Не указано'}\n"
-            f"💳 Способ оплаты: {first_item.payment_method.value}\n"
-            f"💵 Общая сумма: <b>{total_amount} {first_item.currency}</b>\n\n"
-            f"📦 Товары:\n{items_text}"
-            f"{user_data_section}"
+        # Формируем итоговый комментарий
+        final_comment = json.dumps(guest_info, ensure_ascii=False)
+        if items_comments:
+            final_comment += "\n\nДанные форм:\n" + "\n".join(items_comments)
+
+        # Создаем заказ БЕЗ user_id (гостевой заказ)
+        new_order = Order(
+            user_id=None,  # Гостевой заказ
+            game_id=first_item.game_id,
+            product_id=first_item.product_id,
+            amount=total_amount,
+            currency=first_item.currency,
+            payment_method=first_item.payment_method,
+            comment=final_comment,
+            status=OrderStatus.pending
         )
 
-        notify_manual_order_sync(telegram_message, order_id=new_order.id)
-        print(f"    → Отправлено Telegram-уведомление о гостевом заказе #{new_order.id}")
+        db.add(new_order)
+        db.commit()
+        db.refresh(new_order)
+
+        print(f"    → Новый гостевой bulk-заказ создан, id={new_order.id}, сумма={total_amount}, email={data.guest_email}")
+
+        # Генерируем payment_url для RoboKassa методов
+        if first_item.payment_method in [PaymentMethod.sberbank, PaymentMethod.sbp]:
+            try:
+                # ИСПРАВЛЕНО: Используем стандартное описание по закону
+                description = f"Услуга по пополнению игрового аккаунта в игре #{new_order.id}"
+
+                payment_url = robokassa_service.create_payment_url(
+                    order_id=new_order.id,
+                    amount=total_amount,
+                    currency=first_item.currency,
+                    description=description
+                )
+
+                # ИСПРАВЛЕНО: Сохраняем payment_url в базе данных
+                new_order.payment_url = payment_url
+                db.commit()
+
+                print(f"    → Создан URL для оплаты (длина: {len(payment_url)})")
+            except Exception as e:
+                print(f"    → Ошибка создания URL для оплаты: {e}")
+                db.rollback()
+                db.refresh(new_order)  # Перезагружаем заказ без payment_url
+
+        # Отправляем email гостю
+        try:
+            payment_method_names = {
+                PaymentMethod.sberbank: "Банковская карта",
+                PaymentMethod.sbp: "СБП",
+                PaymentMethod.ton: "TON",
+                PaymentMethod.usdt: "USDT TON",
+                PaymentMethod.manual: "Ручная оплата"
+            }
+
+            html = render_template("guest_order_created.html", {
+                "order_id": new_order.id,
+                "amount": total_amount,
+                "currency": first_item.currency,
+                "payment_method": payment_method_names.get(first_item.payment_method, first_item.payment_method.value),
+                "guest_email": data.guest_email,
+                "guest_name": data.guest_name,
+                "created_at": new_order.created_at.strftime("%d.%m.%Y %H:%M")
+            })
+
+            send_email(
+                to=data.guest_email,
+                subject=f"✅ Заказ #{new_order.id} создан | Donate Raid",
+                body=html
+            )
+            print(f"    → Отправлено email гостю {data.guest_email}")
+        except Exception as e:
+            print(f"    → Ошибка отправки email: {e}")
+
+        # Отправляем уведомление в Telegram
+        try:
+            items_info = []
+            for item in data.items:
+                product = db.query(Product).filter(Product.id == item.product_id).first()
+                product_name = product.name if product else f"Товар #{item.product_id}"
+                items_info.append(f"• {product_name} - {item.amount} {item.currency}")
+
+            telegram_message = (
+                    f"🛒 <b>Новый гостевой заказ #{new_order.id}</b>\n\n"
+                    f"📧 Email: <code>{data.guest_email}</code>\n"
+                    f"👤 Имя: {data.guest_name or 'Не указано'}\n"
+                    f"💳 Способ оплаты: {first_item.payment_method.value}\n"
+                    f"💵 Общая сумма: <b>{total_amount} {first_item.currency}</b>\n\n"
+                    f"📦 Товары:\n" + "\n".join(items_info)
+            )
+
+            notify_manual_order_sync(telegram_message, order_id=new_order.id)
+            print(f"    → Отправлено Telegram-уведомление о гостевом заказе #{new_order.id}")
+        except Exception as e:
+            print(f"    → Ошибка отправки Telegram-уведомления: {e}")
+
+        # ИСПРАВЛЕНО: Перезагружаем заказ с связанными объектами для OrderRead
+        order_with_relations = (
+            db.query(Order)
+            .options(joinedload(Order.game), joinedload(Order.product))
+            .filter(Order.id == new_order.id)
+            .first()
+        )
+
+        return order_with_relations
+
     except Exception as e:
-        print(f"    → Ошибка отправки Telegram-уведомления: {e}")
-
-    # ИСПРАВЛЕНО: Перезагружаем заказ с связанными объектами для OrderRead
-    order_with_relations = (
-        db.query(Order)
-        .options(joinedload(Order.game), joinedload(Order.product))
-        .filter(Order.id == new_order.id)
-        .first()
-    )
-
-    return order_with_relations
+        print(f"    → Критическая ошибка создания гостевого заказа: {e}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to create guest order: {str(e)}")
