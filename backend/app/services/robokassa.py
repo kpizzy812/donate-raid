@@ -1,6 +1,8 @@
 # backend/app/services/robokassa.py
 import hashlib
 import os
+import json
+import urllib.parse
 from typing import Optional, Dict, Any
 from decimal import Decimal
 import requests
@@ -23,6 +25,36 @@ class RoboKassaService:
         else:
             self.payment_url = "https://auth.robokassa.ru/Merchant/Index.aspx"
 
+    def create_receipt(self, total_amount: Decimal) -> str:
+        """Создание фискального чека для номенклатуры"""
+        # Формируем название услуги
+        service_name = "Услуга пополнения игрового аккаунта в игре"
+
+        # Структура чека согласно документации Robokassa
+        receipt_data = {
+            "sno": "usn_income",  # Упрощенная СН (доходы)
+            "items": [
+                {
+                    "name": service_name,
+                    "quantity": 1,
+                    "sum": float(total_amount),
+                    "payment_method": "full_payment",  # Полная оплата
+                    "payment_object": "service",  # Услуга
+                    "tax": "none"  # Без НДС
+                }
+            ]
+        }
+
+        # Конвертируем в JSON
+        receipt_json = json.dumps(receipt_data, ensure_ascii=False)
+
+        # URL-кодируем для передачи в параметрах
+        receipt_encoded = urllib.parse.quote(receipt_json)
+
+        logger.info(f"📋 Создан фискальный чек: {receipt_json}")
+
+        return receipt_encoded
+
     def generate_signature(self, merchant_login: str, out_sum: str, inv_id: str,
                            password: str, receipt: Optional[str] = None) -> str:
         """Генерация подписи для RoboKassa"""
@@ -39,12 +71,15 @@ class RoboKassaService:
         return signature
 
     def create_payment_url(self, order_id: int, amount: Decimal, currency: str = "RUB",
-                           description: str = None, receipt: Optional[str] = None) -> str:
-        """Создание URL для оплаты через RoboKassa"""
+                           description: str = None) -> str:
+        """Создание URL для оплаты через RoboKassa с фискализацией"""
 
         out_sum = str(amount)
         inv_id = str(order_id)
-        desc = description or "Услуга по пополнению игрового аккаунта в игре"
+        desc = description or f"Оплата заказа №{order_id} на Donate Raid"
+
+        # Создаем чек для фискализации
+        receipt = self.create_receipt(amount)
 
         # Генерируем подпись
         signature = self.generate_signature(
@@ -69,7 +104,7 @@ class RoboKassaService:
         if receipt:
             params["Receipt"] = receipt
 
-        # ИСПРАВЛЕНО: правильные URL'ы для робокассы
+        # URL'ы для результатов
         params["SuccessURL"] = "https://donateraid.ru/api/robokassa/success"
         params["FailURL"] = "https://donateraid.ru/api/robokassa/fail"
 

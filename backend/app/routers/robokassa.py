@@ -148,6 +148,7 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
         out_sum = data.get("OutSum")  # Сумма
         inv_id = data.get("InvId")  # ID заказа
         signature_value = data.get("SignatureValue")  # Подпись
+        receipt = data.get("Receipt")  # Чек для фискализации
         fee = data.get("Fee", "0")  # Комиссия (опционально)
         email = data.get("EMail")  # Email плательщика (опционально)
 
@@ -165,14 +166,14 @@ async def robokassa_result(request: Request, db: Session = Depends(get_db)):
         logger.error(f"❌ Ошибка парсинга данных от RoboKassa: {e}")
         raise HTTPException(status_code=400, detail="Invalid parameters")
 
-    # Проверяем подпись
-    if not robokassa_service.verify_signature_result(out_sum, inv_id, signature_value):
+    # Проверяем подпись с учетом чека
+    if not robokassa_service.verify_signature_result(out_sum, inv_id, signature_value, receipt):
         logger.error("❌ Неверная подпись от RoboKassa")
-        raise HTTPException(status_code=400, detail="Invalid signature")
+        raise HTTPException(status_code=403, detail="Invalid signature")
 
     # Находим заказ С ПОЛЬЗОВАТЕЛЕМ
     order = db.query(Order).options(
-        joinedload(Order.user),  # ДОБАВЛЕНО: загружаем пользователя
+        joinedload(Order.user),
         joinedload(Order.game),
         joinedload(Order.product)
     ).filter(Order.id == int(inv_id)).first()

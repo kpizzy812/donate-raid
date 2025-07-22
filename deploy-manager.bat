@@ -51,12 +51,18 @@ echo   %GREEN%10%NC% - 📈 Живые логи (follow)
 echo.
 echo %CYAN%🛠️ РАЗРАБОТКА:%NC%
 echo   %GREEN%11%NC% - 🐍 Применить миграции БД
-echo   %GREEN%12%NC% - 💾 Бэкап базы данных
-echo   %GREEN%13%NC% - 🔍 SSH подключение к серверу
+echo.
+echo %CYAN%💾 БЭКАПЫ:%NC%
+echo   %GREEN%12%NC% - 💾 Создать и скачать бэкап БД
+echo   %GREEN%13%NC% - 📥 Скачать существующий бэкап
+echo   %GREEN%14%NC% - 🧹 Очистить старые бэкапы
+echo.
+echo %CYAN%🔧 СИСТЕМА:%NC%
+echo   %GREEN%15%NC% - 🔍 SSH подключение к серверу
 echo.
 echo   %RED%0%NC% - ❌ Выход
 echo.
-set /p choice=%YELLOW%Ваш выбор [0-13]: %NC%
+set /p choice=%YELLOW%Ваш выбор [0-15]: %NC%
 
 if "%choice%"=="1" goto :full_deploy
 if "%choice%"=="2" goto :quick_sync
@@ -70,7 +76,9 @@ if "%choice%"=="9" goto :show_logs
 if "%choice%"=="10" goto :follow_logs
 if "%choice%"=="11" goto :apply_migrations
 if "%choice%"=="12" goto :backup_database
-if "%choice%"=="13" goto :ssh_connect
+if "%choice%"=="13" goto :download_backup
+if "%choice%"=="14" goto :cleanup_backups
+if "%choice%"=="15" goto :ssh_connect
 if "%choice%"=="0" goto :exit
 goto :invalid_choice
 
@@ -233,24 +241,152 @@ goto :show_header
 
 :backup_database
 call :check_requirements
-echo %GREEN%💾 Создание бэкапа базы данных...%NC%
+echo %GREEN%💾 Создание и скачивание бэкапа базы данных...%NC%
+
+:: Создаем имя файла с датой и временем
 for /f "tokens=2 delims==" %%I in ('wmic OS Get localdatetime /value') do set "dt=%%I"
 set "backup_name=backup_%dt:~0,8%_%dt:~8,6%.sql"
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && echo '💾 Создаём бэкап: %backup_name%' && mkdir -p backups && docker-compose exec -T postgres pg_dump -U postgres donateraid > 'backups/%backup_name%' && echo '✅ Бэкап создан: backups/%backup_name%' && echo '📁 Список бэкапов:' && ls -la backups/"
+
+:: Создаем локальную папку для бэкапов если её нет
+if not exist "backups" mkdir backups
+
+echo %YELLOW%🔹 Создаем бэкап на сервере...%NC%
+
+:: Создаем бэкап на сервере
+ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && echo '💾 Создаём бэкап: %backup_name%' && mkdir -p backups && docker-compose exec -T postgres pg_dump -U postgres donateraid > 'backups/%backup_name%' && echo '✅ Бэкап создан на сервере: backups/%backup_name%' && echo '📏 Размер файла:' && ls -lh 'backups/%backup_name%'"
+
+if %errorlevel% equ 0 (
+    echo %YELLOW%🔹 Скачиваем бэкап на локальную машину...%NC%
+
+    :: Скачиваем файл с сервера
+    scp %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_DIR%/backups/%backup_name% backups\%backup_name%
+
+    if %errorlevel% equ 0 (
+        echo %GREEN%✅ Бэкап успешно скачан!%NC%
+        echo %CYAN%📁 Локальный файл: backups\%backup_name%%NC%
+
+        :: Показываем размер локального файла
+        for %%F in ("backups\%backup_name%") do (
+            echo %CYAN%📏 Размер: %%~zF байт%NC%
+        )
+
+        echo %YELLOW%📋 Локальные бэкапы:%NC%
+        if exist "backups\*.sql" (
+            dir /b backups\*.sql
+        ) else (
+            echo   ^(нет файлов^)
+        )
+    ) else (
+        echo %RED%❌ Ошибка скачивания файла%NC%
+        echo %YELLOW%💡 Файл остался на сервере: %REMOTE_HOST%:%REMOTE_DIR%/backups/%backup_name%%NC%
+    )
+) else (
+    echo %RED%❌ Ошибка создания бэкапа на сервере%NC%
+)
+
+:: Показываем список бэкапов на сервере
+echo %YELLOW%📋 Бэкапы на сервере:%NC%
+ssh %REMOTE_USER%@%REMOTE_HOST% "ls -lh %REMOTE_DIR%/backups/*.sql 2>/dev/null || echo '  (нет файлов)'"
+
 pause
 goto :show_header
 
-:ssh_connect
+:download_backup
 call :check_requirements
-echo %GREEN%🔍 Подключение к серверу...%NC%
-echo %YELLOW%Вы будете подключены к %REMOTE_HOST%%NC%
-echo %YELLOW%Для выхода используйте команду 'exit'%NC%
+echo %GREEN%📥 Скачивание существующего бэкапа с сервера...%NC%
+
+:: Создаем локальную папку для бэкапов если её нет
+if not exist "backups" mkdir backups
+
+echo %YELLOW%📋 Доступные бэкапы на сервере:%NC%
+
+:: Получаем список бэкапов и выводим пронумерованный список
+ssh %REMOTE_USER%@%REMOTE_HOST% "ls %REMOTE_DIR%/backups/*.sql 2>/dev/null | sort -r | nl -v1 -s') '" 2>nul
+
+if %errorlevel% neq 0 (
+    echo %RED%❌ На сервере нет бэкапов%NC%
+    pause
+    goto :show_header
+)
+
 echo.
-ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR% && bash"
+set /p choice=%YELLOW%Введите номер бэкапа для скачивания или 0 для отмены: %NC%
+
+if "%choice%"=="0" (
+    echo %YELLOW%❌ Отменено%NC%
+    pause
+    goto :show_header
+)
+
+:: Получаем имя файла по номеру
+for /f "tokens=2" %%F in ('ssh %REMOTE_USER%@%REMOTE_HOST% "ls %REMOTE_DIR%/backups/*.sql 2>/dev/null | sort -r | sed -n '%choice%p'"') do set "selected_backup=%%~nxF"
+
+if defined selected_backup (
+    echo %YELLOW%🔹 Скачиваем: %selected_backup%%NC%
+
+    scp %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_DIR%/backups/%selected_backup% backups\%selected_backup%
+
+    if %errorlevel% equ 0 (
+        echo %GREEN%✅ Бэкап успешно скачан!%NC%
+        echo %CYAN%📁 Локальный файл: backups\%selected_backup%%NC%
+    ) else (
+        echo %RED%❌ Ошибка скачивания%NC%
+    )
+) else (
+    echo %RED%❌ Неверный выбор%NC%
+)
+
+pause
 goto :show_header
 
-:invalid_choice
-echo %RED%❌ Неверный выбор. Попробуйте снова.%NC%
+:cleanup_backups
+echo %GREEN%🧹 Очистка старых бэкапов...%NC%
+echo.
+echo %YELLOW%Выберите что очистить:%NC%
+echo   %GREEN%1%NC% - Локальные бэкапы ^(старше 7 дней^)
+echo   %GREEN%2%NC% - Серверные бэкапы ^(старше 30 дней^)
+echo   %GREEN%3%NC% - И локальные, и серверные
+echo   %RED%0%NC% - Отмена
+echo.
+set /p choice=%YELLOW%Ваш выбор [0-3]: %NC%
+
+if "%choice%"=="1" goto :cleanup_local
+if "%choice%"=="2" goto :cleanup_server
+if "%choice%"=="3" goto :cleanup_both
+if "%choice%"=="0" goto :cleanup_cancel
+goto :cleanup_invalid
+
+:cleanup_local
+echo %YELLOW%🔹 Поиск локальных бэкапов старше 7 дней...%NC%
+:: Windows команда для поиска и удаления файлов старше 7 дней
+forfiles /P backups /M backup_*.sql /D -7 /C "cmd /c echo Удаляем: @file && del @path" 2>nul
+if %errorlevel% equ 0 (
+    echo %GREEN%✅ Старые локальные бэкапы удалены%NC%
+) else (
+    echo %GREEN%✅ Нет старых локальных бэкапов для удаления%NC%
+)
+pause
+goto :show_header
+
+:cleanup_server
+echo %YELLOW%🔹 Очистка серверных бэкапов старше 30 дней...%NC%
+ssh %REMOTE_USER%@%REMOTE_HOST% "cd %REMOTE_DIR%/backups 2>/dev/null && find . -name 'backup_*.sql' -type f -mtime +30 -ls -delete || echo 'Нет старых серверных бэкапов'"
+echo %GREEN%✅ Очистка серверных бэкапов завершена%NC%
+pause
+goto :show_header
+
+:cleanup_both
+call :cleanup_local
+call :cleanup_server
+goto :show_header
+
+:cleanup_cancel
+echo %YELLOW%❌ Отменено%NC%
+pause
+goto :show_header
+
+:cleanup_invalid
+echo %RED%❌ Неверный выбор%NC%
 pause
 goto :show_header
 
