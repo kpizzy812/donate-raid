@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Настройки (можно изменить в ~/.deploy-manager.conf)
 DEFAULT_REMOTE_USER="root"
-DEFAULT_REMOTE_HOST="194.169.160.101"
+DEFAULT_REMOTE_HOST="87.120.166.236"
 DEFAULT_REMOTE_DIR="/home/donate"
 
 # Загружаем конфигурацию если есть
@@ -129,6 +129,34 @@ check_requirements() {
     return 0
 }
 
+check_important_dirs() {
+    echo -e "${CYAN}🔍 Проверяем важные директории на сервере...${NC}"
+
+    ssh "${REMOTE_USER}@${REMOTE_HOST}" bash <<EOF
+        cd ${REMOTE_DIR}
+        echo "📁 Проверяем uploads/:"
+        if [ -d "uploads" ]; then
+            echo "  ✅ uploads/ существует ($(find uploads -type f | wc -l) файлов)"
+        else
+            echo "  ⚠️ uploads/ не найдена"
+        fi
+
+        echo "📁 Проверяем logs/:"
+        if [ -d "logs" ]; then
+            echo "  ✅ logs/ существует"
+        else
+            echo "  ⚠️ logs/ не найдена"
+        fi
+
+        echo "📁 Проверяем backups/:"
+        if [ -d "backups" ]; then
+            echo "  ✅ backups/ существует ($(find backups -name "*.sql" | wc -l) бэкапов)"
+        else
+            echo "  ⚠️ backups/ не найдена"
+        fi
+EOF
+}
+
 # 1. Полный деплой
 full_deploy() {
     echo -e "${GREEN}🚀 Начинаем полный деплой...${NC}"
@@ -139,12 +167,14 @@ full_deploy() {
 
     echo -e "${YELLOW}🔹 Шаг 1: Синхронизация файлов...${NC}"
     rsync -avz --delete \
-        --exclude='.git' \
-        --exclude='node_modules' \
-        --exclude='venv' \
-        --exclude='__pycache__' \
-        --exclude='.env' \
-        --exclude='backups' \
+    --exclude='.git' \
+    --exclude='node_modules' \
+    --exclude='venv' \
+    --exclude='__pycache__' \
+    --exclude='.env' \
+    --exclude='backups' \
+    --exclude='uploads' \
+    --exclude='logs' \
         "${LOCAL_DIR}/" "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
 
     echo -e "${YELLOW}🔹 Шаг 2: Остановка контейнеров...${NC}"
@@ -164,16 +194,15 @@ full_deploy() {
 }
 
 # 2. Быстрая синхронизация
-quick_sync() {
-    echo -e "${GREEN}📁 Быстрая синхронизация кода...${NC}"
-
-    rsync -avz --delete \
-        --exclude='.git' \
-        --exclude='node_modules' \
-        --exclude='venv' \
-        --exclude='__pycache__' \
-        --exclude='.env' \
-        --exclude='backups' \
+rsync -avz --delete \
+    --exclude='.git' \
+    --exclude='node_modules' \
+    --exclude='venv' \
+    --exclude='__pycache__' \
+    --exclude='.env' \
+    --exclude='backups' \
+    --exclude='uploads' \
+    --exclude='logs' \
         "${LOCAL_DIR}/" "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
 
     echo -e "${GREEN}✅ Синхронизация завершена!${NC}"
