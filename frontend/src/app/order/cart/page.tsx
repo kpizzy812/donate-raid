@@ -10,7 +10,7 @@ export default function CartPage() {
   const { items, clearCart, removeItem } = useCart()
   const router = useRouter()
 
-  const total = items.reduce((sum, item) => sum + Number(item.product.price_rub), 0)
+  const total = items.reduce((sum, item) => sum + (Number(item.product.price_rub) * (item.quantity || 1)), 0)
 
   // Функция для получения понятного названия поля
   const getFieldLabel = (fieldName: string): string => {
@@ -78,12 +78,27 @@ export default function CartPage() {
                 className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-2">{item.product.name}</h3>
+  <div className="flex-1">
+    <div className="flex items-start justify-between mb-2">
+      <h3 className="font-semibold text-lg">{item.product.name}</h3>
+      {(item.quantity && item.quantity > 1) && (
+        <span className="text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-2 py-1 rounded-full">
+          ×{item.quantity}
+        </span>
+      )}
+    </div>
 
-                    <div className="text-2xl font-bold text-green-600 mb-4">
-                      ₽{item.product.price_rub}
-                    </div>
+    <div className="text-2xl font-bold text-green-600 mb-4">
+      {(item.quantity && item.quantity > 1) ? (
+        <div className="flex items-center gap-2">
+          <span>₽{item.product.price_rub}</span>
+          <span className="text-sm text-zinc-500">× {item.quantity}</span>
+          <span className="text-xl text-green-700">= ₽{item.product.price_rub * item.quantity}</span>
+        </div>
+      ) : (
+        <span>₽{item.product.price_rub}</span>
+      )}
+    </div>
 
                     {/* Пользовательские данные */}
                     {Object.keys(item.inputs).length > 0 && (
@@ -130,8 +145,11 @@ export default function CartPage() {
                       {item.product.name}
                     </span>
                     <span className="font-medium whitespace-nowrap">
-                      ₽{item.product.price_rub}
-                    </span>
+  {(item.quantity && item.quantity > 1) ?
+    `₽${item.product.price_rub} × ${item.quantity} = ₽${item.product.price_rub * item.quantity}` :
+    `₽${item.product.price_rub}`
+  }
+</span>
                   </div>
                 ))}
               </div>
