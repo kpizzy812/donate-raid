@@ -77,7 +77,7 @@ export default function GamePage() {
   const router = useRouter()
   const { addItems } = useCart()
 
-  const [game, setGame] = useState<Game | null>(null)
+const [game, setGame] = useState<Game | null>(null)
 const [loading, setLoading] = useState(true)
 const [showInstructions, setShowInstructions] = useState(false)
 const [showFAQ, setShowFAQ] = useState(false)
@@ -166,12 +166,9 @@ useEffect(() => {
     filteredProducts = filteredProducts.filter(product => product.subcategory_id === activeSubcategory)
   }
 
-  // ДОБАВЛЕНО: Сортируем по sort_order
+  // Сортируем по sort_order
   return filteredProducts.sort((a, b) => a.sort_order - b.sort_order)
 }
-
-  // Состояние для количества товаров
-const [productQuantities, setProductQuantities] = useState<Map<number, number>>(new Map())
 
 // Обработка выбора товара
 const handleProductSelect = (productId: number, checked: boolean) => {
@@ -553,6 +550,38 @@ const handleBuySelected = () => {
                       </div>
                     </div>
                   </div>
+
+      {/* Селектор количества - показывается только для выбранных товаров с возможностью выбора количества */}
+      {isSelected && hasQuantitySelector && (
+        <div className="flex items-center justify-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              handleQuantityChange(product.id, -1)
+            }}
+            disabled={currentQuantity <= product.min_amount}
+            className="w-8 h-8 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <span className="text-lg font-medium">−</span>
+          </button>
+
+          <span className="min-w-[3rem] text-center font-medium text-lg">
+            {currentQuantity}
+          </span>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              handleQuantityChange(product.id, 1)
+            }}
+            disabled={currentQuantity >= product.max_amount}
+            className="w-8 h-8 rounded-full border border-zinc-300 dark:border-zinc-600 flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <span className="text-lg font-medium">+</span>
+          </button>
+        </div>
+      )}
+    </div>
                 )
               })}
             </div>
