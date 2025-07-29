@@ -233,7 +233,7 @@ export default function CheckoutPage() {
     )
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + item.product.price_rub, 0)
+  const totalAmount = items.reduce((sum, item) => sum + (item.product.price_rub * (item.quantity || 1)), 0)
 
   return (
     <div className="py-8 max-w-4xl mx-auto px-4">
@@ -379,15 +379,21 @@ export default function CheckoutPage() {
 
             <div className="space-y-3 mb-6">
               {items.map((item, index) => (
-                <div key={index} className="flex justify-between items-start text-sm">
-                  <div className="flex-1 pr-2">
-                    <div className="font-medium">{item.product.name}</div>
-                  </div>
-                  <div className="font-medium">
-                    {item.product.price_rub} ₽
-                  </div>
-                </div>
-              ))}
+  <div key={index} className="flex justify-between items-start text-sm">
+    <div className="flex-1 pr-2">
+      <div className="font-medium">{item.product.name}</div>
+      {(item.quantity && item.quantity > 1) && (
+        <div className="text-xs text-zinc-500 mt-1">Количество: {item.quantity}</div>
+      )}
+    </div>
+    <div className="font-medium">
+      {(item.quantity && item.quantity > 1) ?
+        `${item.product.price_rub} ₽ × ${item.quantity} = ${item.product.price_rub * item.quantity} ₽` :
+        `${item.product.price_rub} ₽`
+      }
+    </div>
+  </div>
+))}
             </div>
 
             <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4 mb-6">

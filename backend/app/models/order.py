@@ -32,6 +32,7 @@ class Order(Base):
     game_id = Column(Integer, ForeignKey("games.id"), nullable=False)
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
     manual_game_name = Column(String(255), nullable=True)
+    quantity = Column(Integer, default=1, nullable=False)
 
     amount = Column(Numeric(10, 2), nullable=False)
     currency = Column(String(10), nullable=False)  # RUB, TON, USDT
