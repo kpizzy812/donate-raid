@@ -221,7 +221,8 @@ export function useGameData(id: string | undefined) {
         name: subcategory.name.trim(),
         description: subcategory.description.trim() || null,
         sort_order: subcategory.sort_order,
-        enabled: subcategory.enabled
+        enabled: subcategory.enabled,
+        game_id: parseInt(id!)
       }
 
       try {

@@ -167,9 +167,11 @@ full_deploy() {
 
     echo -e "${YELLOW}🔹 Шаг 1: Синхронизация файлов...${NC}"
     rsync -avz --delete \
+    --exclude='.next' \
     --exclude='.git' \
     --exclude='node_modules' \
     --exclude='venv' \
+    --exclude='.venv' \
     --exclude='__pycache__' \
     --exclude='.env' \
     --exclude='backups' \
@@ -194,18 +196,25 @@ full_deploy() {
 }
 
 # 2. Быстрая синхронизация
-rsync -avz --delete \
-    --exclude='.git' \
-    --exclude='node_modules' \
-    --exclude='venv' \
-    --exclude='__pycache__' \
-    --exclude='.env' \
-    --exclude='backups' \
-    --exclude='uploads' \
-    --exclude='logs' \
-        "${LOCAL_DIR}/" "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
+quick_sync() {
+    echo -e "${GREEN}📁 Быстрая синхронизация кода...${NC}"
+
+    echo -e "${BLUE}📂 Синхронизируем файлы...${NC}"
+    rsync -avz --delete \
+        --exclude='.next' \
+        --exclude='.git' \
+        --exclude='node_modules' \
+        --exclude='venv' \
+        --exclude='.venv' \
+        --exclude='__pycache__' \
+        --exclude='.env' \
+        --exclude='backups' \
+        --exclude='uploads' \
+        --exclude='logs' \
+            "${LOCAL_DIR}/" "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
 
     echo -e "${GREEN}✅ Синхронизация завершена!${NC}"
+    echo -e "${YELLOW}💡 Для применения изменений может потребоваться перезапуск контейнеров${NC}"
 }
 
 # 3. Настройка сервера
@@ -300,7 +309,6 @@ EOF
 }
 
 # 12. Бэкап БД с автоматическим скачиванием
-# 12. Бэкап БД с автоматическим скачиванием (ИСПРАВЛЕНО)
 backup_database() {
     echo -e "${GREEN}💾 Создание и скачивание бэкапа базы данных...${NC}"
 
