@@ -78,13 +78,14 @@ export default function GamePage() {
   const { addItems } = useCart()
 
   const [game, setGame] = useState<Game | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [showInstructions, setShowInstructions] = useState(false)
-  const [showFAQ, setShowFAQ] = useState(false)
-  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
-  const [activeSubcategory, setActiveSubcategory] = useState<number | null>(null)
-  const [selectedProducts, setSelectedProducts] = useState<Set<number>>(new Set())
-  const [inputValues, setInputValues] = useState<Record<string, string>>({})
+const [loading, setLoading] = useState(true)
+const [showInstructions, setShowInstructions] = useState(false)
+const [showFAQ, setShowFAQ] = useState(false)
+const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
+const [activeSubcategory, setActiveSubcategory] = useState<number | null>(null)
+const [selectedProducts, setSelectedProducts] = useState<Set<number>>(new Set())
+const [productQuantities, setProductQuantities] = useState<Map<number, number>>(new Map())
+const [inputValues, setInputValues] = useState<Record<string, string>>({})
 
   useEffect(() => {
     loadGame()
@@ -169,16 +170,42 @@ useEffect(() => {
   return filteredProducts.sort((a, b) => a.sort_order - b.sort_order)
 }
 
-  // Обработка выбора товара
-  const handleProductSelect = (productId: number, checked: boolean) => {
-    const newSelected = new Set(selectedProducts)
-    if (checked) {
-      newSelected.add(productId)
-    } else {
-      newSelected.delete(productId)
+  // Состояние для количества товаров
+const [productQuantities, setProductQuantities] = useState<Map<number, number>>(new Map())
+
+// Обработка выбора товара
+const handleProductSelect = (productId: number, checked: boolean) => {
+  const newSelected = new Set(selectedProducts)
+  if (checked) {
+    newSelected.add(productId)
+    // При выборе товара устанавливаем минимальное количество
+    const product = getFilteredProducts().find(p => p.id === productId)
+    if (product) {
+      setProductQuantities(prev => new Map(prev).set(productId, product.min_amount))
     }
-    setSelectedProducts(newSelected)
+  } else {
+    newSelected.delete(productId)
+    // При снятии выбора удаляем количество
+    setProductQuantities(prev => {
+      const newMap = new Map(prev)
+      newMap.delete(productId)
+      return newMap
+    })
   }
+  setSelectedProducts(newSelected)
+}
+
+// Функция для изменения количества товара
+const handleQuantityChange = (productId: number, delta: number) => {
+  const product = getFilteredProducts().find(p => p.id === productId)
+  if (!product) return
+
+  setProductQuantities(prev => {
+    const currentQuantity = prev.get(productId) || product.min_amount
+    const newQuantity = Math.max(product.min_amount, Math.min(product.max_amount, currentQuantity + delta))
+    return new Map(prev).set(productId, newQuantity)
+  })
+}
 
   // Функция для обновления значений полей ввода
   const handleInputChange = useCallback((fieldName: string, value: string) => {
@@ -218,21 +245,24 @@ const handleBuySelected = () => {
   })
 
   const cartItems = Array.from(selectedProducts)
-    .map(productId => {
-      const product = filteredProducts.find(p => p.id === productId)
-      if (!product) return null
+  .map(productId => {
+    const product = filteredProducts.find(p => p.id === productId)
+    if (!product) return null
 
-      return {
-        product: {
-          id: product.id,
-          game_id: product.game_id,
-          name: product.name,
-          price_rub: product.price_rub
-        },
-        inputs: collectedInputs // Теперь здесь реальные данные!
-      }
-    })
-    .filter((item): item is NonNullable<typeof item> => item !== null)
+    const quantity = productQuantities.get(productId) || product.min_amount
+
+    return {
+      product: {
+        id: product.id,
+        game_id: product.game_id,
+        name: product.name,
+        price_rub: product.price_rub
+      },
+      inputs: collectedInputs,
+      quantity: quantity
+    }
+  })
+  .filter((item): item is NonNullable<typeof item> => item !== null)
 
   if (cartItems.length === 0) return
 
@@ -242,12 +272,13 @@ const handleBuySelected = () => {
 
   // Подсчет общей суммы
   const getTotalPrice = () => {
-    const filteredProducts = getFilteredProducts()
-    return Array.from(selectedProducts).reduce((total, productId) => {
-      const product = filteredProducts.find(p => p.id === productId)
-      return total + (product?.price_rub || 0)
-    }, 0)
-  }
+  const filteredProducts = getFilteredProducts()
+  return Array.from(selectedProducts).reduce((total, productId) => {
+    const product = filteredProducts.find(p => p.id === productId)
+    const quantity = productQuantities.get(productId) || product?.min_amount || 1
+    return total + ((product?.price_rub || 0) * quantity)
+  }, 0)
+}
 
   // Проверка валидности кнопки покупки
   const isSubmitDisabled = () => {
@@ -444,34 +475,36 @@ const handleBuySelected = () => {
           {filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {filteredProducts.map((product) => {
-                const imageUrl = getImageUrl(product.image_url)
-                const isSelected = selectedProducts.has(product.id)
+  const imageUrl = getImageUrl(product.image_url)
+  const isSelected = selectedProducts.has(product.id)
+  const hasQuantitySelector = product.min_amount !== product.max_amount
+  const currentQuantity = productQuantities.get(product.id) || product.min_amount
 
-                return (
-                  <div
-                    key={product.id}
-                    className={`border rounded-lg p-3 transition-all cursor-pointer hover:shadow-md ${
-                      isSelected
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
-                    }`}
-                    onClick={() => handleProductSelect(product.id, !isSelected)}
-                  >
-                    <div className="flex items-start gap-3">
-                      {/* Чекбокс */}
-                      <div className="flex-shrink-0 mt-1">
-                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
-                          isSelected
-                            ? 'bg-blue-500 border-blue-500'
-                            : 'border-zinc-300 dark:border-zinc-600'
-                        }`}>
-                          {isSelected && <CheckCircle className="w-3 h-3 text-white" />}
-                        </div>
-                      </div>
+  return (
+    <div key={product.id} className="space-y-3">
+      <div
+        className={`border rounded-lg p-3 transition-all cursor-pointer hover:shadow-md ${
+          isSelected
+            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+            : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
+        }`}
+        onClick={() => handleProductSelect(product.id, !isSelected)}
+      >
+        <div className="flex items-start gap-3">
+          {/* Чекбокс */}
+          <div className="flex-shrink-0 mt-1">
+            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+              isSelected
+                ? 'bg-blue-500 border-blue-500'
+                : 'border-zinc-300 dark:border-zinc-600'
+            }`}>
+              {isSelected && <CheckCircle className="w-3 h-3 text-white" />}
+            </div>
+          </div>
 
-                      {/* Квадратная картинка товара */}
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
-                        {imageUrl ? (
+          {/* Квадратная картинка товара */}
+          <div className="w-12 h-12 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
+            {imageUrl ? (
                           <img
                             src={imageUrl}
                             alt={product.name}
